@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REZDAR DIGITAL — Hemsidor, Appar & Digital Närvaro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0a0a0a;
+  --bg-elevated: #111111;
+  --bg-card: #161616;
+  --text: #f0ece6;
+  --text-dim: #7a7a7a;
+  --accent: #c8ff00;
+  --accent-glow: rgba(200, 255, 0, 0.15);
+  --radius: 16px;
+  --transition: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--bg);
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  cursor: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── CUSTOM CURSOR ── */
+.cursor {
+  position: fixed;
+  top: 0; left: 0;
+  width: 18px; height: 18px;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10000;
+  transition: transform 0.15s var(--transition), opacity 0.2s;
+  mix-blend-mode: difference;
+}
+.cursor-dot {
+  position: fixed;
+  top: 0; left: 0;
+  width: 6px; height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10001;
+}
+.cursor.hovering {
+  transform: scale(3.5);
+  background: var(--accent);
+  opacity: 0.3;
+  border-color: transparent;
+}
+
+/* ── GRAIN OVERLAY ── */
+.grain {
+  position: fixed;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  padding: 24px 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(20px);
+  background: rgba(10,10,10,0.7);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: transform 0.4s var(--transition);
+}
+.nav-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.5px;
+  color: var(--text);
+  text-decoration: none;
+}
+.nav-logo span { color: var(--accent); }
+.nav-links { display: flex; gap: 36px; align-items: center; }
+.nav-links a {
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  text-decoration: none;
+  transition: color 0.3s;
+  position: relative;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px; left: 0;
+  width: 0; height: 1px;
+  background: var(--accent);
+  transition: width 0.4s var(--transition);
+}
+.nav-links a:hover { color: var(--text); }
+.nav-links a:hover::after { width: 100%; }
+
+.nav-cta {
+  padding: 10px 24px !important;
+  border: 1px solid var(--accent) !important;
+  border-radius: 100px;
+  color: var(--accent) !important;
+  transition: all 0.3s var(--transition) !important;
+}
+.nav-cta:hover {
+  background: var(--accent) !important;
+  color: var(--bg) !important;
+}
+.nav-cta::after { display: none !important; }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 140px 48px 80px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-bg-glow {
+  position: absolute;
+  top: -20%; right: -15%;
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(80px);
+  animation: pulse 6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+
+.hero-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  color: var(--accent);
+  margin-bottom: 32px;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 0.8s var(--transition) 0.3s forwards;
+}
+
+.hero-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(48px, 8vw, 120px);
+  line-height: 0.95;
+  letter-spacing: -3px;
+  max-width: 900px;
+  margin-bottom: 32px;
+}
+.hero-title .line {
+  display: block;
+  overflow: hidden;
+}
+.hero-title .line span {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(100%);
+  animation: slideUp 1s var(--transition) forwards;
+}
+.hero-title .line:nth-child(1) span { animation-delay: 0.4s; }
+.hero-title .line:nth-child(2) span { animation-delay: 0.55s; }
+.hero-title .line:nth-child(3) span { animation-delay: 0.7s; color: var(--accent); }
+
+@keyframes slideUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-desc {
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--text-dim);
+  max-width: 500px;
+  margin-bottom: 48px;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 0.8s var(--transition) 0.9s forwards;
+}
+
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--bg);
+  background: var(--accent);
+  border: none;
+  padding: 18px 40px;
+  border-radius: 100px;
+  text-decoration: none;
+  transition: all 0.4s var(--transition);
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 0.8s var(--transition) 1.1s forwards;
+  position: relative;
+  overflow: hidden;
+}
+.hero-cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s var(--transition);
+  border-radius: inherit;
+}
+.hero-cta:hover::before { transform: scaleX(1); }
+.hero-cta span { position: relative; z-index: 1; }
+.hero-cta .arrow {
+  position: relative; z-index: 1;
+  transition: transform 0.3s var(--transition);
+}
+.hero-cta:hover .arrow { transform: translateX(6px); }
+
+.hero-scroll-indicator {
+  position: absolute;
+  bottom: 40px; left: 48px;
+  display: flex; align-items: center; gap: 12px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--text-dim);
+  opacity: 0;
+  animation: fadeUp 0.8s var(--transition) 1.5s forwards;
+}
+.scroll-line {
+  width: 48px; height: 1px;
+  background: var(--text-dim);
+  position: relative;
+  overflow: hidden;
+}
+.scroll-line::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: var(--accent);
+  animation: scrollLine 2s ease-in-out infinite;
+}
+@keyframes scrollLine {
+  0% { left: -100%; }
+  50% { left: 0; }
+  100% { left: 100%; }
+}
+
+/* ── SECTIONS COMMON ── */
+section { padding: 120px 48px; }
+.section-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  color: var(--accent);
+  margin-bottom: 20px;
+}
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: clamp(32px, 4.5vw, 64px);
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+  margin-bottom: 24px;
+}
+
+/* ── REVEAL ANIMATIONS ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(60px);
+  transition: opacity 0.9s var(--transition), transform 0.9s var(--transition);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* ── SERVICES ── */
+.services-section {
+  background: var(--bg);
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-top: 64px;
+}
+.service-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius);
+  padding: 48px 36px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.5s var(--transition);
+}
+.service-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 3px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s var(--transition);
+}
+.service-card:hover::before { transform: scaleX(1); }
+.service-card:hover {
+  border-color: rgba(200,255,0,0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+.service-icon {
+  font-size: 36px;
+  margin-bottom: 28px;
+  display: block;
+  transition: transform 0.4s var(--transition);
+}
+.service-card:hover .service-icon { transform: scale(1.15) rotate(-5deg); }
+.service-card h3 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  margin-bottom: 14px;
+  letter-spacing: -0.5px;
+}
+.service-card p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text-dim);
+}
+
+/* ── PORTFOLIO ── */
+.portfolio-section { background: var(--bg-elevated); }
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-top: 64px;
+}
+.portfolio-card {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  aspect-ratio: 16/10;
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.06);
+  group: true;
+}
+.portfolio-card iframe {
+  width: 200%;
+  height: 200%;
+  transform: scale(0.5);
+  transform-origin: top left;
+  border: none;
+  pointer-events: none;
+}
+.portfolio-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10,10,10,0.95) 0%, rgba(10,10,10,0.3) 50%, transparent 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 36px;
+  transition: all 0.5s var(--transition);
+}
+.portfolio-card:hover .portfolio-overlay {
+  background: linear-gradient(to top, rgba(10,10,10,0.98) 0%, rgba(10,10,10,0.6) 60%, rgba(10,10,10,0.3) 100%);
+}
+.portfolio-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.portfolio-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+.portfolio-desc {
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.4s var(--transition);
+}
+.portfolio-card:hover .portfolio-desc {
+  opacity: 1;
+  transform: translateY(0);
+}
+.portfolio-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--accent);
+  text-decoration: none;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.4s var(--transition) 0.1s;
+}
+.portfolio-card:hover .portfolio-link {
+  opacity: 1;
+  transform: translateY(0);
+}
+.portfolio-link:hover { gap: 14px; }
+
+/* ── SOCIAL PROOF / BRANDS ── */
+.brands-section {
+  border-top: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  overflow: hidden;
+}
+.brands-subtitle {
+  font-size: 16px;
+  color: var(--text-dim);
+  max-width: 550px;
+  line-height: 1.6;
+  margin-bottom: 64px;
+}
+.brands-marquee-wrap {
+  position: relative;
+  overflow: hidden;
+  padding: 20px 0;
+}
+.brands-marquee-wrap::before,
+.brands-marquee-wrap::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 120px;
+  z-index: 2;
+}
+.brands-marquee-wrap::before {
+  left: 0;
+  background: linear-gradient(to right, var(--bg), transparent);
+}
+.brands-marquee-wrap::after {
+  right: 0;
+  background: linear-gradient(to left, var(--bg), transparent);
+}
+.brands-marquee {
+  display: flex;
+  gap: 64px;
+  animation: marquee 35s linear infinite;
+  width: max-content;
+}
+.brands-marquee:hover { animation-play-state: paused; }
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.brand-item {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  transition: color 0.3s;
+  padding: 12px 0;
+  opacity: 0.5;
+  transition: all 0.3s;
+}
+.brand-item:hover { color: var(--text); opacity: 1; }
+
+/* second row */
+.brands-marquee-wrap.reverse .brands-marquee {
+  animation-direction: reverse;
+  animation-duration: 40s;
+}
+
+/* ── SOCIAL PROOF STATS ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-top: 80px;
+}
+.stat-card {
+  text-align: center;
+  padding: 40px 20px;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  transition: all 0.4s var(--transition);
+}
+.stat-card:hover {
+  border-color: rgba(200,255,0,0.2);
+  transform: translateY(-4px);
+}
+.stat-number {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(32px, 3vw, 48px);
+  color: var(--accent);
+  letter-spacing: -1px;
+}
+.stat-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  margin-top: 8px;
+}
+
+/* ── CONTACT ── */
+.contact-section {
+  background: var(--bg-elevated);
+  position: relative;
+  overflow: hidden;
+}
+.contact-section::before {
+  content: '';
+  position: absolute;
+  bottom: -200px; left: -100px;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, var(--accent-glow), transparent 70%);
+  filter: blur(100px);
+  pointer-events: none;
+}
+.contact-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
+.contact-info h2 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(36px, 4vw, 56px);
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+  margin-bottom: 24px;
+}
+.contact-info h2 em {
+  font-style: italic;
+  color: var(--accent);
+}
+.contact-info p {
+  color: var(--text-dim);
+  font-size: 16px;
+  line-height: 1.7;
+  margin-bottom: 40px;
+  max-width: 420px;
+}
+.contact-socials {
+  display: flex;
+  gap: 16px;
+}
+.contact-socials a {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: var(--text-dim);
+  font-size: 18px;
+  transition: all 0.3s var(--transition);
+}
+.contact-socials a:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-3px);
+}
+
+.contact-form { position: relative; }
+.form-group {
+  margin-bottom: 24px;
+  position: relative;
+}
+.form-group label {
+  display: block;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+}
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 16px 20px;
+  background: var(--bg);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.3s var(--transition);
+  -webkit-appearance: none;
+}
+.form-group select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7a7a' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+}
+.form-group select option {
+  background: var(--bg-card);
+  color: var(--text);
+}
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.form-group textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 18px;
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  border-radius: 12px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  cursor: none;
+  transition: all 0.4s var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+.submit-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s var(--transition);
+}
+.submit-btn:hover::before { transform: scaleX(1); }
+.submit-btn span { position: relative; z-index: 1; }
+.submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(200,255,0,0.2); }
+
+.form-success {
+  display: none;
+  text-align: center;
+  padding: 60px 20px;
+}
+.form-success.show { display: block; }
+.form-success .check {
+  width: 64px; height: 64px;
+  border: 3px solid var(--accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  font-size: 28px;
+  color: var(--accent);
+  animation: scaleIn 0.4s var(--transition);
+}
+@keyframes scaleIn {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
+}
+.form-success h3 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+.form-success p { color: var(--text-dim); }
+
+/* ── FOOTER ── */
+footer {
+  padding: 48px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+footer p {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+}
+footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* ── MOBILE MENU ── */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 32px;
+  height: 24px;
+  position: relative;
+  z-index: 1001;
+}
+.menu-toggle span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: var(--text);
+  transition: all 0.3s;
+  position: absolute;
+  left: 0;
+}
+.menu-toggle span:nth-child(1) { top: 0; }
+.menu-toggle span:nth-child(2) { top: 50%; transform: translateY(-50%); }
+.menu-toggle span:nth-child(3) { bottom: 0; }
+.menu-toggle.active span:nth-child(1) { top: 50%; transform: translateY(-50%) rotate(45deg); }
+.menu-toggle.active span:nth-child(2) { opacity: 0; }
+.menu-toggle.active span:nth-child(3) { bottom: 50%; transform: translateY(50%) rotate(-45deg); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1024px) {
+  .portfolio-grid { grid-template-columns: 1fr; }
+  .contact-inner { grid-template-columns: 1fr; gap: 48px; }
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  body { cursor: auto; }
+  .cursor, .cursor-dot { display: none; }
+
+  nav { padding: 16px 24px; }
+  .nav-links {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(10,10,10,0.97);
+    backdrop-filter: blur(20px);
+    flex-direction: column;
+    justify-content: center;
+    gap: 32px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .nav-links.open { opacity: 1; pointer-events: all; }
+  .nav-links a { font-size: 16px; letter-spacing: 3px; }
+  .menu-toggle { display: block; }
+
+  section { padding: 80px 24px; }
+  .hero { padding: 120px 24px 80px; }
+  .hero-title { letter-spacing: -1.5px; }
+  .hero-scroll-indicator { display: none; }
+  .services-grid { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: 1fr 1fr; gap: 16px; }
+  footer { flex-direction: column; gap: 16px; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+
+<!-- Grain -->
+<div class="grain"></div>
+
+<!-- Nav -->
+<nav>
+  <a href="#" class="nav-logo">REZDAR<span>.</span>DIGITAL</a>
+  <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-links" id="navLinks">
+    <a href="#tjanster">Tjänster</a>
+    <a href="#portfolio">Portfolio</a>
+    <a href="#kunder">Kunder</a>
+    <a href="#kontakt" class="nav-cta">Boka möte</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero" id="hero">
+  <div class="hero-bg-glow"></div>
+  <p class="hero-label">Digital byrå — Stockholm</p>
+  <h1 class="hero-title">
+    <span class="line"><span>Vi bygger</span></span>
+    <span class="line"><span>digitala</span></span>
+    <span class="line"><span>upplevelser.</span></span>
+  </h1>
+  <p class="hero-desc">Hemsidor, appar, pitch decks och social media — allt du behöver för att synas, växa och konvertera. Från idé till lansering.</p>
+  <a href="#kontakt" class="hero-cta">
+    <span>Starta ditt projekt</span>
+    <span class="arrow">→</span>
+  </a>
+  <div class="hero-scroll-indicator">
+    <div class="scroll-line"></div>
+    Scrolla ner
+  </div>
+</section>
+
+<!-- Services -->
+<section class="services-section" id="tjanster">
+  <p class="section-label reveal">Vad vi gör</p>
+  <h2 class="section-title reveal reveal-delay-1">Tjänster som<br>driver resultat.</h2>
+  <div class="services-grid">
+    <div class="service-card reveal reveal-delay-1">
+      <span class="service-icon">◈</span>
+      <h3>Hemsidor</h3>
+      <p>Skräddarsydda, snabba och responsiva hemsidor som konverterar besökare till kunder. Moderna designprinciper med fokus på UX.</p>
+    </div>
+    <div class="service-card reveal reveal-delay-2">
+      <span class="service-icon">⬡</span>
+      <h3>Appar & Plattformar</h3>
+      <p>Webappar och progressiva mobilappar som löser verkliga problem. Från prototyp till produktion — allt under ett tak.</p>
+    </div>
+    <div class="service-card reveal reveal-delay-3">
+      <span class="service-icon">◉</span>
+      <h3>Pitch Decks</h3>
+      <p>Visuellt slående presentationer som säljer. Perfekt för investerare, samarbeten och stora kunder som kräver "wow-faktorn".</p>
+    </div>
+    <div class="service-card reveal reveal-delay-4">
+      <span class="service-icon">◎</span>
+      <h3>Social Media</h3>
+      <p>Strategi och innehållsproduktion som bygger varumärken. Med erfarenhet från 750K+ följare och samarbeten med globala brands.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Portfolio -->
+<section class="portfolio-section" id="portfolio">
+  <p class="section-label reveal">Urval</p>
+  <h2 class="section-title reveal reveal-delay-1">Senaste<br>projekten.</h2>
+  <div class="portfolio-grid">
+    <div class="portfolio-card reveal reveal-delay-1">
+      <iframe src="https://rezdarbakri-star.github.io/stoltgym/" loading="lazy" sandbox></iframe>
+      <div class="portfolio-overlay">
+        <span class="portfolio-tag">Hemsida — Gym</span>
+        <h3 class="portfolio-name">Stolt Gym</h3>
+        <p class="portfolio-desc">Modern hemsida för ett lokalt gym med bokningssystem och responsiv design.</p>
+        <a href="https://rezdarbakri-star.github.io/stoltgym/" target="_blank" class="portfolio-link">Se live →</a>
+      </div>
+    </div>
+    <div class="portfolio-card reveal reveal-delay-2">
+      <iframe src="https://rezdarbakri-star.github.io/100WILD1/" loading="lazy" sandbox></iframe>
+      <div class="portfolio-overlay">
+        <span class="portfolio-tag">Pitch Deck — Äventyr</span>
+        <h3 class="portfolio-name">100 WILD</h3>
+        <p class="portfolio-desc">Cinematiskt pitch deck för ett äventyrskoncept — byggt för att imponera.</p>
+        <a href="https://rezdarbakri-star.github.io/100WILD1/" target="_blank" class="portfolio-link">Se live →</a>
+      </div>
+    </div>
+    <div class="portfolio-card reveal reveal-delay-3">
+      <iframe src="https://rezdarbakri-star.github.io/handla/" loading="lazy" sandbox></iframe>
+      <div class="portfolio-overlay">
+        <span class="portfolio-tag">App — Livsmedel</span>
+        <h3 class="portfolio-name">Handla</h3>
+        <p class="portfolio-desc">Smart inköpslista-app med delad funktionalitet för hela hushållet.</p>
+        <a href="https://rezdarbakri-star.github.io/handla/" target="_blank" class="portfolio-link">Se live →</a>
+      </div>
+    </div>
+    <div class="portfolio-card reveal reveal-delay-4">
+      <iframe src="https://rezdarbakri-star.github.io/wackado/" loading="lazy" sandbox></iframe>
+      <div class="portfolio-overlay">
+        <span class="portfolio-tag">Hemsida — Varumärke</span>
+        <h3 class="portfolio-name">Wackado</h3>
+        <p class="portfolio-desc">Lekfull och energisk brand site med stark visuell identitet.</p>
+        <a href="https://rezdarbakri-star.github.io/wackado/" target="_blank" class="portfolio-link">Se live →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Brands / Social Proof -->
+<section class="brands-section" id="kunder">
+  <p class="section-label reveal">Förtroende</p>
+  <h2 class="section-title reveal reveal-delay-1">Brands vi<br>samarbetat med.</h2>
+  <p class="brands-subtitle reveal reveal-delay-2">Erfarenhet från kampanjer med några av världens mest kända varumärken — från tech till livsmedel.</p>
+
+  <div class="brands-marquee-wrap reveal">
+    <div class="brands-marquee">
+      <span class="brand-item">Red Bull</span>
+      <span class="brand-item">NVIDIA</span>
+      <span class="brand-item">Disney</span>
+      <span class="brand-item">Marvel</span>
+      <span class="brand-item">ASUS</span>
+      <span class="brand-item">RevolutionRace</span>
+      <span class="brand-item">Revolut</span>
+      <span class="brand-item">NordVPN</span>
+      <span class="brand-item">Xiaomi</span>
+      <span class="brand-item">Insta360</span>
+      <span class="brand-item">Square Enix</span>
+      <span class="brand-item">Naturkompaniet</span>
+      <!-- Duplicate for seamless loop -->
+      <span class="brand-item">Red Bull</span>
+      <span class="brand-item">NVIDIA</span>
+      <span class="brand-item">Disney</span>
+      <span class="brand-item">Marvel</span>
+      <span class="brand-item">ASUS</span>
+      <span class="brand-item">RevolutionRace</span>
+      <span class="brand-item">Revolut</span>
+      <span class="brand-item">NordVPN</span>
+      <span class="brand-item">Xiaomi</span>
+      <span class="brand-item">Insta360</span>
+      <span class="brand-item">Square Enix</span>
+      <span class="brand-item">Naturkompaniet</span>
+    </div>
+  </div>
+
+  <div class="brands-marquee-wrap reverse reveal reveal-delay-1" style="margin-top: 8px;">
+    <div class="brands-marquee">
+      <span class="brand-item">Barebells</span>
+      <span class="brand-item">VitaminWell</span>
+      <span class="brand-item">Nocco</span>
+      <span class="brand-item">Willys</span>
+      <span class="brand-item">Arla</span>
+      <span class="brand-item">Fanta</span>
+      <span class="brand-item">MyProtein</span>
+      <span class="brand-item">Nextory</span>
+      <span class="brand-item">Lifesum</span>
+      <span class="brand-item">Anyfin</span>
+      <span class="brand-item">Hemmakväll</span>
+      <span class="brand-item">Tradera</span>
+      <!-- Duplicate -->
+      <span class="brand-item">Barebells</span>
+      <span class="brand-item">VitaminWell</span>
+      <span class="brand-item">Nocco</span>
+      <span class="brand-item">Willys</span>
+      <span class="brand-item">Arla</span>
+      <span class="brand-item">Fanta</span>
+      <span class="brand-item">MyProtein</span>
+      <span class="brand-item">Nextory</span>
+      <span class="brand-item">Lifesum</span>
+      <span class="brand-item">Anyfin</span>
+      <span class="brand-item">Hemmakväll</span>
+      <span class="brand-item">Tradera</span>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card reveal reveal-delay-1">
+      <div class="stat-number" data-count="750">0</div>
+      <div class="stat-label">K+ Följare</div>
+    </div>
+    <div class="stat-card reveal reveal-delay-2">
+      <div class="stat-number" data-count="40">0</div>
+      <div class="stat-label">+ Samarbeten</div>
+    </div>
+    <div class="stat-card reveal reveal-delay-3">
+      <div class="stat-number" data-count="100">0</div>
+      <div class="stat-label">M+ Visningar</div>
+    </div>
+    <div class="stat-card reveal reveal-delay-4">
+      <div class="stat-number" data-count="3">0</div>
+      <div class="stat-label">Plattformar</div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact -->
+<section class="contact-section" id="kontakt">
+  <div class="contact-inner">
+    <div class="contact-info reveal">
+      <h2>Redo att bygga<br>något <em>stort?</em></h2>
+      <p>Berätta om ditt projekt så återkommer vi inom 24h med en plan och prisförslag. Ingen förpliktelse.</p>
+      <div class="contact-socials">
+        <a href="https://www.youtube.com/@Rezdar1" target="_blank" title="YouTube">▶</a>
+        <a href="https://www.instagram.com/rezdar" target="_blank" title="Instagram">◻</a>
+        <a href="https://www.tiktok.com/@rezdar" target="_blank" title="TikTok">♪</a>
+      </div>
+    </div>
+    <div class="contact-form reveal reveal-delay-2">
+      <form id="contactForm" action="https://formsubmit.co/samarbete@rezdar.se" method="POST">
+        <!-- FormSubmit config -->
+        <input type="hidden" name="_subject" value="Ny förfrågan — Rezdar Digital">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_template" value="box">
+        <input type="text" name="_honey" style="display:none">
+
+        <div class="form-group">
+          <label>Namn</label>
+          <input type="text" name="name" placeholder="Ditt namn" required>
+        </div>
+        <div class="form-group">
+          <label>E-post</label>
+          <input type="email" name="email" placeholder="din@email.se" required>
+        </div>
+        <div class="form-group">
+          <label>Tjänst</label>
+          <select name="service" required>
+            <option value="" disabled selected>Vad behöver du?</option>
+            <option value="Hemsida">Hemsida</option>
+            <option value="App">App / Plattform</option>
+            <option value="Pitch Deck">Pitch Deck</option>
+            <option value="Social Media">Social Media</option>
+            <option value="Komplett paket">Komplett paket</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Meddelande</label>
+          <textarea name="message" placeholder="Berätta kort om ditt projekt..." required></textarea>
+        </div>
+        <button type="submit" class="submit-btn"><span>Skicka förfrågan →</span></button>
+      </form>
+      <div class="form-success" id="formSuccess">
+        <div class="check">✓</div>
+        <h3>Tack för din förfrågan!</h3>
+        <p>Vi återkommer inom 24 timmar.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <p>© 2026 REZDAR DIGITAL. Alla rättigheter förbehållna.</p>
+  <p><a href="mailto:samarbete@rezdar.se">samarbete@rezdar.se</a></p>
+</footer>
+
+<script>
+// ── CUSTOM CURSOR ──
+const cursor = document.getElementById('cursor');
+const cursorDot = document.getElementById('cursorDot');
+let mouseX = 0, mouseY = 0;
+let cursorX = 0, cursorY = 0;
+
+document.addEventListener('mousemove', (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+  cursorDot.style.transform = `translate(${mouseX - 3}px, ${mouseY - 3}px)`;
+});
+
+function animateCursor() {
+  cursorX += (mouseX - cursorX) * 0.12;
+  cursorY += (mouseY - cursorY) * 0.12;
+  cursor.style.transform = `translate(${cursorX - 9}px, ${cursorY - 9}px)`;
+  requestAnimationFrame(animateCursor);
+}
+animateCursor();
+
+// Cursor hover effect
+document.querySelectorAll('a, button, .service-card, .portfolio-card, .stat-card').forEach(el => {
+  el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
+  el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
+});
+
+// ── SCROLL REVEAL ──
+const observerOptions = { threshold: 0.15, rootMargin: '0px 0px -50px 0px' };
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, observerOptions);
+
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+// ── COUNT-UP ANIMATION ──
+const countObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const el = entry.target;
+      const target = parseInt(el.dataset.count);
+      const duration = 2000;
+      const start = performance.now();
+
+      function update(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(target * eased);
+        if (progress < 1) requestAnimationFrame(update);
+      }
+      requestAnimationFrame(update);
+      countObserver.unobserve(el);
+    }
+  });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('[data-count]').forEach(el => countObserver.observe(el));
+
+// ── MOBILE MENU ──
+const menuToggle = document.getElementById('menuToggle');
+const navLinks = document.getElementById('navLinks');
+menuToggle.addEventListener('click', () => {
+  menuToggle.classList.toggle('active');
+  navLinks.classList.toggle('open');
+});
+navLinks.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    menuToggle.classList.remove('active');
+    navLinks.classList.remove('open');
+  });
+});
+
+// ── PARALLAX HERO GLOW ──
+document.addEventListener('mousemove', (e) => {
+  const glow = document.querySelector('.hero-bg-glow');
+  if (!glow) return;
+  const x = (e.clientX / window.innerWidth - 0.5) * 40;
+  const y = (e.clientY / window.innerHeight - 0.5) * 40;
+  glow.style.transform = `translate(${x}px, ${y}px)`;
+});
+
+// ── NAV HIDE ON SCROLL ──
+let lastScroll = 0;
+const nav = document.querySelector('nav');
+window.addEventListener('scroll', () => {
+  const currentScroll = window.scrollY;
+  if (currentScroll > lastScroll && currentScroll > 100) {
+    nav.style.transform = 'translateY(-100%)';
+  } else {
+    nav.style.transform = 'translateY(0)';
+  }
+  lastScroll = currentScroll;
+}, { passive: true });
+
+// ── SMOOTH SCROLL ──
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', (e) => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
+
+</body>
+</html>
