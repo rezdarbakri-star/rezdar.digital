@@ -1,1 +1,552 @@
-.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REZDAR — Production</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@200;300;400;500&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --gold:#C9A96E;--gold-dim:#8A7A52;--cream:#F2EDE4;
+  --warm-gray:#7A7368;--soft-gray:#3A3632;
+  --card:#111;--bg:#0A0A0A;--bg2:#0E0E0E;
+}
+
+html{scroll-behavior:smooth;background:var(--bg);overflow-x:hidden}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--cream);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::selection{background:var(--gold);color:var(--bg)}
+
+/* ════════════════════════════════
+   HERO
+   ════════════════════════════════ */
+.hero{
+  position:relative;width:100%;height:100vh;
+  overflow:hidden;background:#000;
+}
+.hero-video-wrap{
+  position:absolute;inset:0;z-index:1;overflow:hidden;
+  opacity:0;animation:videoFadeIn 2.5s 0.5s forwards;
+}
+.hero-video-wrap iframe{
+  position:absolute;top:50%;left:50%;
+  width:177.78vh;height:100vh;
+  min-width:100vw;min-height:56.25vw;
+  transform:translate(-50%,-50%);
+  pointer-events:none;border:none;
+}
+.hero-overlay{
+  position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(to bottom,
+    rgba(10,10,10,0.5) 0%,
+    rgba(10,10,10,0.3) 20%,
+    rgba(10,10,10,0.35) 40%,
+    rgba(10,10,10,0.3) 60%,
+    rgba(10,10,10,0.55) 78%,
+    rgba(10,10,10,0.92) 100%
+  );
+}
+.hero-top-line{
+  position:absolute;top:0;left:0;right:0;height:1px;z-index:5;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+
+/* Centered title card */
+.hero-center{
+  position:absolute;inset:0;z-index:4;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;pointer-events:none;
+}
+.hero-center-name{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(48px,9vw,100px);font-weight:300;
+  letter-spacing:.15em;color:var(--cream);line-height:1;
+  opacity:0;animation:fadeUp 1s .3s forwards;
+}
+.hero-center-type{
+  font-size:11px;letter-spacing:6px;color:var(--gold-dim);
+  text-transform:uppercase;margin-top:14px;
+  opacity:0;animation:fadeUp .8s .6s forwards;
+}
+.hero-center-divider{
+  width:40px;height:1px;background:var(--gold);margin:28px 0;
+  opacity:0;animation:scaleIn .8s .9s forwards;
+}
+.hero-center-line{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(16px,2.2vw,24px);font-weight:300;
+  font-style:italic;color:var(--gold);line-height:1.4;
+  opacity:0;animation:fadeUp .8s 1.1s forwards;
+}
+
+.hero-bottom{
+  position:absolute;bottom:0;left:0;right:0;z-index:3;
+  padding:0 40px 44px;
+  display:flex;justify-content:space-between;align-items:flex-end;
+}
+.hero-tag{
+  font-size:8px;letter-spacing:5px;color:var(--gold-dim);
+  text-transform:uppercase;
+  opacity:0;animation:fadeUp .8s .8s forwards;
+}
+.hero-scroll-hint{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  opacity:0;animation:fadeUp .8s 1.2s forwards;
+}
+.hero-scroll-hint span{
+  font-size:7px;letter-spacing:4px;color:var(--soft-gray);text-transform:uppercase;
+}
+.scroll-line{
+  width:1px;height:28px;
+  background:linear-gradient(to bottom,var(--gold-dim),transparent);
+  animation:scrollPulse 2s infinite;
+}
+
+/* ════════════════════════════════
+   SHARED
+   ════════════════════════════════ */
+.container{max-width:1100px;margin:0 auto;padding:0 40px}
+.section-line{
+  position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,169,110,.12),transparent);
+}
+.label{
+  font-size:9px;letter-spacing:5px;color:var(--gold-dim);
+  text-transform:uppercase;margin-bottom:20px;
+}
+.section-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(28px,4vw,44px);font-weight:300;
+  line-height:1.2;color:var(--cream);margin-bottom:48px;
+}
+.section-title em{font-style:italic;color:var(--gold)}
+
+/* ════════════════════════════════
+   PRODUCED FOR
+   ════════════════════════════════ */
+.produced{
+  padding:100px 0 120px;background:var(--bg2);
+  position:relative;text-align:center;
+}
+.hotel-grid{
+  display:flex;flex-direction:column;align-items:center;
+}
+.hotel-name{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(16px,2.2vw,22px);
+  letter-spacing:.15em;padding:16px 0;
+  color:var(--cream);opacity:.5;
+  transition:all .5s cubic-bezier(.4,0,.2,1);
+  cursor:default;position:relative;
+}
+.hotel-name:hover{color:var(--gold);opacity:1;letter-spacing:.22em}
+.hotel-name::after{
+  content:'';position:absolute;bottom:0;left:50%;
+  transform:translateX(-50%);width:0;height:1px;
+  background:var(--gold-dim);
+  transition:width .5s cubic-bezier(.4,0,.2,1);
+}
+.hotel-name:hover::after{width:100%}
+.hotel-sep{
+  width:24px;height:1px;
+  background:rgba(201,169,110,.1);margin:2px auto;
+}
+
+/* ════════════════════════════════
+   FORMATS
+   ════════════════════════════════ */
+.formats{
+  padding:100px 0 120px;background:var(--bg);position:relative;
+}
+.format-cards{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:20px;margin-top:56px;
+}
+.format-card{
+  position:relative;overflow:hidden;aspect-ratio:9/14;
+  background:var(--card);
+  border:1px solid rgba(201,169,110,.05);
+  cursor:default;
+  transition:all .6s cubic-bezier(.4,0,.2,1);
+}
+.format-card:hover{
+  border-color:rgba(201,169,110,.2);
+  transform:translateY(-6px);
+  box-shadow:0 30px 80px rgba(0,0,0,.5);
+}
+.format-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;
+  height:2px;background:var(--gold);z-index:3;
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .5s cubic-bezier(.4,0,.2,1);
+}
+.format-card:hover::before{transform:scaleX(1)}
+.format-card::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:60%;
+  background:linear-gradient(to top,rgba(10,10,10,.95) 0%,rgba(10,10,10,.5) 50%,transparent 100%);
+  pointer-events:none;z-index:1;
+}
+.format-bg{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(160deg,#141210 0%,#1a1816 40%,#12100e 100%);
+}
+.format-play{
+  width:48px;height:48px;border-radius:50%;
+  border:1px solid rgba(201,169,110,.12);
+  display:flex;align-items:center;justify-content:center;
+  transition:all .5s;
+}
+.format-card:hover .format-play{
+  border-color:var(--gold);
+  box-shadow:0 0 40px rgba(201,169,110,.12);
+}
+.format-play svg{width:14px;height:14px;fill:var(--gold-dim);transition:fill .4s}
+.format-card:hover .format-play svg{fill:var(--gold)}
+.format-info{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:28px 24px;z-index:2;
+}
+.format-title-card{
+  font-family:'Cormorant Garamond',serif;
+  font-size:26px;font-weight:400;
+  color:var(--gold);letter-spacing:.06em;margin-bottom:3px;
+}
+.format-sub{
+  font-size:8px;letter-spacing:3px;color:var(--gold-dim);
+  text-transform:uppercase;margin-bottom:14px;
+}
+.format-desc{
+  font-size:12px;font-weight:300;line-height:1.7;color:var(--warm-gray);
+}
+
+/* ════════════════════════════════
+   PROCESS
+   ════════════════════════════════ */
+.process{
+  padding:100px 0 120px;background:var(--bg2);position:relative;
+}
+.steps{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:32px;margin-top:56px;
+}
+.step{padding-top:20px;position:relative}
+.step::before{
+  content:'';position:absolute;top:0;left:0;
+  width:22px;height:1px;background:var(--gold-dim);
+}
+.step-num{
+  font-family:'Cormorant Garamond',serif;
+  font-size:34px;font-weight:300;color:var(--gold);
+  line-height:1;margin-bottom:10px;
+}
+.step-name{
+  font-size:10px;letter-spacing:4px;color:var(--cream);
+  text-transform:uppercase;margin-bottom:12px;
+}
+.step-desc{
+  font-size:12px;font-weight:300;line-height:1.8;color:var(--warm-gray);
+}
+.process-note{
+  text-align:center;margin-top:52px;
+  font-family:'Cormorant Garamond',serif;
+  font-size:17px;font-style:italic;
+  color:var(--soft-gray);font-weight:300;
+}
+
+/* ════════════════════════════════
+   DELIVERABLES
+   ════════════════════════════════ */
+.deliverables{
+  padding:100px 0 120px;background:var(--bg);position:relative;
+}
+.deliver-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:40px 72px;margin-top:56px;
+}
+.deliver-title{
+  font-size:10px;letter-spacing:4px;color:var(--gold);
+  text-transform:uppercase;margin-bottom:10px;
+}
+.deliver-line{
+  width:20px;height:1px;background:var(--gold-dim);margin-bottom:12px;
+}
+.deliver-desc{
+  font-size:12px;font-weight:300;line-height:1.8;color:var(--warm-gray);
+}
+
+/* ════════════════════════════════
+   CTA
+   ════════════════════════════════ */
+.cta{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:center;
+  background:var(--bg);position:relative;text-align:center;
+}
+.cta-glow{
+  position:absolute;width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(circle,rgba(201,169,110,.05) 0%,transparent 65%);
+  top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;
+}
+.cta-word{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(48px,9vw,110px);font-weight:300;
+  color:var(--gold);letter-spacing:.12em;line-height:1;
+  cursor:default;transition:all .6s cubic-bezier(.4,0,.2,1);
+}
+.cta-word:hover{
+  letter-spacing:.2em;
+  text-shadow:0 0 80px rgba(201,169,110,.25);
+}
+.cta-divider{
+  width:40px;height:1px;background:var(--gold-dim);margin:30px 0;
+}
+.cta-email{
+  font-size:14px;font-weight:300;color:var(--cream);
+  text-decoration:none;letter-spacing:1px;transition:color .3s;
+}
+.cta-email:hover{color:var(--gold)}
+.cta-site{
+  font-size:11px;font-weight:300;color:var(--warm-gray);
+  letter-spacing:1px;margin-top:6px;
+}
+
+/* ════════════════════════════════
+   FOOTER
+   ════════════════════════════════ */
+.footer{padding:20px 0;text-align:center;position:relative}
+.footer::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+.footer span{
+  font-size:7px;letter-spacing:4px;color:var(--soft-gray);text-transform:uppercase;
+}
+
+/* ════════════════════════════════
+   SCROLL REVEAL
+   ════════════════════════════════ */
+.anim{
+  opacity:0;transform:translateY(25px);
+  transition:all .7s cubic-bezier(.4,0,.2,1);
+}
+.anim.vis{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}
+.d3{transition-delay:.3s}.d4{transition-delay:.4s}
+
+/* ════════════════════════════════
+   KEYFRAMES
+   ════════════════════════════════ */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(16px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes scaleIn{
+  from{opacity:0;transform:scaleX(0)}
+  to{opacity:1;transform:scaleX(1)}
+}
+@keyframes videoFadeIn{
+  from{opacity:0}to{opacity:1}
+}
+@keyframes scrollPulse{
+  0%,100%{opacity:.3}50%{opacity:.7}
+}
+
+/* ════════════════════════════════
+   RESPONSIVE
+   ════════════════════════════════ */
+@media(max-width:768px){
+  .container{padding:0 24px}
+  .hero-bottom{padding:0 24px 36px}
+  .format-cards{grid-template-columns:1fr;gap:16px}
+  .format-card{aspect-ratio:9/12}
+  .steps{grid-template-columns:1fr 1fr;gap:28px}
+  .deliver-grid{grid-template-columns:1fr;gap:28px}
+  .produced,.formats,.process,.deliverables{padding:80px 0}
+}
+@media(max-width:480px){
+  .steps{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-top-line"></div>
+  <div class="hero-video-wrap">
+    <iframe src="https://player.vimeo.com/video/1164170750?background=1&autoplay=1&loop=1&byline=0&title=0&muted=1" allow="autoplay; fullscreen" allowfullscreen></iframe>
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="hero-center">
+    <div class="hero-center-name">REZDAR</div>
+    <div class="hero-center-type">Production</div>
+    <div class="hero-center-divider"></div>
+    <div class="hero-center-line">I tell stories that make people book.</div>
+  </div>
+  <div class="hero-bottom">
+    <div class="hero-tag">Rezdar Production &middot; 2025</div>
+    <div class="hero-scroll-hint">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCED FOR -->
+<section class="produced">
+  <div class="section-line"></div>
+  <div class="container">
+    <div class="label anim">Previous Productions</div>
+    <h2 class="section-title anim d1">Produced for</h2>
+    <div class="hotel-grid">
+      <div class="hotel-name anim d1">MARRIOTT BONVOY</div>
+      <div class="hotel-sep anim"></div>
+      <div class="hotel-name anim d2">VILLA ZAVIER</div>
+      <div class="hotel-sep anim"></div>
+      <div class="hotel-name anim d2">STEAM HOTEL</div>
+      <div class="hotel-sep anim"></div>
+      <div class="hotel-name anim d3">KL&Auml;PPEN SKI RESORT</div>
+      <div class="hotel-sep anim"></div>
+      <div class="hotel-name anim d3">JACY'Z</div>
+    </div>
+  </div>
+</section>
+
+<!-- FORMATS -->
+<section class="formats">
+  <div class="section-line"></div>
+  <div class="container">
+    <div class="label anim">Formats</div>
+    <h2 class="section-title anim d1">Three ways to show your <em>property.</em></h2>
+    <div class="format-cards">
+      <div class="format-card anim d1">
+        <div class="format-bg"><div class="format-play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div>
+        <div class="format-info">
+          <div class="format-title-card">Vlog</div>
+          <div class="format-sub">Personal Experience</div>
+          <p class="format-desc">Your property through the eyes of a guest who happens to have an audience.</p>
+        </div>
+      </div>
+      <div class="format-card anim d2">
+        <div class="format-bg"><div class="format-play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div>
+        <div class="format-info">
+          <div class="format-title-card">Cinematic</div>
+          <div class="format-sub">Quality Filmmaking</div>
+          <p class="format-desc">Filmmaking that mirrors the standard your property already holds itself to.</p>
+        </div>
+      </div>
+      <div class="format-card anim d3">
+        <div class="format-bg"><div class="format-play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div>
+        <div class="format-info">
+          <div class="format-title-card">Experience</div>
+          <div class="format-sub">Desire to Visit</div>
+          <p class="format-desc">Content that makes viewers feel like they're already there &mdash; and need to arrive.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="process">
+  <div class="section-line"></div>
+  <div class="container">
+    <div class="label anim">The Process</div>
+    <h2 class="section-title anim d1">From arrival to <em>delivery.</em></h2>
+    <div class="steps">
+      <div class="step anim d1">
+        <div class="step-num">01</div>
+        <div class="step-name">Brief</div>
+        <p class="step-desc">We align on your vision, tone, and the story you want told.</p>
+      </div>
+      <div class="step anim d2">
+        <div class="step-num">02</div>
+        <div class="step-name">Stay</div>
+        <p class="step-desc">I arrive, experience your property as a guest, and capture authentically.</p>
+      </div>
+      <div class="step anim d3">
+        <div class="step-num">03</div>
+        <div class="step-name">Produce</div>
+        <p class="step-desc">Cinematic editing, color grading, and sound design &mdash; to your standard.</p>
+      </div>
+      <div class="step anim d4">
+        <div class="step-num">04</div>
+        <div class="step-name">Deliver</div>
+        <p class="step-desc">Final content in formats optimized for your channels &mdash; ready to publish.</p>
+      </div>
+    </div>
+    <p class="process-note anim">Each production is tailored. No templates. No shortcuts.</p>
+  </div>
+</section>
+
+<!-- DELIVERABLES -->
+<section class="deliverables">
+  <div class="section-line"></div>
+  <div class="container">
+    <div class="label anim">Deliverables</div>
+    <h2 class="section-title anim d1">Content your guests will <em>feel.</em></h2>
+    <div class="deliver-grid">
+      <div class="anim d1">
+        <div class="deliver-title">Short-Form</div>
+        <div class="deliver-line"></div>
+        <p class="deliver-desc">TikTok, Reels, Shorts &mdash; vertical content optimized for discovery and reach.</p>
+      </div>
+      <div class="anim d2">
+        <div class="deliver-title">Photography</div>
+        <div class="deliver-line"></div>
+        <p class="deliver-desc">High-resolution stills &mdash; for website, print, and social assets.</p>
+      </div>
+      <div class="anim d3">
+        <div class="deliver-title">Long-Form</div>
+        <div class="deliver-line"></div>
+        <p class="deliver-desc">YouTube vlogs and cinematic edits &mdash; for deeper storytelling and SEO.</p>
+      </div>
+      <div class="anim d4">
+        <div class="deliver-title">Raw Assets</div>
+        <div class="deliver-line"></div>
+        <p class="deliver-desc">Full footage library &mdash; your property owns and reuses the material freely.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="section-line"></div>
+  <div class="cta-glow"></div>
+  <div class="cta-word anim">PRODUCE?</div>
+  <div class="cta-divider anim d1"></div>
+  <div class="anim d2">
+    <a href="mailto:samarbete@rezdar.se" class="cta-email">samarbete@rezdar.se</a>
+    <div class="cta-site">rezdar.se</div>
+  </div>
+</section>
+
+<div class="footer">
+  <span>Rezdar Production &middot; 2025</span>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+(function(){
+  // Scroll reveal
+  if('IntersectionObserver' in window){
+    var obs=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting) e.target.classList.add('vis');
+      });
+    },{threshold:0.05,rootMargin:'0px 0px 50px 0px'});
+    var els=document.querySelectorAll('.anim');
+    for(var i=0;i<els.length;i++) obs.observe(els[i]);
+  } else {
+    // No observer support — show everything
+    var els=document.querySelectorAll('.anim');
+    for(var i=0;i<els.length;i++) els[i].classList.add('vis');
+  }
+  // Safety fallback
+  setTimeout(function(){
+    var els=do
