@@ -1,1 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Content Calendar — Rezdar</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c0c0f;
+    --surface: #141418;
+    --surface-2: #1a1a20;
+    --border: #2a2a35;
+    --text: #e8e6e1;
+    --text-dim: #7a7880;
+    --fitness: #3498DB;
+    --fitness-bg: rgba(52, 152, 219, 0.10);
+    --fitness-border: rgba(52, 152, 219, 0.20);
+    --travel: #2ECC71;
+    --travel-bg: rgba(46, 204, 113, 0.10);
+    --travel-border: rgba(46, 204, 113, 0.20);
+    --story: #9B59B6;
+    --story-bg: rgba(155, 89, 182, 0.10);
+    --story-border: rgba(155, 89, 182, 0.20);
+    --reno: #F57C20;
+    --reno-bg: rgba(245, 124, 32, 0.10);
+    --reno-border: rgba(245, 124, 32, 0.20);
+  }
 
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 32px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 64px;
+    animation: fadeUp 0.8s ease-out;
+  }
+
+  header .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 8px 20px;
+    margin-bottom: 28px;
+  }
+
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(38px, 6vw, 64px);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    margin-bottom: 20px;
+  }
+
+  header h1 em {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--fitness), var(--travel), var(--story), var(--reno));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* LEGEND */
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 48px;
+    animation: fadeUp 0.8s ease-out 0.35s both;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.25s, border-color 0.3s, background 0.3s, opacity 0.4s;
+  }
+
+  .legend-item:hover { transform: translateY(-2px); }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: box-shadow 0.3s;
+  }
+
+  .legend-item[data-type="fitness"] .legend-dot { background: var(--fitness); }
+  .legend-item[data-type="travel"] .legend-dot { background: var(--travel); }
+  .legend-item[data-type="story"] .legend-dot { background: var(--story); }
+  .legend-item[data-type="reno"] .legend-dot { background: var(--reno); }
+
+  .legend-item.active[data-type="fitness"] { border-color: var(--fitness); background: var(--fitness-bg); }
+  .legend-item.active[data-type="fitness"] .legend-dot { box-shadow: 0 0 12px var(--fitness); }
+  .legend-item.active[data-type="travel"] { border-color: var(--travel); background: var(--travel-bg); }
+  .legend-item.active[data-type="travel"] .legend-dot { box-shadow: 0 0 12px var(--travel); }
+  .legend-item.active[data-type="story"] { border-color: var(--story); background: var(--story-bg); }
+  .legend-item.active[data-type="story"] .legend-dot { box-shadow: 0 0 12px var(--story); }
+  .legend-item.active[data-type="reno"] { border-color: var(--reno); background: var(--reno-bg); }
+  .legend-item.active[data-type="reno"] .legend-dot { box-shadow: 0 0 12px var(--reno); }
+
+  .legend-item.dimmed { opacity: 0.3; }
+  .legend-item.dimmed:hover { opacity: 0.6; }
+
+  .reset-hint {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    height: 18px;
+  }
+  .reset-hint.visible { opacity: 1; }
+
+  /* QUARTER GROUPS */
+  .quarter {
+    margin-bottom: 16px;
+    animation: fadeUp 0.6s ease-out both;
+  }
+  .quarter:nth-child(1) { animation-delay: 0.1s; }
+  .quarter:nth-child(2) { animation-delay: 0.2s; }
+  .quarter:nth-child(3) { animation-delay: 0.3s; }
+  .quarter:nth-child(4) { animation-delay: 0.4s; }
+
+  .quarter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.3s, border-color 0.3s;
+  }
+
+  .quarter-header:hover {
+    background: var(--surface-2);
+    border-color: #3a3a48;
+  }
+
+  .quarter.open .quarter-header {
+    border-radius: 14px 14px 0 0;
+    border-bottom-color: transparent;
+  }
+
+  .quarter-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .quarter-label {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px;
+    font-weight: 400;
+  }
+
+  .quarter-months {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  .quarter-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .quarter-dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .quarter-dots .qdot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .quarter-chevron {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.35s ease;
+    color: var(--text-dim);
+  }
+
+  .quarter.open .quarter-chevron {
+    transform: rotate(180deg);
+  }
+
+  .quarter-badge {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 100px;
+    background: rgba(52, 152, 219, 0.12);
+    color: var(--fitness);
+    border: 1px solid rgba(52, 152, 219, 0.2);
+  }
+
+  .quarter-body {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .quarter.open .quarter-body {
+    max-height: 800px;
+  }
+
+  .quarter-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    padding: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 14px 14px;
+  }
+
+  @media (max-width: 700px) { .quarter-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 450px) { .quarter-grid { grid-template-columns: 1fr; } }
+
+  /* MONTH CARDS */
+  .month-card {
+    position: relative;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+    min-height: 190px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: transform 0.4s ease, border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.4s ease;
+  }
+
+  .month-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 32px rgba(0,0,0,0.4);
+    border-color: #3a3a48;
+  }
+
+  .month-card .stripe {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 14px 14px 0 0;
+  }
+
+  .month-card.filtered-out {
+    opacity: 0.06;
+    transform: scale(0.96);
+    pointer-events: none;
+  }
+  .month-card.filtered-out:hover {
+    transform: scale(0.96);
+    box-shadow: none;
+  }
+
+  .month-num {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+
+  .month-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    font-weight: 400;
+    margin-bottom: 14px;
+    line-height: 1.2;
+  }
+
+  .bucket-tags {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: auto;
+  }
+
+  .bucket-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 7px 12px;
+    border-radius: 8px;
+    width: fit-content;
+    transition: opacity 0.35s ease;
+  }
+
+  .bucket-tag.tag-dimmed {
+    opacity: 0.15;
+  }
+
+  .bucket-tag .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .bucket-tag.fitness { background: var(--fitness-bg); color: var(--fitness); border: 1px solid var(--fitness-border); }
+  .bucket-tag.fitness .dot { background: var(--fitness); }
+  .bucket-tag.travel { background: var(--travel-bg); color: var(--travel); border: 1px solid var(--travel-border); }
+  .bucket-tag.travel .dot { background: var(--travel); }
+  .bucket-tag.story { background: var(--story-bg); color: var(--story); border: 1px solid var(--story-border); }
+  .bucket-tag.story .dot { background: var(--story); }
+  .bucket-tag.reno { background: var(--reno-bg); color: var(--reno); border: 1px solid var(--reno-border); }
+  .bucket-tag.reno .dot { background: var(--reno); }
+
+  .bucket-sub {
+    font-size: 10px;
+    opacity: 0.7;
+    font-weight: 400;
+  }
+
+  .strategy-note {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 10px;
+    font-style: italic;
+    line-height: 1.5;
+    padding-left: 12px;
+    border-left: 2px solid var(--border);
+  }
+
+  .empty-note {
+    margin-top: auto;
+    font-size: 12px;
+    color: var(--text-dim);
+    font-style: italic;
+    opacity: 0.6;
+  }
+
+  .month-card.month-passed {
+    opacity: 0.3;
+  }
+  .month-card.month-passed:hover {
+    opacity: 0.5;
+  }
+  .month-card.month-passed .stripe {
+    filter: grayscale(0.8);
+  }
+
+  .month-current-indicator {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+  }
+
+  .month-card.month-current .month-current-indicator {
+    display: flex;
+  }
+
+  .month-card.month-current .split-badge {
+    display: none;
+  }
+
+  .green-lamp {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #2ECC71;
+    box-shadow: 0 0 8px #2ECC71, 0 0 16px rgba(46, 204, 113, 0.4);
+    animation: pulse-lamp 2s ease-in-out infinite;
+  }
+
+  .green-lamp-label {
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #2ECC71;
+  }
+
+  @keyframes pulse-lamp {
+    0%, 100% { box-shadow: 0 0 8px #2ECC71, 0 0 16px rgba(46, 204, 113, 0.4); }
+    50% { box-shadow: 0 0 12px #2ECC71, 0 0 24px rgba(46, 204, 113, 0.6); }
+  }
+
+  .month-card.month-current {
+    border-color: rgba(46, 204, 113, 0.3);
+  }
+
+  .month-progress {
+    display: none;
+    margin-top: 12px;
+  }
+
+  .month-card.month-current .month-progress {
+    display: block;
+  }
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .progress-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .progress-pct {
+    font-size: 11px;
+    font-weight: 700;
+    color: #2ECC71;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .progress-track {
+    width: 100%;
+    height: 4px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #2ECC71, #27AE60);
+    box-shadow: 0 0 8px rgba(46, 204, 113, 0.4);
+    transition: width 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+  }
+
+  .progress-fill::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -1px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #2ECC71;
+    box-shadow: 0 0 6px #2ECC71;
+  }
+
+  .progress-days {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    font-size: 9px;
+    color: var(--text-dim);
+    opacity: 0.7;
+  }
+
+  .split-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    opacity: 0.4;
+  }
+
+  /* FOOTER */
+  .footer {
+    margin-top: 56px;
+    text-align: center;
+    animation: fadeUp 0.8s ease-out 0.6s both;
+  }
+
+  .insight-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+
+  @media (max-width: 700px) { .insight-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  .insight-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 18px;
+    text-align: center;
+    transition: transform 0.2s;
+  }
+
+  .insight-card:hover { transform: translateY(-2px); }
+
+  .insight-card .ic-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 32px;
+    margin-bottom: 4px;
+  }
+
+  .insight-card .ic-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .insight-card:nth-child(1) .ic-num { color: var(--fitness); }
+  .insight-card:nth-child(2) .ic-num { color: var(--travel); }
+  .insight-card:nth-child(3) .ic-num { color: var(--story); }
+  .insight-card:nth-child(4) .ic-num { color: var(--reno); }
+
+  .footer-text {
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header>
+    <div class="tag">2026 Content Strategy</div>
+    <h1>The <em>Content Calendar</em></h1>
+  </header>
+
+  <div class="legend" id="legend">
+    <div class="legend-item" data-type="fitness"><div class="legend-dot"></div>Fitness</div>
+    <div class="legend-item" data-type="travel"><div class="legend-dot"></div>Travel Adventure</div>
+    <div class="legend-item" data-type="story"><div class="legend-dot"></div>Storytelling</div>
+    <div class="legend-item" data-type="reno"><div class="legend-dot"></div>Renovation</div>
+  </div>
+
+  <div class="reset-hint" id="resetHint">Click the active bucket again to show all</div>
+
+  <div id="quarters">
+
+    <!-- Q1 -->
+    <div class="quarter open" data-q="1">
+      <div class="quarter-header">
+        <div class="quarter-left">
+          <div class="quarter-label">Q1</div>
+          <div class="quarter-months">Jan · Feb · Mar</div>
+          <div class="quarter-badge">NOW</div>
+        </div>
+        <div class="quarter-right">
+          <div class="quarter-dots">
+            <div class="qdot" style="background:var(--fitness)"></div>
+            <div class="qdot" style="background:var(--reno)"></div>
+            <div class="qdot" style="background:var(--travel)"></div>
+          </div>
+          <div class="quarter-chevron"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+      </div>
+      <div class="quarter-body">
+        <div class="quarter-grid">
+
+          <div class="month-card" data-month="1" data-buckets="fitness reno">
+            <div class="stripe" style="background:linear-gradient(90deg, var(--fitness) 50%, var(--reno) 50%)"></div>
+            <span class="split-badge">SPLIT</span>
+            <div class="month-current-indicator"><div class="green-lamp"></div><span class="green-lamp-label">NOW</span></div>
+            <div class="month-num">01</div>
+            <div class="month-name">January</div>
+            <div class="bucket-tags">
+              <div class="bucket-tag fitness"><span class="dot"></span>Fitness <span class="bucket-sub">— New Year push</span></div>
+              <div class="bucket-tag reno"><span class="dot"></span>Renovation <span class="bucket-sub">— Indoor</span></div>
+            </div>
+            <div class="strategy-note">Resolution seekers are dreaming of transformation</div>
+            <div class="month-progress">
+              <div class="progress-header">
+                <span class="progress-label">Month progress</span>
+                <span class="progress-pct"></span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width:0%"></div>
+              </div>
+              <div class="progress-days">
+                <span class="days-elapsed"></span>
+                <span class="days-remaining"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="month-card" data-month="2" data-buckets="fitness reno">
+            <div class="stripe" style="background:linear-gradient(90deg, var(--fitness) 50%, var(--reno) 50%)"></div>
+            <span class="split-badge">SPLIT</span>
+            <div class="month-current-indicator"><div class="green-lamp"></div><span class="green-lamp-label">NOW</span></div>
+            <div class="month-num">02</div>
+            <div class="month-name">February</div>
+            <div class="bucket-tags">
+              <div class="bucket-tag fitness"><span class="dot"></span>Fitness <span class="bucket-sub">— Momentum</span></div>
+              <div class="bucket-tag reno"><span class="dot"></span>Renovation <span class="bucket-sub">— Indoor</span></div>
+            </div>
+            <div class="strategy-note">Keep gym motivation alive before spring</div>
+            <div class="month-progress">
+              <div class="progress-header">
+                <span class="progress-label">Month progress</span>
+                <span class="progress-pct"></span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width:0%"></div>
+              </div>
+              <div class="progress-days">
+                <span class="days-elapsed"></span>
+                <span class="days-remaining"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="month-card" data-month="3" data-buckets="fitness travel">
+            <div class="stripe" style="background:linear-gradient(90deg, var(--fitness) 50%, var(--travel) 50%)"></div>
+            <span class="split-badge">SPLIT</span>
+            <div class="month-current-indicator"><div class="green-lamp"></div><span class="green-lamp-label">NOW</span></div>
+            <div class="month-num">03</div>
+            <div class="month-name">March</div>
+            <div class="bucket-tags">
+              <div class="bucket-tag fitness"><span class="dot"></span>Fitness <span class="bucket-sub">— Spring cut</span></div>
+              <div class="bucket-tag travel"><span class="dot"></span>Travel Adventure <span class="bucket-sub">— Summer planning</span></div>
+            </div>
+            <div class="strategy-note">People booking summer trips — inspire now</div>
+            <div class="month-progress">
+              <div class="progress-header">
+                <span class="progress-label">Month progress</span>
+                <span class="progress-pct"></span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width:0%"></div>
+              </div>
+              <div class="progress-days">
+                <span class="days-elapsed"></span>
+                <span class="days-remaining"></span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quarter" data-q="2">
+      <div class="quarter-header">
+        <div class="quarter-left">
+          <div class="quarter-label">Q2</div>
+          <div class="quarter-months">Apr · May · Jun</div>
+                  <div class="quarter-badge">NOW</div>
+</div>
+        <div class="quarter-right">
+          <div class="quarter-dots">
+            <div class="qdot" style="background:var(--travel)"></div>
+            <div class="qdot" style="background:var(--reno)"></div>
+          </div>
+          <div class="quarter-chevron"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+      </div>
+      <div class="quarter-body">
+        <div class="quarter-grid">
+
+          <div class="month-card" data-month="4" data-buckets="travel reno">
+            <div class="stripe" style="background:linear-gradient(90deg, var(--travel) 50%, var(--reno) 50%)"></div>
+            <span class="split-badge">SPLIT</span>
+            <div class="month-current-indicator"><div class="green-lamp"></div><span class="green-lamp-label">NOW</span></div>
+            <div class="month-num">04</div>
+            <div class="month-name">April</div>
+            <div class="bucket-tags">
+              <div class="bucket-tag travel"><span class="dot"></span>Travel Adventure <span class="bucket-sub">— Expedition tease</span></div>
+              <div class="bucket-tag reno"><span class="dot"></span>Renovation <span class="bucket-sub">— Outdoor</span></div>
+            </div>
+            <div class="strategy-note">Outdoor season opens — first project reveals</div>
+            <div class="month-progress">
+              <div class="progress-header">
+                <span class="progress-label">Month progress</span>
+                <span class="progress-pct"></span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width:0%"></div>
+              </div>
+              <div class="progress-days">
+                <span class="days-elapsed"></span>
+                <span class="days-remaining"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="month-card" data-month="5" data-buckets="travel reno">
+            <div class="stripe" style="background:linear-gradient(90deg, var(--travel) 50%, var(--reno) 50%)"></div>
+            <span class="split-badge">SPLIT</span>
+            <div class="month-current-indicator"><div class="green-lamp"></div><span class="green-lamp-label">NOW</span></div>
+            <div class="month-num">05</div>
+            <div class="month-name">May</div>
+            <div class="bucket-tags">
+              <div class="bucket-tag travel"><span class="dot"></span>Travel Adventure <span class="bucket-sub">— Deep content</span></div>
+              <div class="bucket-tag reno"><span class="dot"></span>Renovation <span class="bucket-sub">— Outdoor</span></div>
+            </div>
+            <div class="strategy-note">Peak wanderlust — show the wild stuff</div>
+            <div class="month-progress">
+              <div class="progress-header">
+                <span class="progress-label">Month progress</span>
+                <span class="progress-pct"></span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width:0%"></div>
+              </div>
+              <div class="progress-days">
+                <span class="days-elapsed"></span>
+                <span class="days-remaining"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="month-card" data-month="6" data-buckets="travel reno">
+            <div class="stripe" style="background:linear-gradient(90deg, var(--travel) 50%, var(--reno) 50%)"></div>
+            <span class="split-badge">SPLIT</span>
+            <div class="month-current-indicator"><div class="green-lamp"></div><span class="green-lamp-label">NOW</span></div>
+            <div class="month-num">06</div>
+            <div class="month-name">June</div>
+            <div class="bucket-tags">
+              <div class="bucket-tag travel"><span class="dot"></span>Travel Adventure <span class="bucket-sub">— Expedition drops</span></div>
+              <div class="bucket-tag reno"><span class="dot"></span>Renovation <span class="bucket-sub">— Outdoor</span></div>
+            </div>
+            <div class="strategy-note">Midsommar energy — adventure at peak</div>
+            <div class="month-progress">
+              <div class="progress-header">
+                <span class="progress-label">Month progress</span>
+                <span class="progress-pct"></span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width:0%"></div>
+              </div>
+              <div class="progress-days">
+                <span class="days-elapsed"></span>
+                <span class="days-remaining"></span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quarter" data-q="3">
+      <div class="quarter-header">
+        <div class="quarter-left">
+          <div class="quarter-label">Q3</div>
+          <div class="quarter-months">Jul · Aug · Sep</div>
+                  <div class="quarter-badge">NOW</div>
+</div>
+        <div class="quarter-right">
+          <div class="quarter-dots">
+            <div class="qdot" style="background:var(--reno)"></div>
+            <div class="qdot" style="background:var(--fitness)"></div>
+            <div class="qdot" style="background:var(--story)"></div>
+          </div>
+          <div class="quarter-chevron"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+      </div>
+      <div class="quarter-body">
+        <div class="quarter-grid">
+
+          <div class="month-card" data-month="7" data-buckets="reno">
+            <div class="stripe" style="background:var(--reno)"></div>
+            <div class="month-current-indicator"><div class="green-lamp"></div><span class="green-lamp-label">NOW</span></div>
+            <div class="month-num">07</div>
+            <div class="month-name">July</div>
+            <div class="bucket-tags">
+              <div class="bucket-tag reno"><span class="dot"></span>Renovation <span class="bucket-sub">— Outdoor builds</span></div>
+            </div>
+            <div class="strategy-note">People are doing — go light, show progress</div>
+            <div class="month-progress">
+              <div class="progress-header">
+                <span class="progress-label">Month progress</span>
+                <span class="progress-pct"></span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width:0%"></div>
+              </div>
+              <div class="progress-days">
+                <span class="days-elapsed"></span>
+                <span class="days-remaining"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="month-card" data-month="8" data-buckets="fitness">
+            <div class="stripe" style="background:var(--fitness)"></div>
+            <div class="month-current-indicator"><div class="green-lamp"></div><span class="green-lamp-label">NOW</span></div>
+            <div class="month-num">08</div>
+            <div class="month-name">August</div>
+            <div class="bucket-tags">
+              <div class="bucket-tag fitness"><span class="dot"></span>Fitness <span class="bucket-sub">— Back-to-routine</span></div>
+            </div>
+            <div class="strategy-note">Autumn prep mindset kicks in early</div>
+            <div class="month-progress">
+              <div class="progress-header">
+                <span class="progress-label">Month progress</span>
+                <span class="progress-pct"></span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width:0%"></div>
+              </div>
+              <div class="progress-days">
+                <span class="days-elapsed"></span>
+                <span class="days-remaining"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="month-card" data-month="9" data-buckets="fitness story">
+            <div class="stripe" style="background:linear-gradient(90deg, var(--fitness) 50%, var(--story) 50%)"></div>
+            <span class="split-badge">SPLIT</span>
+            <div class="month-current-indicator"><div class="green-lamp"></div><span class="green-lamp-label">NOW</span></div>
+            <div class="month-num">09</div>
+            <div class="month-name">September</div>
+            <div class="bucket-tags">
+              <div class="bucket-tag fitness"><span class="dot"></span>Fitness <span class="bucket-sub">— Fall grind</span></div>
+              <div class="bucket-tag story"><span class="dot"></span>Storytelling <span class="bucket-sub">— Season opens</span></div>
+            </div>
+            <div class="strategy-note">Dark nights = people watching more content</div>
+            <div class="month-progress">
+              <div class="progress-header">
+                <span class="progress-label">Month progress</span>
+                <span class="progress-pct"></span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width:0%"></div>
+              </div>
+              <div class="progress-days">
+                <span class="days-elapsed"></span>
+                <span class="days-remaining"></span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quarter" data-q="4">
+      <div class="quarter-header">
+        <div class="quarter-left">
+          <div class="quarter-label">Q4</div>
+          <div class="quarter-months">Oct · Nov · Dec</div>
+                  <div class="quarter-badge">NOW</div>
+</div>
+        <div class="quarter-right">
+          <div class="quarter-dots">
+            <div class="qdot" style="background:var(--fitness)"></div>
+            <div class="qdot" style="background:var(--story)"></div>
+            <div class="qdot" style="background:var(--reno)"></div>
+          </div>
+          <div class="quarter-chevron"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+      </div>
+      <div class="quarter-body">
+        <div class="quarter-grid">
+
+          <div class="month-card" data-month="10" data-buckets="fitness story reno">
+            <div class="stripe" style="background:linear-gradient(90deg, var(--fitness) 33%, var(--story) 33% 66%, var(--reno) 66%)"></div>
+            <span class="split-badge">SPLIT</span>
+            <div class="month-current-indicator"><div class="green-lamp"></div><span class="green-lamp-label">NOW</span></div>
+            <div class="month-num">10</div>
+            <div class="month-name">October</div>
+            <div class="bucket-tags">
+              <div class="bucket-tag fitness"><span class="dot"></span>Fitness <span class="bucket-sub">— Final push</span></div>
+              <div class="bucket-tag story"><span class="dot"></span>Storytelling <span class="bucket-sub">— Deep narratives</span></div>
+              <div class="bucket-tag reno"><span class="dot"></span>Renovation <span class="bucket-sub">— Indoor</span></div>
+            </div>
+            <div class="strategy-note">Long-form thrives — lean into documentary</div>
+            <div class="month-progress">
+              <div class="progress-header">
+                <span class="progress-label">Month progress</span>
+                <span class="progress-pct"></span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width:0%"></div>
+              </div>
+              <div class="progress-days">
+                <span class="days-elapsed"></span>
+                <span class="days-remaining"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="month-card" data-month="11" data-buckets="story reno">
+            <div class="stripe" style="background:linear-gradient(90deg, var(--story) 50%, var(--reno) 50%)"></div>
+            <span class="split-badge">SPLIT</span>
+            <div class="month-current-indicator"><div class="green-lamp"></div><span class="green-lamp-label">NOW</span></div>
+            <div class="month-num">11</div>
+            <div class="month-name">November</div>
+            <div class="bucket-tags">
+              <div class="bucket-tag story"><span class="dot"></span>Storytelling <span class="bucket-sub">— Peak season</span></div>
+              <div class="bucket-tag reno"><span class="dot"></span>Renovation <span class="bucket-sub">— Indoor</span></div>
+            </div>
+            <div class="strategy-note">Reflective season — personal stories hit hardest</div>
+            <div class="month-progress">
+              <div class="progress-header">
+                <span class="progress-label">Month progress</span>
+                <span class="progress-pct"></span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width:0%"></div>
+              </div>
+              <div class="progress-days">
+                <span class="days-elapsed"></span>
+                <span class="days-remaining"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="month-card" data-month="12" data-buckets="reno">
+            <div class="stripe" style="background:var(--reno)"></div>
+            <div class="month-current-indicator"><div class="green-lamp"></div><span class="green-lamp-label">NOW</span></div>
+            <div class="month-num">12</div>
+            <div class="month-name">December</div>
+            <div class="bucket-tags">
+              <div class="bucket-tag reno"><span class="dot"></span>Renovation <span class="bucket-sub">— Indoor projects</span></div>
+            </div>
+            <div class="strategy-note">Year-end nesting — indoor builds resonate</div>
+            <div class="month-progress">
+              <div class="progress-header">
+                <span class="progress-label">Month progress</span>
+                <span class="progress-pct"></span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width:0%"></div>
+              </div>
+              <div class="progress-days">
+                <span class="days-elapsed"></span>
+                <span class="days-remaining"></span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="insight-grid">
+      <div class="insight-card">
+        <div class="ic-num">6</div>
+        <div class="ic-label">Fitness months</div>
+      </div>
+      <div class="insight-card">
+        <div class="ic-num">4</div>
+        <div class="ic-label">Travel months</div>
+      </div>
+      <div class="insight-card">
+        <div class="ic-num">3</div>
+        <div class="ic-label">Story months</div>
+      </div>
+      <div class="insight-card">
+        <div class="ic-num">9</div>
+        <div class="ic-label">Reno months</div>
+      </div>
+    </div>
+    <div class="footer-text">REZDAR — CONTENT STRATEGY 2026</div>
+  </div>
+
+</div>
+
+<script>
+(function() {
+  /* ── QUARTER ACCORDION ── */
+  var quarters = document.querySelectorAll('.quarter');
+  for (var q = 0; q < quarters.length; q++) {
+    (function(quarter) {
+      var header = quarter.querySelector('.quarter-header');
+      header.onclick = function() {
+        if (quarter.className.indexOf('open') !== -1) {
+          quarter.className = 'quarter';
+        } else {
+          quarter.className = 'quarter open';
+        }
+      };
+    })(quarters[q]);
+  }
+
+  /* ── BUCKET FILTER ── */
+  var activeFilter = null;
+  var legendEl = document.getElementById('legend');
+  var hintEl = document.getElementById('resetHint');
+  var cards = document.querySelectorAll('.month-card');
+  var items = document.querySelectorAll('.legend-item');
+  var allTags = document.querySelectorAll('.bucket-tag');
+
+  function getBaseClass(card) {
+    var cls = 'month-card';
+    if (card.getAttribute('data-month')) {
+      var mn = parseInt(card.getAttribute('data-month'), 10);
+      if (mn < currentMonth) cls += ' month-passed';
+      else if (mn === currentMonth) cls += ' month-current';
+    }
+    return cls;
+  }
+
+  function resetAll() {
+    activeFilter = null;
+    hintEl.className = 'reset-hint';
+    for (var i = 0; i < items.length; i++) {
+      items[i].className = 'legend-item';
+    }
+    for (var j = 0; j < cards.length; j++) {
+      cards[j].className = getBaseClass(cards[j]);
+    }
+    for (var k = 0; k < allTags.length; k++) {
+      allTags[k].className = allTags[k].className.replace(' tag-dimmed', '');
+    }
+  }
+
+  function applyFilter(type) {
+    activeFilter = type;
+    hintEl.className = 'reset-hint visible';
+
+    // Open all quarters so filtered results are visible
+    for (var q = 0; q < quarters.length; q++) {
+      quarters[q].className = 'quarter open';
+    }
+
+    for (var i = 0; i < items.length; i++) {
+      var t = items[i].getAttribute('data-type');
+      if (t === type) {
+        items[i].className = 'legend-item active';
+      } else {
+        items[i].className = 'legend-item dimmed';
+      }
+    }
+
+    for (var j = 0; j < cards.length; j++) {
+      var buckets = cards[j].getAttribute('data-buckets') || '';
+      var base = getBaseClass(cards[j]);
+      if (buckets.indexOf(type) !== -1) {
+        cards[j].className = base;
+      } else {
+        cards[j].className = base + ' filtered-out';
+      }
+    }
+
+    for (var k = 0; k < allTags.length; k++) {
+      var tag = allTags[k];
+      var clean = tag.className.replace(' tag-dimmed', '');
+      if (clean.indexOf(type) !== -1) {
+        tag.className = clean;
+      } else {
+        tag.className = clean + ' tag-dimmed';
+      }
+    }
+  }
+
+  /* ── CURRENT QUARTER DETECTION ── */
+  var currentQ = Math.ceil(currentMonth / 3);
+  for (var qi = 0; qi < quarters.length; qi++) {
+    var qNum = parseInt(quarters[qi].getAttribute('data-q'), 10);
+    if (qNum === currentQ) {
+      quarters[qi].className = 'quarter open';
+    } else {
+      quarters[qi].className = 'quarter';
+    }
+    // Show/hide NOW badge
+    var badge = quarters[qi].querySelector('.quarter-badge');
+    if (badge) {
+      badge.style.display = (qNum === currentQ) ? 'inline-block' : 'none';
+    }
+  }
+
+  /* ── CURRENT MONTH DETECTION ── */
+  var now = new Date();
+  var currentMonth = now.getMonth() + 1; // 1-indexed
+
+  for (var m = 0; m < cards.length; m++) {
+    var monthNum = parseInt(cards[m].getAttribute('data-month'), 10);
+    if (monthNum < currentMonth) {
+      cards[m].className = cards[m].className + ' month-passed';
+    } else if (monthNum === currentMonth) {
+      cards[m].className = cards[m].className + ' month-current';
+
+      // Calculate progress
+      var year = now.getFullYear();
+      var daysInMonth = new Date(year, currentMonth, 0).getDate();
+      var currentDay = now.getDate();
+      var pct = Math.round((currentDay / daysInMonth) * 100);
+      var remaining = daysInMonth - currentDay;
+
+      // Fill progress bar
+      var bar = cards[m].querySelector('.progress-fill');
+      var pctLabel = cards[m].querySelector('.progress-pct');
+      var elapsedLabel = cards[m].querySelector('.days-elapsed');
+      var remainingLabel = cards[m].querySelector('.days-remaining');
+
+      if (bar) {
+        var finalWidth = pct + '%';
+        bar.style.width = '0%';
+        setTimeout(function() { bar.style.width = finalWidth; }, 400);
+      }
+      if (pctLabel) pctLabel.textContent = pct + '%';
+      if (elapsedLabel) elapsedLabel.textContent = 'Day ' + currentDay;
+      if (remainingLabel) remainingLabel.textContent = remaining + ' days left';
+    }
+  }
+
+  legendEl.onclick = function(e) {
+    var target = e.target;
+    while (target && target !== legendEl) {
+      if (target.className && target.className.indexOf('legend-item') !== -1) {
+        var type = target.getAttribute('data-type');
+        if (activeFilter === type) {
+          resetAll();
+        } else {
+          applyFilter(type);
+        }
+        return;
+      }
+      target = target.parentNode;
+    }
+  };
+})();
+</script>
+
+</body>
+</html>
