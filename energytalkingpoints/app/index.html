@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Understand The World</title>
+<title>Understand Energy</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🔥</text></svg>" />
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;0,800;1,400;1,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 <style>
@@ -275,7 +275,7 @@ function App() {
         <div style={{ textAlign: "center", maxWidth: 560, position: "relative", zIndex: 1 }}>
           <div style={{ fontSize: 11, letterSpacing: 6, color: T.primary, marginBottom: 28, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", opacity: 0.8 }}>How well do you understand</div>
           <h1 style={{ fontSize: "clamp(44px, 9vw, 76px)", fontWeight: 800, color: "#fff", fontFamily: "'Playfair Display', Georgia, serif", lineHeight: 1.05, margin: "0 0 8px", textShadow: "0 2px 40px rgba(255,107,26,0.15)" }}>Understand</h1>
-          <h1 style={{ fontSize: "clamp(44px, 9vw, 76px)", fontWeight: 700, fontFamily: "'Playfair Display', Georgia, serif", lineHeight: 1.05, margin: "0 0 12px", background: `linear-gradient(135deg, ${T.primary}, ${T.amber}, ${T.flame})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", filter: "drop-shadow(0 0 30px rgba(255,107,26,0.3))" }}><em>The World</em></h1>
+          <h1 style={{ fontSize: "clamp(44px, 9vw, 76px)", fontWeight: 700, fontFamily: "'Playfair Display', Georgia, serif", lineHeight: 1.05, margin: "0 0 12px", background: `linear-gradient(135deg, ${T.primary}, ${T.amber}, ${T.flame})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", filter: "drop-shadow(0 0 30px rgba(255,107,26,0.3))" }}><em>Energy</em></h1>
           <div style={{ width: 60, height: 3, margin: "24px auto", background: `linear-gradient(90deg, transparent, ${T.primary}, transparent)`, borderRadius: 2 }} />
           <p style={{ fontSize: 17, color: "rgba(255,255,255,0.4)", lineHeight: 1.7, margin: "24px auto 20px", maxWidth: 440, fontWeight: 300 }}>Most people score worse than random guessing on basic questions about energy, climate, poverty, and economics.</p>
           <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap", marginBottom: 40 }}>
@@ -340,14 +340,14 @@ function App() {
         {flameSvg}
         <div style={{ maxWidth: 480, width: "100%", textAlign: "center", position: "relative", zIndex: 1 }}>
           <div style={{ fontSize: 11, letterSpacing: 6, color: T.primary, marginBottom: 12, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase" }}>Your Results</div>
-          <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 34, color: "#fff", fontWeight: 400, margin: "0 0 40px" }}>How well do you<br/><em style={{ background: `linear-gradient(135deg, ${T.primary}, ${T.amber})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>understand the world?</em></h2>
+          <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 34, color: "#fff", fontWeight: 400, margin: "0 0 40px" }}>How well do you<br/><em style={{ background: `linear-gradient(135deg, ${T.primary}, ${T.amber})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>understand energy?</em></h2>
           <ScoreRing score={soloScore} total={maxScore} />
           <div style={{ marginTop: 40, textAlign: "left" }}>
             <div style={{ fontSize: 11, letterSpacing: 4, color: T.textFaint, marginBottom: 16, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase" }}>By Category</div>
             {Object.entries(cats).map(([k, v]) => <AnimBar key={k} label={CATS[k].label} value={Math.round((v.c / v.t) * 100)} max={100} color={CATS[k].color} delay={300} />)}
           </div>
           <div style={{ marginTop: 32, padding: 20, borderRadius: 12, background: "rgba(255,107,26,0.03)", border: "1px solid rgba(255,107,26,0.1)", textAlign: "left" }}>
-            <div style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", lineHeight: 1.7, fontWeight: 300 }}>Don't worry — most people score poorly. <strong style={{ color: T.primary, fontWeight: 600 }}>Understanding the world starts with discovering what you got wrong.</strong></div>
+            <div style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", lineHeight: 1.7, fontWeight: 300 }}>Don't worry — most people score poorly. <strong style={{ color: T.primary, fontWeight: 600 }}>Understanding energy starts with discovering what you got wrong.</strong></div>
           </div>
           <div style={{ display: "flex", gap: 12, marginTop: 32, justifyContent: "center" }}><Btn onClick={soloRestart}>Play Again</Btn><Btn variant="secondary" onClick={() => setScreen("home")}>Home</Btn></div>
         </div>
@@ -364,7 +364,7 @@ function App() {
           <div style={{ display: "inline-block", padding: "6px 16px", borderRadius: 20, background: "rgba(167,139,250,0.1)", border: "1px solid rgba(167,139,250,0.2)", marginBottom: 16 }}>
             <span style={{ fontSize: 12, color: "#A78BFA", fontFamily: "'JetBrains Mono', monospace", fontWeight: 600 }}>🧪 DEMO MODE — {pc} simulated students</span>
           </div>
-          <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 34, color: "#fff", margin: "0 0 32px" }}>Understand <em style={{ color: T.primary }}>The World</em></h2>
+          <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 34, color: "#fff", margin: "0 0 32px" }}>Understand <em style={{ color: T.primary }}>Energy</em></h2>
           <div style={{ padding: 32, borderRadius: 20, background: T.cardBg, border: `1px solid ${T.cardBorder}`, marginBottom: 32 }}>
             <div style={{ fontSize: 13, color: T.textDim, marginBottom: 12, fontFamily: "'JetBrains Mono', monospace" }}>Room code:</div>
             <div style={{ fontSize: 72, fontWeight: 800, fontFamily: "'JetBrains Mono', monospace", color: "#fff", letterSpacing: 12, textShadow: "0 0 40px rgba(255,107,26,0.4)" }}>{room.code}</div>
