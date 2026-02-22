@@ -1,1 +1,302 @@
-  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Understand The World — For Alex Epstein</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;0,800;1,400;1,700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#0B1628;--primary:#FF6B1A;--amber:#FFAA00;--flame:#FF4500;--navy:#122240;--card:rgba(18,34,64,0.6);--border:rgba(255,107,26,0.12);--success:#22C55E;--error:#FF4444;--dim:rgba(255,255,255,0.5);--faint:rgba(255,255,255,0.25)}
+  html{scroll-behavior:smooth}
+  body{font-family:'Outfit',sans-serif;background:var(--bg);color:#fff;-webkit-font-smoothing:antialiased;overflow-x:hidden;background-image:radial-gradient(ellipse at 50% 100%,rgba(255,107,26,0.08) 0%,transparent 50%),radial-gradient(ellipse at 20% 80%,rgba(255,69,0,0.05) 0%,transparent 40%)}
+  .page{max-width:600px;margin:0 auto;padding:48px 20px 80px}
+
+  .header{text-align:center;margin-bottom:56px;opacity:0;animation:fadeUp .8s ease forwards .2s}
+  .for-badge{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--primary);margin-bottom:24px}
+  .header h1{font-family:'Playfair Display',serif;font-size:clamp(36px,8vw,56px);font-weight:800;line-height:1.05}
+  .header h1 em{background:linear-gradient(135deg,var(--primary),var(--amber),var(--flame));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .header p{font-size:16px;color:var(--dim);margin-top:16px;line-height:1.6;font-weight:300}
+
+  .label{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--faint);margin-bottom:20px;text-align:center}
+
+  /* PHONE — fixed height, no reflow */
+  .phone{width:100%;max-width:360px;margin:0 auto;border-radius:28px;border:2px solid rgba(255,255,255,0.06);background:var(--bg);position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.4),0 0 0 1px rgba(255,255,255,0.03)}
+  .phone-inner{padding:24px 20px 28px;position:relative;overflow:hidden}
+  .phone-notch{width:120px;height:5px;background:rgba(255,255,255,0.08);border-radius:3px;margin:0 auto 20px}
+  .phone.wide{max-width:440px}
+
+  /* Lock heights so page never shifts */
+  #solo-phone .phone-inner{min-height:880px}
+  #class-phone .phone-inner{min-height:900px}
+
+  .q-category{display:inline-block;padding:4px 12px;border-radius:16px;font-size:11px;font-family:'JetBrains Mono',monospace;font-weight:500;background:rgba(74,158,255,0.12);color:#4A9EFF;border:1px solid rgba(74,158,255,0.15)}
+  .q-counter{float:right;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--faint);line-height:26px}
+  .q-icon{font-size:28px;text-align:center;margin:16px 0 10px}
+  .q-text{font-family:'Playfair Display',serif;font-size:19px;font-weight:400;text-align:center;line-height:1.4;margin-bottom:20px}
+
+  .choice{display:flex;align-items:center;gap:10px;padding:13px 16px;border-radius:10px;background:var(--navy);margin-bottom:8px;border:1px solid rgba(255,255,255,0.04);font-size:14px;color:rgba(255,255,255,0.7);transition:all .5s ease}
+  .choice-letter{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;flex-shrink:0;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3);transition:all .5s ease}
+  .choice.selected{background:rgba(255,107,26,0.12);border-color:rgba(255,107,26,0.4);color:#fff}
+  .choice.selected .choice-letter{background:rgba(255,107,26,0.2);color:var(--primary)}
+  .choice.correct{background:rgba(34,197,94,0.15);border-color:rgba(34,197,94,0.5);color:var(--success)}
+  .choice.correct .choice-letter{background:rgba(34,197,94,0.2);color:var(--success)}
+  .choice.wrong{background:rgba(255,68,68,0.08);border-color:rgba(255,68,68,0.25);color:var(--error);opacity:.7}
+  .choice.wrong .choice-letter{background:rgba(255,68,68,0.15);color:var(--error)}
+  .choice.dimmed{opacity:.25}
+
+  .result-panel{margin-top:16px;padding:18px;border-radius:12px;background:var(--card);border:1px solid var(--border);opacity:0;transition:opacity .8s}
+  .result-panel.show{opacity:1}
+  .result-explanation{font-size:13px;color:rgba(255,255,255,0.55);line-height:1.7;font-weight:300;margin-bottom:12px}
+  .result-insight{padding:10px 14px;border-radius:8px;background:rgba(255,107,26,0.06);border-left:3px solid var(--primary);font-size:13px;color:#FF8C42;line-height:1.5;font-weight:500}
+  .result-source{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--faint);margin-top:10px}
+
+  .classroom-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .live-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:16px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2)}
+  .live-dot{width:7px;height:7px;border-radius:50%;background:var(--success);animation:pulse 1.5s ease infinite}
+  .live-text{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--success);font-weight:600}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+  .students{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:16px 0}
+  .student{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-family:'JetBrains Mono',monospace;font-weight:600;background:rgba(255,255,255,0.04);color:var(--faint);transition:all .4s ease;border:1px solid transparent}
+  .student.answered{background:rgba(34,197,94,0.12);color:var(--success);border-color:rgba(34,197,94,0.25)}
+  .student.wrong-a{background:rgba(255,107,26,0.15);color:var(--primary);border-color:rgba(255,107,26,0.3)}
+  .student.right-a{background:rgba(34,197,94,0.25);color:var(--success);border-color:rgba(34,197,94,0.5)}
+
+  .answer-counter{text-align:center;margin:12px 0;font-family:'JetBrains Mono',monospace}
+  .answer-counter .big{font-size:36px;font-weight:800;color:var(--primary);transition:color .5s}
+  .answer-counter .big.done{color:var(--success)}
+  .answer-counter .sub{font-size:12px;color:var(--dim)}
+
+  .dist-results-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--faint);text-transform:uppercase;margin-bottom:14px}
+  .dist-row{margin-bottom:12px;border-radius:12px;overflow:hidden;background:var(--navy);border:2px solid transparent;transition:border-color 1s ease}
+  .dist-row.is-correct{border-color:rgba(34,197,94,0.5)}
+  .dist-row-top{display:flex;justify-content:space-between;align-items:center;padding:10px 14px 6px}
+  .dist-row-top-left{display:flex;align-items:center;gap:8px}
+  .dist-letter{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3);transition:all .8s}
+  .dist-row.is-correct .dist-letter{background:rgba(34,197,94,0.2);color:var(--success)}
+  .dist-option{font-size:13px;color:rgba(255,255,255,0.5);transition:color .8s}
+  .dist-row.is-correct .dist-option{color:var(--success);font-weight:600}
+  .dist-pct-text{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;color:var(--primary);opacity:0;transition:opacity .8s}
+  .dist-row.is-correct .dist-pct-text{color:var(--success)}
+  .dist-count{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--faint);margin-left:6px;opacity:0;transition:opacity .8s}
+  .dist-bar-track{height:14px;margin:0 14px 10px;border-radius:7px;background:rgba(255,255,255,0.03);overflow:hidden}
+  .dist-bar-fill{height:100%;border-radius:7px;width:0;transition:width 1.8s cubic-bezier(0.16,1,0.3,1)}
+  .dist-row:not(.is-correct) .dist-bar-fill{background:linear-gradient(90deg,var(--primary),var(--amber));box-shadow:0 0 12px rgba(255,107,26,0.2)}
+  .dist-row.is-correct .dist-bar-fill{background:linear-gradient(90deg,var(--success),#4ADE80);box-shadow:0 0 16px rgba(34,197,94,0.3)}
+
+  /* Phases use opacity only — no height changes */
+  .phase{position:absolute;left:20px;right:20px;transition:opacity .5s}
+  .phase.hidden{opacity:0;pointer-events:none}
+  .phase.visible{opacity:1}
+
+  .step-label{text-align:center;padding:8px 0;margin:4px 0 10px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;opacity:0;transition:opacity .5s}
+  .step-label.show{opacity:1}
+  .step-label.orange{color:var(--primary)}
+  .step-label.green{color:var(--success)}
+
+  .cta{text-align:center;margin-top:56px;padding-top:40px;border-top:1px solid rgba(255,255,255,0.04)}
+  .cta h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:400;line-height:1.4;margin-bottom:8px}
+  .cta h2 strong{color:var(--primary);font-weight:700}
+  .cta p{font-size:14px;color:var(--dim);font-weight:300}
+  .cta .name{color:var(--primary);font-weight:600;margin-top:16px;font-size:15px}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  .fade-in{opacity:0;transform:translateY(20px);transition:opacity .6s,transform .6s}
+  .fade-in.visible{opacity:1;transform:translateY(0)}
+  .section-gap{margin-bottom:72px}
+
+  .cursor-dot{position:absolute;width:40px;height:40px;border-radius:50%;background:rgba(255,107,26,0.15);border:2px solid rgba(255,107,26,0.4);pointer-events:none;z-index:10;opacity:0;transition:top .6s cubic-bezier(.4,0,.2,1),left .6s cubic-bezier(.4,0,.2,1),opacity .3s}
+  .cursor-dot.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="for-badge">Built for Alex Epstein</div>
+    <h1>Understand<br><em>The World</em></h1>
+    <p>Turn your lectures into interactive experiences.<br>Show students how wrong they are — using your data.</p>
+  </div>
+
+  <!-- ═══ SOLO ═══ -->
+  <div class="demo-section section-gap fade-in" id="solo-demo">
+    <div class="label">Solo Play</div>
+    <div class="phone" id="solo-phone">
+      <div class="phone-inner">
+        <div class="phone-notch"></div>
+        <div><span class="q-category">Climate</span><span class="q-counter">5 / 10</span></div>
+        <div class="q-icon">🌡️</div>
+        <div class="q-text">Which kills more people globally each year: cold or heat?</div>
+        <div class="step-label orange" id="solo-step1">↓ Player answers</div>
+        <div id="solo-choices">
+          <div class="choice" data-i="0"><span class="choice-letter">A</span> Heat kills 5x more</div>
+          <div class="choice" data-i="1"><span class="choice-letter">B</span> Heat kills 2x more</div>
+          <div class="choice" data-i="2"><span class="choice-letter">C</span> About the same</div>
+          <div class="choice" data-i="3"><span class="choice-letter">D</span> Cold kills 10x more</div>
+        </div>
+        <div class="step-label green" id="solo-step2">↓ Reality revealed</div>
+        <div class="result-panel" id="solo-result">
+          <div class="result-explanation">Cold kills roughly 10 times more people than heat globally. A Lancet study covering 68 million deaths found cold-related mortality vastly exceeds heat.</div>
+          <div class="result-insight">💡 The narrative focuses on heat waves, but cold is by far the bigger killer.</div>
+          <div class="result-source">Source: The Lancet, 2021</div>
+        </div>
+        <div class="cursor-dot" id="solo-cursor"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ CLASSROOM ═══ -->
+  <div class="demo-section section-gap fade-in" id="classroom-demo">
+    <div class="label">Classroom Mode — Live on Stage</div>
+    <div class="phone wide" id="class-phone">
+      <div class="phone-inner">
+        <div class="phone-notch"></div>
+        <div class="classroom-header">
+          <div><span class="q-category">Climate</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--faint);margin-left:10px">Q2 / 10</span></div>
+          <div class="live-badge"><div class="live-dot"></div><span class="live-text">16 students</span></div>
+        </div>
+        <div class="q-icon">🌍</div>
+        <div class="q-text" style="font-size:17px">Since 1920, how much have climate-related disaster deaths changed?</div>
+
+        <!-- Wrapper to contain absolute phases -->
+        <div style="position:relative;min-height:600px">
+          <div class="phase visible" id="class-p1">
+            <div class="step-label orange show">Students answering on their phones...</div>
+            <div class="students" id="student-grid"></div>
+            <div class="answer-counter"><div class="big" id="class-counter">0/16</div><div class="sub">responses received</div></div>
+          </div>
+
+          <div class="phase hidden" id="class-p2">
+            <div class="step-label green show">Results revealed to the room</div>
+            <div class="students" id="student-grid-2"></div>
+            <div class="dist-results-label">Classroom responses — 16 students</div>
+            <div class="dist-row" id="d0"><div class="dist-row-top"><div class="dist-row-top-left"><span class="dist-letter">A</span><span class="dist-option">Increased 50%</span></div><div style="display:flex;align-items:baseline"><span class="dist-pct-text" id="d0p">38%</span><span class="dist-count" id="d0c">(6)</span></div></div><div class="dist-bar-track"><div class="dist-bar-fill" id="d0b"></div></div></div>
+            <div class="dist-row" id="d1"><div class="dist-row-top"><div class="dist-row-top-left"><span class="dist-letter">B</span><span class="dist-option">Stayed the same</span></div><div style="display:flex;align-items:baseline"><span class="dist-pct-text" id="d1p">31%</span><span class="dist-count" id="d1c">(5)</span></div></div><div class="dist-bar-track"><div class="dist-bar-fill" id="d1b"></div></div></div>
+            <div class="dist-row" id="d2"><div class="dist-row-top"><div class="dist-row-top-left"><span class="dist-letter">C</span><span class="dist-option">Declined ~50%</span></div><div style="display:flex;align-items:baseline"><span class="dist-pct-text" id="d2p">19%</span><span class="dist-count" id="d2c">(3)</span></div></div><div class="dist-bar-track"><div class="dist-bar-fill" id="d2b"></div></div></div>
+            <div class="dist-row is-correct" id="d3"><div class="dist-row-top"><div class="dist-row-top-left"><span class="dist-letter">✓</span><span class="dist-option">Declined ~98%</span></div><div style="display:flex;align-items:baseline"><span class="dist-pct-text" id="d3p">12%</span><span class="dist-count" id="d3c">(2)</span></div></div><div class="dist-bar-track"><div class="dist-bar-fill" id="d3b"></div></div></div>
+            <div id="class-insight" style="margin-top:16px;padding:12px 16px;border-radius:10px;background:rgba(255,107,26,0.06);border-left:3px solid var(--primary);opacity:0;transition:opacity .8s">
+              <div style="font-size:14px;color:#FF8C42;line-height:1.5;font-weight:500">💡 More CO₂, yet 98% fewer climate deaths. Energy is the ultimate climate protection.</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--faint);margin-top:8px">Source: EM-DAT International Disaster Database</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="cta fade-in">
+    <h2>Turn your Energy Talking Points into<br><strong>interactive proof your audience won't forget.</strong></h2>
+    <p>Working prototype ready. 10 questions. Solo + classroom mode.</p>
+    <div class="name">Rezdar — Rezdar Digital</div>
+  </div>
+</div>
+
+<script>
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+}, { threshold: 0.15 });
+document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+// ═══ SOLO ═══
+const SOLO_CYCLE = 13000;
+let sT = [];
+function st(fn, ms) { sT.push(setTimeout(fn, ms)); }
+
+function resetSolo() {
+  sT.forEach(clearTimeout); sT = [];
+  const cs = document.querySelectorAll('#solo-choices .choice');
+  ['A','B','C','D'].forEach((l,i) => { cs[i].className = 'choice'; cs[i].querySelector('.choice-letter').textContent = l; });
+  document.getElementById('solo-result').classList.remove('show');
+  const c = document.getElementById('solo-cursor'); c.classList.remove('show'); c.style.transform = '';
+  document.getElementById('solo-step1').classList.remove('show');
+  document.getElementById('solo-step2').classList.remove('show');
+}
+
+function runSolo() {
+  resetSolo();
+  const cur = document.getElementById('solo-cursor');
+  const cs = document.querySelectorAll('#solo-choices .choice');
+  const phone = document.getElementById('solo-phone');
+
+  st(() => document.getElementById('solo-step1').classList.add('show'), 3000);
+
+  st(() => {
+    const r = cs[1].getBoundingClientRect(), pr = phone.getBoundingClientRect();
+    cur.style.top = (r.top - pr.top + r.height/2 - 20) + 'px';
+    cur.style.left = (r.left - pr.left + r.width/2 - 20) + 'px';
+    cur.classList.add('show');
+  }, 3800);
+
+  st(() => { cs[1].classList.add('selected'); cur.style.transform = 'scale(0.8)'; st(() => cur.style.transform = 'scale(1)', 200); }, 4600);
+  st(() => cur.classList.remove('show'), 5200);
+  st(() => document.getElementById('solo-step1').classList.remove('show'), 6500);
+  st(() => document.getElementById('solo-step2').classList.add('show'), 7000);
+  st(() => {
+    cs[1].classList.remove('selected'); cs[1].classList.add('wrong'); cs[1].querySelector('.choice-letter').textContent = '✗';
+    cs[3].classList.add('correct'); cs[3].querySelector('.choice-letter').textContent = '✓';
+    cs[0].classList.add('dimmed'); cs[2].classList.add('dimmed');
+  }, 7500);
+  st(() => document.getElementById('solo-result').classList.add('show'), 8500);
+}
+
+const soloObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { runSolo(); setInterval(runSolo, SOLO_CYCLE); soloObs.unobserve(e.target); } });
+}, { threshold: 0.3 });
+soloObs.observe(document.getElementById('solo-demo'));
+
+// ═══ CLASSROOM ═══
+const NAMES = ['Em','Li','So','No','Ol','Lu','Mi','Et','Av','Ja','Is','Al','Ch','Wi','Am','Be'];
+const CLASS_CYCLE = 16000;
+let cT = [];
+function ct(fn, ms) { cT.push(setTimeout(fn, ms)); }
+
+function resetClassroom() {
+  cT.forEach(clearTimeout); cT = [];
+  ['student-grid','student-grid-2'].forEach(id => {
+    const g = document.getElementById(id); g.innerHTML = '';
+    NAMES.forEach(n => { const d = document.createElement('div'); d.className = 'student'; d.textContent = n; g.appendChild(d); });
+  });
+  document.getElementById('class-counter').textContent = '0/16';
+  document.getElementById('class-counter').classList.remove('done');
+  document.getElementById('class-p1').className = 'phase visible';
+  document.getElementById('class-p2').className = 'phase hidden';
+  ['d0b','d1b','d2b','d3b'].forEach(id => { const e = document.getElementById(id); e.style.transition = 'none'; e.style.width = '0'; requestAnimationFrame(() => e.style.transition = 'width 1.8s cubic-bezier(0.16,1,0.3,1)'); });
+  ['d0p','d1p','d2p','d3p','d0c','d1c','d2c','d3c'].forEach(id => document.getElementById(id).style.opacity = '0');
+  document.getElementById('class-insight').style.opacity = '0';
+}
+
+function runClassroom() {
+  resetClassroom();
+  const s1 = document.querySelectorAll('#student-grid .student');
+  const s2 = document.querySelectorAll('#student-grid-2 .student');
+  const counter = document.getElementById('class-counter');
+  const order = [...Array(16).keys()].sort(() => Math.random() - 0.5);
+  let ans = 0;
+
+  order.forEach((idx, i) => {
+    ct(() => { s1[idx].classList.add('answered'); ans++; counter.textContent = ans+'/16'; if(ans>=16) counter.classList.add('done'); }, 3000 + i*200);
+  });
+
+  const sw = 3000 + 16*200 + 1500;
+
+  ct(() => {
+    document.getElementById('class-p1').className = 'phase hidden';
+    document.getElementById('class-p2').className = 'phase visible';
+    order.slice(0,14).forEach(i => s2[i].classList.add('wrong-a'));
+    order.slice(14).forEach(i => s2[i].classList.add('right-a'));
+  }, sw);
+
+  const bars = [{b:'d0b',w:'38%',p:'d0p',c:'d0c'},{b:'d1b',w:'31%',p:'d1p',c:'d1c'},{b:'d2b',w:'19%',p:'d2p',c:'d2c'},{b:'d3b',w:'12%',p:'d3p',c:'d3c'}];
+  ct(() => { bars.forEach((b,i) => { ct(() => { document.getElementById(b.b).style.width=b.w; document.getElementById(b.p).style.opacity='1'; document.getElementById(b.c).style.opacity='1'; }, i*300); }); }, sw+500);
+  ct(() => document.getElementById('class-insight').style.opacity='1', sw+500+4*300+600);
+}
+
+const classObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { runClassroom(); setInterval(runClassroom, CLASS_CYCLE); classObs.unobserve(e.target); } });
+}, { threshold: 0.2 });
+classObs.observe(document.getElementById('classroom-demo'));
+</script>
+</body>
+</html>
