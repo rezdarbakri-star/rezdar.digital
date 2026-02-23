@@ -1,1 +1,539 @@
-...
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Learners — Hoover Institution</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cardinal: #8C1515;
+    --cardinal-light: #B83A3A;
+    --gold: #B9975B;
+    --dark: #0D0B07;
+    --text: #F5F0E8;
+    --text-mid: #B8B3A6;
+    --text-dim: #6A6458;
+    --text-faint: #3A3830;
+    --surface: #13110D;
+    --surface-hover: #1A1814;
+    --border: #242018;
+    --green: #4ADE80;
+    --red: #EF4444;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Source Serif 4', Georgia, serif;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 0 1.5rem; }
+
+  /* ── Hero ── */
+  .hero {
+    padding: 4.5rem 1.5rem 1.5rem;
+    text-align: center;
+  }
+  .hero-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--cardinal-light);
+    margin-bottom: 1rem;
+    opacity: 0; animation: fadeUp 0.6s ease 0.1s forwards;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 6vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.08;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    margin-bottom: 0.75rem;
+    opacity: 0; animation: fadeUp 0.6s ease 0.2s forwards;
+  }
+  .hero h1 span { color: var(--cardinal); }
+  .hero .sub {
+    font-size: 1rem;
+    color: var(--text-dim);
+    max-width: 440px;
+    margin: 0 auto;
+    opacity: 0; animation: fadeUp 0.6s ease 0.35s forwards;
+  }
+
+  /* ── Demo Card ── */
+  .demo-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin-bottom: 1rem;
+    opacity: 0; animation: fadeUp 0.5s ease forwards;
+  }
+  .demo-card:nth-child(1) { animation-delay: 0.4s; }
+  .demo-card:nth-child(2) { animation-delay: 0.5s; }
+  .demo-card:nth-child(3) { animation-delay: 0.6s; }
+  .demo-card:nth-child(4) { animation-delay: 0.7s; }
+  .demo-card:nth-child(5) { animation-delay: 0.8s; }
+  .demo-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.65rem;
+  }
+  .demo-q {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.1rem, 2.8vw, 1.35rem);
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.4;
+    margin-bottom: 1.25rem;
+  }
+
+  /* ── Slider ── */
+  .slider-display { text-align: center; margin-bottom: 0.6rem; }
+  .slider-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+    transition: color 0.3s;
+  }
+  .slider-val.dim { color: var(--text-dim); }
+  .slider-hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--text-faint);
+    margin-top: 0.15rem;
+  }
+  .track-wrap { position: relative; padding: 14px 0; margin-bottom: 0.3rem; }
+  .track {
+    height: 8px;
+    background: #1A1814;
+    border-radius: 4px;
+    position: relative;
+    cursor: pointer;
+  }
+  .track-fill {
+    position: absolute; top: 0; left: 0;
+    height: 100%; border-radius: 4px;
+    background: rgba(185,151,91,0.35);
+    transition: background 0.3s;
+  }
+  .thumb {
+    position: absolute; top: 50%;
+    width: 26px; height: 26px;
+    background: var(--gold);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    cursor: grab;
+    box-shadow: 0 2px 10px #00000066;
+    transition: all 0.3s;
+    z-index: 3;
+  }
+  .thumb.done { width: 14px; height: 14px; background: var(--text-dim); box-shadow: none; cursor: default; }
+  .correct-mark {
+    position: absolute; top: -8px;
+    width: 4px; height: 24px;
+    background: var(--green);
+    border-radius: 2px;
+    transform: translateX(-50%);
+    z-index: 5;
+    display: none;
+  }
+  .correct-mark.show { display: block; animation: fadeUp 0.5s ease; }
+  .correct-label {
+    position: absolute; top: -32px; left: 50%; transform: translateX(-50%);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem; font-weight: 700; color: var(--green); white-space: nowrap;
+  }
+  .track-mm {
+    display: flex; justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.55rem; color: var(--text-faint);
+  }
+
+  /* ── Choice buttons ── */
+  .opt {
+    display: flex; align-items: center; gap: 0.65rem; width: 100%;
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 0.75rem 1rem;
+    color: var(--text-mid); font-family: 'Source Serif 4', serif;
+    font-size: 0.9rem; text-align: left; cursor: pointer;
+    transition: all 0.2s; margin-bottom: 0.45rem; line-height: 1.45;
+  }
+  .opt:hover:not(.locked) { border-color: var(--text-faint); background: var(--surface-hover); }
+  .opt.locked { cursor: default; }
+  .opt.correct { background: #132A1A; border-color: #4ADE8055; color: var(--green); }
+  .opt.wrong { background: #2A1313; border-color: #EF444444; color: var(--red); }
+  .opt.faded { color: var(--text-faint); }
+  .ind {
+    width: 24px; height: 24px; min-width: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem; font-weight: 700;
+    background: #1A1814; color: var(--text-faint); border: 1px solid #2A2820;
+    transition: all 0.25s;
+  }
+  .correct .ind { background: var(--green); color: var(--dark); border-color: var(--green); }
+  .wrong .ind { background: var(--red); color: var(--dark); border-color: var(--red); }
+
+  /* ── Reveal ── */
+  .reveal {
+    background: var(--dark); border: 1px solid var(--border); border-radius: 10px;
+    padding: 1.15rem; margin-top: 1rem; display: none;
+  }
+  .reveal.show { display: block; animation: fadeUp 0.4s ease; }
+  .reveal-t {
+    font-size: 0.95rem; font-weight: 700; color: var(--text);
+    margin-bottom: 0.4rem; line-height: 1.35;
+  }
+  .reveal-t.ok {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--green);
+  }
+  .reveal-p { color: var(--text-dim); font-size: 0.85rem; line-height: 1.7; margin-bottom: 0.5rem; }
+  .reveal-src {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.6rem;
+    color: var(--text-faint); background: var(--surface);
+    display: inline-block; padding: 0.25rem 0.55rem; border-radius: 4px;
+  }
+
+  /* ── Lock button ── */
+  .lock {
+    display: inline-block; background: var(--gold); color: var(--dark); border: none;
+    border-radius: 8px; padding: 0.65rem 1.75rem;
+    font-family: 'Source Serif 4', serif; font-size: 0.85rem; font-weight: 700;
+    cursor: pointer; transition: all 0.15s; margin-top: 0.5rem;
+  }
+  .lock:hover { transform: translateY(-1px); filter: brightness(1.08); }
+  .lock.hidden { display: none; }
+
+  /* ── CTA ── */
+  .cta {
+    text-align: center;
+    padding: 2.5rem 1.5rem 1.5rem;
+    opacity: 0; animation: fadeUp 0.5s ease 0.9s forwards;
+  }
+  .cta p { color: var(--text-dim); font-size: 0.95rem; max-width: 480px; margin: 0 auto 0.35rem; }
+  .cta .small { font-size: 0.8rem; color: var(--text-faint); font-style: italic; }
+
+  /* ── Pitch box ── */
+  .pitch-box {
+    background: var(--surface);
+    border: 1.5px solid var(--cardinal);
+    border-radius: 14px;
+    padding: 1.75rem;
+    margin-bottom: 2rem;
+  }
+  .pitch-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem; font-weight: 700;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--cardinal-light);
+    margin-bottom: 1.25rem;
+  }
+  .pitch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+  .pitch-item-title {
+    font-weight: 700; font-size: 0.95rem;
+    color: var(--text); margin-bottom: 0.3rem;
+  }
+  .pitch-item-desc {
+    font-size: 0.82rem; color: var(--text-dim); line-height: 1.6;
+  }
+  .pitch-scale {
+    font-size: 0.85rem; color: var(--text-dim);
+    padding-top: 1rem; border-top: 1px solid var(--border);
+    margin-bottom: 0.75rem; line-height: 1.6;
+  }
+  .pitch-ask {
+    font-size: 0.9rem; color: var(--text); font-weight: 600;
+  }
+  .pitch-divider {
+    height: 1px; background: var(--border); margin: 1.25rem 0;
+  }
+  .pitch-bold {
+    font-size: 0.95rem; color: var(--text); font-weight: 700; margin-bottom: 0.35rem;
+  }
+  .pitch-text {
+    font-size: 0.88rem; color: var(--text-mid); margin-bottom: 0.5rem;
+  }
+  .pitch-list {
+    list-style: none; padding: 0; margin: 0 0 1.25rem 0;
+  }
+  .pitch-list li {
+    padding: 0.25rem 0;
+    color: var(--text-mid);
+    font-size: 0.85rem;
+    display: flex; align-items: flex-start; gap: 0.5rem;
+    line-height: 1.5;
+  }
+  .pitch-list li::before {
+    content: "→"; color: var(--cardinal-light); font-weight: 700; flex-shrink: 0;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    max-width: 680px; margin: 0 auto; padding: 2rem 1.5rem 3rem;
+    display: flex; justify-content: space-between; align-items: flex-end;
+    border-top: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--text-faint);
+  }
+  .footer .r { text-align: right; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @media (max-width: 500px) {
+    .footer { flex-direction: column; gap: 0.5rem; align-items: center; text-align: center; }
+    .footer .r { text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO — tiny -->
+<div class="hero">
+  <div class="hero-tag">A proposal for the Hoover Institution</div>
+  <h1>What if your research<br>could <span>teach itself?</span></h1>
+  <p class="sub">Try two questions from our working prototype. Drag. Click. See what happens.</p>
+</div>
+
+<div class="wrap">
+
+  <!-- Q1: SLIDER — Slavery -->
+  <div class="demo-card">
+    <div class="demo-label">⛓️ From The Slavery Blind Spots</div>
+    <div class="demo-q">Of all enslaved Africans shipped across the Atlantic, what percentage ended up in North America?</div>
+    <div class="slider-display">
+      <div class="slider-val" id="s1v">40%</div>
+      <div class="slider-hint">Drag to estimate</div>
+    </div>
+    <div class="track-wrap">
+      <div class="track" id="s1track">
+        <div class="track-fill" id="s1fill" style="width:50%"></div>
+        <div class="correct-mark" id="s1mark" style="left:7.5%"><div class="correct-label">6%</div></div>
+        <div class="thumb" id="s1thumb" style="left:50%"></div>
+      </div>
+    </div>
+    <div class="track-mm"><span>0%</span><span>80%</span></div>
+    <div style="text-align:center"><button class="lock" id="s1btn" onclick="lockSlider('s1')">Lock in my answer</button></div>
+    <div class="reveal" id="s1reveal">
+      <div class="reveal-t">About 5–6%. Over 90% went to the Caribbean and Brazil.</div>
+      <p class="reveal-p">The vast majority went to the Caribbean and Brazil, where conditions were far harsher. Yet North America dominates the global conversation on slavery.</p>
+      <div class="reveal-src">📖 Black Rednecks and White Liberals</div>
+    </div>
+  </div>
+
+  <!-- Q2: CHOICE — Tax -->
+  <div class="demo-card">
+    <div class="demo-label">💰 From The Tax Illusion</div>
+    <div class="demo-q">In the 1920s, the US cut the top tax rate from 73% to 25%. Revenue from the wealthy…</div>
+    <div id="q2opts">
+      <button class="opt" onclick="lockChoice('q2',0,2)"><span class="ind">A</span>Fell significantly</button>
+      <button class="opt" onclick="lockChoice('q2',1,2)"><span class="ind">B</span>Stayed about the same</button>
+      <button class="opt" onclick="lockChoice('q2',2,2)"><span class="ind">C</span>Nearly doubled</button>
+    </div>
+    <div class="reveal" id="q2reveal">
+      <div class="reveal-t" id="q2rt">Revenue nearly DOUBLED. People moved money out of tax shelters.</div>
+      <p class="reveal-p">At 73%, avoidance was rational. At 25%, earning openly beat paying accountants. The number of people reporting high incomes more than tripled. The same pattern repeated under Kennedy and Reagan.</p>
+      <div class="reveal-src">📖 Economic Facts and Fallacies, Ch. 2</div>
+    </div>
+  </div>
+
+  <!-- Q3: SLIDER — Abolition -->
+  <div class="demo-card">
+    <div class="demo-label">⛓️ From The Slavery Blind Spots</div>
+    <div class="demo-q">When was slavery last formally criminalized anywhere in the world?</div>
+    <div class="slider-display">
+      <div class="slider-val" id="s2v">1960</div>
+      <div class="slider-hint">Drag to estimate</div>
+    </div>
+    <div class="track-wrap">
+      <div class="track" id="s2track">
+        <div class="track-fill" id="s2fill" style="width:48%"></div>
+        <div class="correct-mark" id="s2mark" style="left:85.6%"><div class="correct-label">2007</div></div>
+        <div class="thumb" id="s2thumb" style="left:48%"></div>
+      </div>
+    </div>
+    <div class="track-mm"><span>1900</span><span>2025</span></div>
+    <div style="text-align:center"><button class="lock" id="s2btn" onclick="lockSlider('s2')">Lock in my answer</button></div>
+    <div class="reveal" id="s2reveal">
+      <div class="reveal-t">2007. In Mauritania.</div>
+      <p class="reveal-p">Mauritania "abolished" slavery in 1981 but didn't make it a criminal offense until 2007. Anti-slavery organizations estimate hundreds of thousands remain in bondage there today.</p>
+      <div class="reveal-src">📖 Race and Culture</div>
+    </div>
+  </div>
+
+  <!-- Q4: CHOICE — Disparities -->
+  <div class="demo-card">
+    <div class="demo-label">📊 From The Disparity Puzzle</div>
+    <div class="demo-q">Nigerian immigrants in the US — who are black — are educationally…</div>
+    <div id="q4opts">
+      <button class="opt" onclick="lockChoice('q4',0,2)"><span class="ind">A</span>Below the national average</button>
+      <button class="opt" onclick="lockChoice('q4',1,2)"><span class="ind">B</span>About average</button>
+      <button class="opt" onclick="lockChoice('q4',2,2)"><span class="ind">C</span>Among the most educated groups in the entire country</button>
+    </div>
+    <div class="reveal" id="q4reveal">
+      <div class="reveal-t" id="q4rt">They outperform white Americans in education and income.</div>
+      <p class="reveal-p">Same skin color, same country, vastly different outcomes. Culture, selection effects, and specific circumstances explain more than race alone ever could.</p>
+      <div class="reveal-src">📖 Discrimination and Disparities</div>
+    </div>
+  </div>
+
+  <!-- Q5: SLIDER — Family -->
+  <div class="demo-card">
+    <div class="demo-label">📊 From The Disparity Puzzle</div>
+    <div class="demo-q">In 1960, what percentage of black children were raised in two-parent families?</div>
+    <div class="slider-display">
+      <div class="slider-val" id="s3v">50%</div>
+      <div class="slider-hint">Drag to estimate</div>
+    </div>
+    <div class="track-wrap">
+      <div class="track" id="s3track">
+        <div class="track-fill" id="s3fill" style="width:47%"></div>
+        <div class="correct-mark" id="s3mark" style="left:80%"><div class="correct-label">78%</div></div>
+        <div class="thumb" id="s3thumb" style="left:47%"></div>
+      </div>
+    </div>
+    <div class="track-mm"><span>10%</span><span>95%</span></div>
+    <div style="text-align:center"><button class="lock" id="s3btn" onclick="lockSlider('s3')">Lock in my answer</button></div>
+    <div class="reveal" id="s3reveal">
+      <div class="reveal-t">78%. The black family survived slavery and Jim Crow. Then it collapsed.</div>
+      <p class="reveal-p">By 1992 it had dropped to 37%. The family structure that endured centuries of oppression disintegrated after welfare policies removed economic incentives for marriage.</p>
+      <div class="reveal-src">📖 Discrimination and Disparities</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- CTA -->
+<div class="cta">
+  <p><strong>This is 5 questions from one fellow.</strong></p>
+  <p>The full Sowell prototype has 8 chapters and 35+ questions. We've built the same format for Alex Epstein. It works.</p>
+</div>
+
+<div class="wrap">
+  <div class="pitch-box">
+    <div class="pitch-label">Where this fits</div>
+    <div class="pitch-grid">
+      <div class="pitch-item">
+        <div class="pitch-item-title">Embed on hoover.org</div>
+        <div class="pitch-item-desc">"Before you watch this Uncommon Knowledge episode, take the quiz." A pre-engagement layer on content you already produce.</div>
+      </div>
+      <div class="pitch-item">
+        <div class="pitch-item-title">Classroom tool</div>
+        <div class="pitch-item-desc">Professors assign a Learner before lecture. Students arrive having confronted their own misconceptions. Discussion starts at a higher level.</div>
+      </div>
+      <div class="pitch-item">
+        <div class="pitch-item-title">Social reach</div>
+        <div class="pitch-item-desc">Shareable results ("You scored 34% — the narrative got you") drive organic traffic to Hoover's work. Every share is a gateway.</div>
+      </div>
+    </div>
+    <div class="pitch-divider"></div>
+    <p class="pitch-bold">The Sowell Learner prototype is built and ready to demo.</p>
+    <p class="pitch-text">A pilot engagement would include:</p>
+    <ul class="pitch-list">
+      <li>Production-ready Learner for one fellow — fact-checked, designed, fully interactive</li>
+      <li>Web deployment — embeddable on hoover.org or as standalone link</li>
+      <li>Shareable results for social media distribution</li>
+      <li>Analytics on user responses (what do people get wrong most?)</li>
+    </ul>
+    <p class="pitch-scale">The format scales to any fellow with a thesis: Victor Davis Hanson, Niall Ferguson, Scott Atlas — one framework, customized to the content.</p>
+    <div class="pitch-ask">Happy to demo the full version. A short call is the easiest next step.</div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div><strong style="color:var(--text-dim)">Rezdar Digital</strong><br>rezdar.com</div>
+  <div class="r">Prepared for Peter Robinson<br>Hoover Institution, Stanford</div>
+</div>
+
+<script>
+// ── Slider engine ──
+const sliders = {
+  s1: { min: 0, max: 80, val: 40, unit: '%', correct: 6, correctPct: 7.5, answered: false },
+  s2: { min: 1900, max: 2025, val: 1960, unit: '', correct: 2007, correctPct: 85.6, answered: false },
+  s3: { min: 10, max: 95, val: 50, unit: '%', correct: 78, correctPct: 80, answered: false },
+};
+let activeSlider = null;
+
+function pctToVal(id, pct) {
+  const s = sliders[id];
+  return Math.round(s.min + (pct / 100) * (s.max - s.min));
+}
+
+function updateSlider(id, pct) {
+  const s = sliders[id];
+  if (s.answered) return;
+  pct = Math.max(0, Math.min(100, pct));
+  s.val = pctToVal(id, pct);
+  document.getElementById(id + 'thumb').style.left = pct + '%';
+  document.getElementById(id + 'fill').style.width = pct + '%';
+  document.getElementById(id + 'v').textContent = s.val + s.unit;
+}
+
+function getTrackPct(id, e) {
+  const rect = document.getElementById(id + 'track').getBoundingClientRect();
+  const x = (e.touches ? e.touches[0].clientX : e.clientX);
+  return ((x - rect.left) / rect.width) * 100;
+}
+
+Object.keys(sliders).forEach(id => {
+  const track = document.getElementById(id + 'track');
+  track.addEventListener('mousedown', e => { if (!sliders[id].answered) { activeSlider = id; updateSlider(id, getTrackPct(id, e)); }});
+  track.addEventListener('touchstart', e => { if (!sliders[id].answered) { activeSlider = id; updateSlider(id, getTrackPct(id, e)); }}, {passive:true});
+});
+
+window.addEventListener('mousemove', e => { if (activeSlider) updateSlider(activeSlider, getTrackPct(activeSlider, e)); });
+window.addEventListener('touchmove', e => { if (activeSlider) updateSlider(activeSlider, getTrackPct(activeSlider, e)); }, {passive:true});
+window.addEventListener('mouseup', () => activeSlider = null);
+window.addEventListener('touchend', () => activeSlider = null);
+
+function lockSlider(id) {
+  const s = sliders[id];
+  if (s.answered) return;
+  s.answered = true;
+  document.getElementById(id + 'btn').classList.add('hidden');
+  document.getElementById(id + 'thumb').classList.add('done');
+  document.getElementById(id + 'v').classList.add('dim');
+  document.getElementById(id + 'fill').style.background = '#5A5548';
+  document.getElementById(id + 'mark').classList.add('show');
+  document.getElementById(id + 'reveal').classList.add('show');
+}
+
+// ── Choice engine ──
+const choiceLocked = {};
+
+function lockChoice(qid, picked, correctIdx) {
+  if (choiceLocked[qid]) return;
+  choiceLocked[qid] = true;
+  const btns = document.querySelectorAll('#' + qid + 'opts .opt');
+  btns.forEach((btn, i) => {
+    btn.classList.add('locked');
+    if (i === correctIdx) { btn.classList.add('correct'); btn.querySelector('.ind').textContent = '✓'; }
+    else if (i === picked) { btn.classList.add('wrong'); btn.querySelector('.ind').textContent = '✗'; }
+    else { btn.classList.add('faded'); }
+  });
+  const rt = document.getElementById(qid + 'rt');
+  if (picked === correctIdx) { rt.textContent = '✓ You got it'; rt.classList.add('ok'); }
+  document.getElementById(qid + 'reveal').classList.add('show');
+}
+</script>
+</body>
+</html>
