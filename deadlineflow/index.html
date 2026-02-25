@@ -45,7 +45,7 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
     const googleProvider = new firebase.auth.GoogleAuthProvider();
-    googleProvider.addScope("https://www.googleapis.com/auth/calendar.events");
+    // Calendar scope requested separately only when pushing
 
     // Store Google access token globally
     let googleAccessToken = null;
@@ -102,14 +102,16 @@
       return await res.json();
     }
 
-    // Re-authenticate Google to get fresh token for Calendar
+    // Request Calendar access — separate popup with scope
     async function getGoogleCalendarToken() {
       try {
-        const result = await auth.currentUser.reauthenticateWithPopup(googleProvider);
+        const calProvider = new firebase.auth.GoogleAuthProvider();
+        calProvider.addScope("https://www.googleapis.com/auth/calendar.events");
+        const result = await auth.currentUser.reauthenticateWithPopup(calProvider);
         googleAccessToken = result.credential.accessToken;
         return googleAccessToken;
       } catch(e) {
-        console.error("Re-auth error:", e);
+        console.error("Calendar auth error:", e);
         return null;
       }
     }
@@ -130,8 +132,30 @@ const isToday=s=>s===iso(new Date());
 const isPast=s=>new Date(s)<new Date(iso(new Date()));
 const getWeekNum=s=>{const d=new Date(s);d.setHours(0,0,0,0);d.setDate(d.getDate()+3-(d.getDay()+6)%7);const w=new Date(d.getFullYear(),0,4);return 1+Math.round(((d-w)/864e5-3+(w.getDay()+6)%7)/7)};
 function skipWknd(d){while(d.getDay()===0||d.getDay()===6)d.setDate(d.getDate()-1);return d}
+function skipWkndFwd(d){while(d.getDay()===0||d.getDay()===6)d.setDate(d.getDate()+1);return d}
 function subBizDays(d,n){let r=n;while(r>0){d.setDate(d.getDate()-1);if(d.getDay()!==0&&d.getDay()!==6)r--}return d}
-function calcSteps(tpl,dl,skip=true){const st=[];let c=new Date(dl);if(skip)skipWknd(c);for(let i=tpl.steps.length-1;i>=0;i--){st.unshift({name:tpl.steps[i].name,date:iso(c),completed:false});if(i>0){if(skip)subBizDays(c,tpl.steps[i].days);else{c.setDate(c.getDate()-tpl.steps[i].days)}}}return st}
+function addBizDays(d,n){let r=n;while(r>0){d.setDate(d.getDate()+1);if(d.getDay()!==0&&d.getDay()!==6)r--}return d}
+function calcSteps(tpl,dl,skip=true){
+  const pre=tpl.steps.filter(s=>!s.after);
+  const post=tpl.steps.filter(s=>s.after);
+  const st=[];
+  // Pre-deadline steps (backward from deadline)
+  let c=new Date(dl);
+  if(skip)skipWknd(c);
+  for(let i=pre.length-1;i>=0;i--){
+    st.unshift({name:pre[i].name,date:iso(c),completed:false});
+    if(i>0){if(skip)subBizDays(c,pre[i].days);else c.setDate(c.getDate()-pre[i].days)}
+  }
+  // Post-deadline steps (forward from deadline)
+  if(post.length>0){
+    let p=new Date(dl);
+    for(let i=0;i<post.length;i++){
+      if(skip)addBizDays(p,post[i].days);else p.setDate(p.getDate()+post[i].days);
+      st.push({name:post[i].name,date:iso(p),completed:false,after:true});
+    }
+  }
+  return st;
+}
 
 // ===== THEMES =====
 const THEMES={
@@ -192,6 +216,7 @@ function LoginScreen({onLogin}){
   const [err,setErr]=useState("");
   const [loading,setLoading]=useState(false);
   const [showMore,setShowMore]=useState(false);
+  const [showPrivacy,setShowPrivacy]=useState(false);
 
   const doEmail=async()=>{
     if(!email||!pass){setErr("Fyll i e-post och lösenord");return}
@@ -215,14 +240,13 @@ function LoginScreen({onLogin}){
     setLoading(true);setErr("");
     try{
       const cred=await auth.signInWithPopup(googleProvider);
-      googleAccessToken=cred.credential.accessToken;
       onLogin({type:"google",email:cred.user.email,uid:cred.user.uid});
     }catch(e){setErr(e.message)}
     setLoading(false);
   };
 
   return(
-    <div style={{position:"fixed",inset:0,background:C.bg,zIndex:3000,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24,maxWidth:420,margin:"0 auto"}}>
+    <div style={{position:"fixed",inset:0,background:C.bg,zIndex:3000,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24,maxWidth:480,margin:"0 auto"}}>
       <div style={{width:56,height:56,background:`linear-gradient(135deg,${C.ac},${C.ac}88)`,borderRadius:16,display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,fontWeight:800,color:"#fff",marginBottom:20}}>DF</div>
       <h1 style={{fontSize:24,fontWeight:800,color:C.t1,marginBottom:4}}>DeadlineFlow</h1>
       <p style={{fontSize:13,color:C.t3,marginBottom:6}}>Planera. Följ upp. Leverera.</p>
@@ -270,17 +294,58 @@ function LoginScreen({onLogin}){
           </button>
         </div>
       )}
+
+      {/* Privacy policy link */}
+      <div onClick={()=>setShowPrivacy(true)} style={{position:"absolute",bottom:24,right:24,width:28,height:28,borderRadius:"50%",background:C.bg3,border:`1px solid ${C.bd}`,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
+        <span style={{fontSize:13,fontWeight:700,color:C.t3}}>?</span>
+      </div>
+
+      {showPrivacy&&<PrivacyModal onClose={()=>setShowPrivacy(false)}/>}
     </div>
   );
 }
 
+
+// ===== PRIVACY POLICY =====
+function PrivacyModal({onClose}){
+  return(
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.7)",zIndex:5000,display:"flex",alignItems:"center",justifyContent:"center",padding:16}} onClick={onClose}>
+      <div onClick={e=>e.stopPropagation()} style={{background:C.bg,borderRadius:16,maxWidth:400,width:"100%",maxHeight:"85vh",overflow:"auto",padding:"28px 24px",position:"relative"}}>
+        <button onClick={onClose} style={{position:"absolute",top:12,right:14,background:"none",border:"none",color:C.t3,fontSize:18,cursor:"pointer",fontFamily:"inherit"}}>✕</button>
+        <h2 style={{fontSize:18,fontWeight:800,color:C.t1,marginBottom:4}}>Integritetspolicy</h2>
+        <p style={{fontSize:10,color:C.t3,marginBottom:16}}>Senast uppdaterad: februari 2026</p>
+
+        <div style={{fontSize:12,color:C.t2,lineHeight:1.7}}>
+          <p style={{fontWeight:700,color:C.t1,marginBottom:4,marginTop:12}}>Vad är DeadlineFlow?</p>
+          <p style={{marginBottom:10}}>DeadlineFlow är en projektplaneringsapp utvecklad av Rezdar Digital. Appen hjälper dig planera deadlines, organisera steg och synka med Google Calendar.</p>
+
+          <p style={{fontWeight:700,color:C.t1,marginBottom:4,marginTop:12}}>Vilken data samlar vi in?</p>
+          <p style={{marginBottom:10}}>Vi samlar in din e-postadress och de projekt du skapar i appen. Om du loggar in med Google får vi tillgång till ditt namn och din e-post via ditt Google-konto. Vi lagrar inga lösenord — autentisering hanteras av Firebase Authentication (Google).</p>
+
+          <p style={{fontWeight:700,color:C.t1,marginBottom:4,marginTop:12}}>Google Calendar</p>
+          <p style={{marginBottom:10}}>Om du väljer att pusha uppgifter till Google Calendar begär vi tillgång till att skapa händelser i din kalender. Denna behörighet begärs separat och först när du aktivt trycker på "Push". Vi läser aldrig befintliga händelser i din kalender.</p>
+
+          <p style={{fontWeight:700,color:C.t1,marginBottom:4,marginTop:12}}>Var lagras din data?</p>
+          <p style={{marginBottom:10}}>Din data lagras säkert i Google Firebase (Firestore). Vi säljer, delar eller överför aldrig din data till tredje part utöver de tjänster som krävs för appens funktion (Firebase, Google Calendar API).</p>
+
+          <p style={{fontWeight:700,color:C.t1,marginBottom:4,marginTop:12}}>Dina rättigheter</p>
+          <p style={{marginBottom:10}}>Du kan radera alla dina projekt direkt i appen via Profil-fliken. Du kan när som helst ta bort ditt konto genom att kontakta oss. Du kan återkalla Google Calendar-åtkomst via ditt Google-konto under Säkerhet → Tredjepartsappar.</p>
+
+          <p style={{fontWeight:700,color:C.t1,marginBottom:4,marginTop:12}}>Kontakt</p>
+          <p style={{marginBottom:4}}>Rezdar Digital</p>
+          <p>E-post: info@rezdar.com</p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ===== CATEGORY PICKER (after onboarding) =====
 function CategoryPicker({onDone}){
   const [picked,setPicked]=useState([]);
   const toggle=id=>setPicked(p=>p.includes(id)?p.filter(x=>x!==id):[...p,id]);
   return(
-    <div style={{position:"fixed",inset:0,background:C.bg,zIndex:2500,display:"flex",flexDirection:"column",maxWidth:420,margin:"0 auto"}}>
+    <div style={{position:"fixed",inset:0,background:C.bg,zIndex:2500,display:"flex",flexDirection:"column",maxWidth:480,margin:"0 auto"}}>
       <div style={{flex:1,overflowY:"auto",padding:"32px 20px 100px"}}>
         <div style={{textAlign:"center",marginBottom:24}}>
           <div style={{fontSize:28,marginBottom:6}}>👋</div>
@@ -420,7 +485,7 @@ function Onboarding({onDone}){
   const s2Reveal=slide===1&&f>=3;
 
   return(
-    <div style={{position:"fixed",inset:0,background:C.bg,zIndex:2000,maxWidth:420,margin:"0 auto",display:"flex",flexDirection:"column",padding:"24px 20px 20px"}}>
+    <div style={{position:"fixed",inset:0,background:C.bg,zIndex:2000,maxWidth:480,margin:"0 auto",display:"flex",flexDirection:"column",padding:"24px 20px 20px"}}>
       <div style={{flex:1,display:"flex",flexDirection:"column",justifyContent:"center",overflowY:"auto"}}>
 
         {/* ===== SLIDE 1: Template + animated reminder chips ===== */}
@@ -617,7 +682,7 @@ function WeekView({data,onToggle}){
   const tasks=useMemo(()=>{
     const t=[];
     data.projects.forEach(p=>{const c=data.clients.find(x=>x.id===p.clientId);
-      p.steps.forEach((s,i)=>{t.push({pid:p.id,si:i,name:s.name,date:s.date,done:s.completed,client:c?c.name:"",color:c?c.color:"#6c5ce7",pname:p.name,isDL:i===p.steps.length-1})})});
+      p.steps.forEach((s,i)=>{const dlI=p.steps.reduce((a,x,j)=>x.after?a:j,-1);t.push({pid:p.id,si:i,name:s.name,date:s.date,done:s.completed,client:c?c.name:"",color:c?c.color:"#6c5ce7",pname:p.name,isDL:i===dlI,isAfter:!!s.after})})});
     return t.sort((a,b)=>a.date.localeCompare(b.date));
   },[data]);
 
@@ -673,30 +738,30 @@ function WeekView({data,onToggle}){
 
   const TaskCard=({t,accent,compact})=>(
     <div onClick={()=>onToggle(t.pid,t.si)}
-      style={{display:"flex",alignItems:"center",gap:compact?8:12,padding:compact?"8px 10px":"14px 16px",background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:compact?10:14,borderLeft:`3px solid ${t.color}`,cursor:"pointer",opacity:t.done?0.35:1,transition:"opacity .3s"}}>
-      <div style={{width:compact?16:22,height:compact?16:22,border:`2px solid ${t.done?C.gn:C.bd2}`,borderRadius:compact?4:7,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:t.done?C.gn:"transparent",transition:"all .2s"}}>
-        {t.done&&<span style={{color:"#fff",fontSize:compact?9:12,fontWeight:700}}>✓</span>}
+      style={{display:"flex",alignItems:"center",gap:compact?10:14,padding:compact?"10px 12px":"16px 18px",background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:compact?12:16,borderLeft:`3px solid ${t.color}`,cursor:"pointer",opacity:t.done?0.35:1,transition:"opacity .3s"}}>
+      <div style={{width:compact?18:24,height:compact?18:24,border:`2px solid ${t.done?C.gn:C.bd2}`,borderRadius:compact?5:8,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:t.done?C.gn:"transparent",transition:"all .2s"}}>
+        {t.done&&<span style={{color:"#fff",fontSize:compact?10:14,fontWeight:700}}>✓</span>}
       </div>
       <div style={{flex:1,minWidth:0}}>
-        <div style={{fontSize:compact?12:15,fontWeight:compact?500:600,textDecoration:t.done?"line-through":"none",color:t.done?C.t3:C.t1}}>{t.isDL?"🎯 ":""}{t.name}</div>
-        <div style={{fontSize:compact?9:12,color:C.t3,marginTop:compact?0:2}}>{t.client}{compact?"":" · "+t.pname}</div>
+        <div style={{fontSize:compact?14:17,fontWeight:compact?500:600,textDecoration:t.done?"line-through":"none",color:t.done?C.t3:t.isAfter?C.gn:C.t1}}>{t.isDL?"🎯 ":t.isAfter?"↪ ":""}{t.name}</div>
+        <div style={{fontSize:compact?11:13,color:C.t3,marginTop:compact?1:3}}>{t.client}{compact?"":" · "+t.pname}</div>
       </div>
-      {accent&&!t.done&&<div style={{width:6,height:6,borderRadius:"50%",background:C.ac,flexShrink:0}}/>}
+      {accent&&!t.done&&<div style={{width:8,height:8,borderRadius:"50%",background:C.ac,flexShrink:0}}/>}
     </div>
   );
 
   return(
     <div style={{paddingBottom:80}}>
       {overdue.length>0&&(
-        <div style={{marginBottom:16,padding:"14px 16px",background:"rgba(255,71,87,.06)",border:"1px solid rgba(255,71,87,.12)",borderRadius:16}}>
-          <div style={{fontSize:13,fontWeight:700,color:C.rd,marginBottom:10}}>⚠️ {overdue.length} försenade</div>
-          <div style={{display:"flex",flexDirection:"column",gap:6}}>
+        <div style={{marginBottom:16,padding:"16px 18px",background:"rgba(255,71,87,.06)",border:"1px solid rgba(255,71,87,.12)",borderRadius:16}}>
+          <div style={{fontSize:15,fontWeight:700,color:C.rd,marginBottom:10}}>⚠️ {overdue.length} försenade</div>
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
             {overdue.slice(0,3).map(t=>(
               <div key={`o-${t.pid}-${t.si}`} onClick={()=>onToggle(t.pid,t.si)}
-                style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"rgba(255,71,87,.04)",borderRadius:10,cursor:"pointer",border:`1px solid rgba(255,71,87,.1)`}}>
-                <div style={{width:18,height:18,border:`2px solid ${C.rd}`,borderRadius:5,flexShrink:0}}/>
-                <div style={{flex:1}}><span style={{fontSize:13,fontWeight:600,color:C.rd}}>{t.name}</span></div>
-                <span style={{fontSize:11,color:C.t3}}>{t.client}</span>
+                style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",background:"rgba(255,71,87,.04)",borderRadius:12,cursor:"pointer",border:`1px solid rgba(255,71,87,.1)`}}>
+                <div style={{width:20,height:20,border:`2px solid ${C.rd}`,borderRadius:6,flexShrink:0}}/>
+                <div style={{flex:1}}><span style={{fontSize:15,fontWeight:600,color:C.rd}}>{t.name}</span></div>
+                <span style={{fontSize:13,color:C.t3}}>{t.client}</span>
               </div>
             ))}
           </div>
@@ -704,20 +769,20 @@ function WeekView({data,onToggle}){
       )}
 
       {/* ===== HERO: TODAY ===== */}
-      <div style={{marginBottom:20}}>
-        <div style={{display:"flex",alignItems:"baseline",justifyContent:"space-between",marginBottom:12}}>
+      <div style={{marginBottom:24}}>
+        <div style={{display:"flex",alignItems:"baseline",justifyContent:"space-between",marginBottom:14}}>
           <div>
-            <div style={{fontSize:22,fontWeight:800,color:C.t1}}>{isWeekend?"Helg":"Idag"}</div>
-            <div style={{fontSize:13,color:C.ac,fontWeight:600,marginTop:2}}>{DAYS[todayDow]} {today.getDate()} {MONTHS[today.getMonth()]}</div>
+            <div style={{fontSize:26,fontWeight:800,color:C.t1}}>{isWeekend?"Helg":"Idag"}</div>
+            <div style={{fontSize:15,color:C.ac,fontWeight:600,marginTop:3}}>{DAYS[todayDow]} {today.getDate()} {MONTHS[today.getMonth()]}</div>
           </div>
           {todayUndone.length>0&&(
-            <div style={{fontSize:12,color:C.t3}}>{todayDone.length}/{todayTasks.length} klara</div>
+            <div style={{fontSize:14,color:C.t3}}>{todayDone.length}/{todayTasks.length} klara</div>
           )}
         </div>
 
         {todayTasks.length===0?(
-          <div style={{padding:"28px 20px",background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:16,textAlign:"center"}}>
-            <div style={{fontSize:13,color:C.t3}}>{isWeekend?"Njut av helgen 🌿":"Inga uppgifter idag 🎉"}</div>
+          <div style={{padding:"32px 24px",background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:16,textAlign:"center"}}>
+            <div style={{fontSize:15,color:C.t3}}>{isWeekend?"Njut av helgen 🌿":"Inga uppgifter idag 🎉"}</div>
           </div>
         ):(
           <div style={{display:"flex",flexDirection:"column",gap:8}}>
@@ -734,12 +799,12 @@ function WeekView({data,onToggle}){
 
       {/* ===== NEXT UP ===== */}
       {upcoming.length>0&&(
-        <div style={{marginBottom:20}}>
-          <div style={{fontSize:14,fontWeight:700,color:C.t2,marginBottom:10}}>Nästa upp</div>
-          <div style={{display:"flex",flexDirection:"column",gap:6}}>
+        <div style={{marginBottom:24}}>
+          <div style={{fontSize:16,fontWeight:700,color:C.t2,marginBottom:12}}>Nästa upp</div>
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
             {upcoming.map(day=>(
               <div key={day.date}>
-                <div style={{fontSize:11,fontWeight:600,color:C.t3,marginBottom:4,marginLeft:2}}>{DAYS[day.dow]} {day.num} {MONTHS[new Date(day.date).getMonth()]}</div>
+                <div style={{fontSize:13,fontWeight:600,color:C.t3,marginBottom:6,marginLeft:2}}>{DAYS[day.dow]} {day.num} {MONTHS[new Date(day.date).getMonth()]}</div>
                 {day.tasks.map(t=>(
                   <TaskCard key={`${t.pid}-${t.si}`} t={t} compact/>
                 ))}
@@ -801,7 +866,7 @@ function ProjectsView({data,onDelete}){
       {active.length===0&&<p style={{color:C.t3,fontSize:14,textAlign:"center",padding:40}}>Inga aktiva projekt.</p>}
       {active.map(p=>{
         const c=data.clients.find(x=>x.id===p.clientId);const cl=c?c.color:C.ac;
-        const dn=p.steps.filter(s=>s.completed).length;const dl=p.steps[p.steps.length-1];
+        const dn=p.steps.filter(s=>s.completed).length;const dlSteps=p.steps.filter(s=>!s.after);const dl=dlSteps[dlSteps.length-1]||p.steps[p.steps.length-1];
         return(
           <div key={p.id} style={{background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:12,padding:16,marginBottom:10,borderLeft:`3px solid ${cl}`}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"start"}}>
@@ -885,6 +950,7 @@ function TemplatesView({data,onEdit,onDelete,onNew}){
 // ===== PROFILE VIEW =====
 function ProfileView({authState,data,onDeleteProject,onResetPush,onLogout}){
   const [confirmDel,setConfirmDel]=useState(null);
+  const [showPP,setShowPP]=useState(false);
   return(
     <div style={{paddingBottom:80}}>
       {/* Account info */}
@@ -964,6 +1030,10 @@ function ProfileView({authState,data,onDeleteProject,onResetPush,onLogout}){
         style={{width:"100%",padding:14,borderRadius:10,background:C.rd+"10",border:`1px solid ${C.rd}30`,color:C.rd,fontSize:14,fontWeight:700,fontFamily:"inherit",cursor:"pointer",marginTop:20}}>
         Logga ut
       </button>
+
+      {/* Privacy */}
+      <div onClick={()=>setShowPP(true)} style={{textAlign:"center",marginTop:12,fontSize:11,color:C.t3,cursor:"pointer",opacity:0.6}}>Integritetspolicy</div>
+      {showPP&&<PrivacyModal onClose={()=>setShowPP(false)}/>}
     </div>
   );
 }
@@ -973,7 +1043,7 @@ function CalendarOverview({data,month,setMonth,onToggle,onPush}){
   const tasks=useMemo(()=>{
     const t=[];
     data.projects.forEach(p=>{const c=data.clients.find(x=>x.id===p.clientId);
-      p.steps.forEach((s,i)=>{t.push({pid:p.id,si:i,name:s.name,date:s.date,done:s.completed,client:c?c.name:"",color:c?c.color:C.ac,pname:p.name,isDL:i===p.steps.length-1,pushed:!!s.pushedToGcal})})});
+      p.steps.forEach((s,i)=>{const dlI=p.steps.reduce((a,x,j)=>x.after?a:j,-1);t.push({pid:p.id,si:i,name:s.name,date:s.date,done:s.completed,client:c?c.name:"",color:c?c.color:C.ac,pname:p.name,isDL:i===dlI,isAfter:!!s.after,pushed:!!s.pushedToGcal})})});
     return t;
   },[data]);
 
@@ -1062,7 +1132,7 @@ function CalendarOverview({data,month,setMonth,onToggle,onPush}){
                     {t.done&&<span style={{color:"#fff",fontSize:10,fontWeight:700}}>✓</span>}
                   </div>
                   <div style={{flex:1}}>
-                    <div style={{fontSize:13,fontWeight:600,color:t.done?C.t3:C.t1,textDecoration:t.done?"line-through":"none"}}>{t.isDL?"🎯 ":""}{t.name}</div>
+                    <div style={{fontSize:13,fontWeight:600,color:t.done?C.t3:t.isAfter?C.gn:C.t1,textDecoration:t.done?"line-through":"none"}}>{t.isDL?"🎯 ":t.isAfter?"↪ ":""}{t.name}</div>
                     <div style={{fontSize:10,color:C.t3}}>{t.client} · {t.pname}</div>
                   </div>
                   {t.pushed&&<span style={{fontSize:9,color:C.gn}}>☁️</span>}
@@ -1147,6 +1217,7 @@ function App(){
   const [movingIdx,setMovingIdx]=useState(-1);
   const wizLongPress=useRef(null);
   const [wizDragOver,setWizDragOver]=useState(null);
+  const dragNavTimer=useRef(null);
   const [showPushPopup,setShowPushPopup]=useState(false);
 
   // Template modal
@@ -1338,11 +1409,11 @@ function App(){
   const delTpl=id=>{upd(d=>{d.templates=d.templates.filter(x=>x.id!==id)});msg("Mall raderad")};
 
   return(
-    <div style={{fontFamily:"'Outfit',sans-serif",background:C.bg,color:C.t1,height:"100vh",display:"flex",flexDirection:"column",position:"relative",maxWidth:420,margin:"0 auto",boxShadow:"0 0 40px rgba(0,0,0,.3)"}}>
+    <div style={{fontFamily:"'Outfit',sans-serif",background:C.bg,color:C.t1,height:"100vh",display:"flex",flexDirection:"column",position:"relative",maxWidth:480,margin:"0 auto",boxShadow:"0 0 40px rgba(0,0,0,.3)"}}>
 
       {/* LOADING */}
       {authLoading&&(
-        <div style={{position:"fixed",inset:0,background:C.bg,zIndex:4000,display:"flex",alignItems:"center",justifyContent:"center",maxWidth:420,margin:"0 auto"}}>
+        <div style={{position:"fixed",inset:0,background:C.bg,zIndex:4000,display:"flex",alignItems:"center",justifyContent:"center",maxWidth:480,margin:"0 auto"}}>
           <div style={{textAlign:"center"}}>
             <div style={{width:56,height:56,background:`linear-gradient(135deg,${C.ac},${C.ac}88)`,borderRadius:16,display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,fontWeight:800,color:"#fff",margin:"0 auto 16px"}}>DF</div>
             <div style={{fontSize:13,color:C.t3}}>Laddar...</div>
@@ -1384,59 +1455,81 @@ function App(){
 
       {/* BOTTOM TAB BAR */}
       {!wiz&&!tplOpen&&(
-        <div style={{position:"fixed",bottom:0,left:0,right:0,maxWidth:420,margin:"0 auto",background:C.bg2,borderTop:`1px solid ${C.bd}`,display:"flex",alignItems:"flex-end",justifyContent:"space-around",padding:"6px 8px 12px",zIndex:500}}>
-          <div onClick={()=>setTab("templates")} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,padding:"6px 10px",cursor:"pointer",opacity:tab==="templates"?1:0.45,transition:"opacity .2s"}}>
-            <span style={{fontSize:18}}>⚙️</span>
-            <span style={{fontSize:9,fontWeight:600,color:tab==="templates"?C.ac:C.t3}}>Mallar</span>
+        <div style={{position:"fixed",bottom:0,left:0,right:0,maxWidth:480,margin:"0 auto",background:C.bg2,borderTop:`1px solid ${C.bd}`,display:"flex",alignItems:"flex-end",justifyContent:"space-around",padding:"8px 8px 14px",zIndex:500}}>
+          <div onClick={()=>setTab("templates")} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:3,padding:"6px 12px",cursor:"pointer",opacity:tab==="templates"?1:0.45,transition:"opacity .2s"}}>
+            <span style={{fontSize:22}}>⚙️</span>
+            <span style={{fontSize:11,fontWeight:600,color:tab==="templates"?C.ac:C.t3}}>Mallar</span>
           </div>
 
-          <div onClick={()=>setTab("week")} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,padding:"6px 10px",cursor:"pointer",opacity:tab==="week"?1:0.45,transition:"opacity .2s"}}>
-            <span style={{fontSize:18}}>📋</span>
-            <span style={{fontSize:9,fontWeight:600,color:tab==="week"?C.ac:C.t3}}>Uppgifter</span>
+          <div onClick={()=>setTab("week")} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:3,padding:"6px 12px",cursor:"pointer",opacity:tab==="week"?1:0.45,transition:"opacity .2s"}}>
+            <span style={{fontSize:22}}>📋</span>
+            <span style={{fontSize:11,fontWeight:600,color:tab==="week"?C.ac:C.t3}}>Uppgifter</span>
           </div>
 
           {/* Center FAB */}
-          <div onClick={startWiz} style={{marginTop:-22,display:"flex",flexDirection:"column",alignItems:"center",gap:2,cursor:"pointer"}}>
-            <div style={{width:52,height:52,borderRadius:16,background:C.ac,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:`0 4px 20px ${C.ac}50`}}>
-              <span style={{fontSize:26,color:"#fff",lineHeight:1}}>+</span>
+          <div onClick={startWiz} style={{marginTop:-24,display:"flex",flexDirection:"column",alignItems:"center",gap:3,cursor:"pointer"}}>
+            <div style={{width:56,height:56,borderRadius:18,background:C.ac,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:`0 4px 20px ${C.ac}50`}}>
+              <span style={{fontSize:28,color:"#fff",lineHeight:1}}>+</span>
             </div>
-            <span style={{fontSize:9,fontWeight:600,color:C.ac}}>Nytt</span>
+            <span style={{fontSize:11,fontWeight:600,color:C.ac}}>Nytt</span>
           </div>
 
-          <div onClick={()=>setTab("calendar")} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,padding:"6px 10px",cursor:"pointer",opacity:tab==="calendar"?1:0.45,transition:"opacity .2s"}}>
-            <span style={{fontSize:18}}>📅</span>
-            <span style={{fontSize:9,fontWeight:600,color:tab==="calendar"?C.ac:C.t3}}>Kalender</span>
+          <div onClick={()=>setTab("calendar")} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:3,padding:"6px 12px",cursor:"pointer",opacity:tab==="calendar"?1:0.45,transition:"opacity .2s"}}>
+            <span style={{fontSize:22}}>📅</span>
+            <span style={{fontSize:11,fontWeight:600,color:tab==="calendar"?C.ac:C.t3}}>Kalender</span>
           </div>
 
-          <div onClick={()=>setTab("profile")} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,padding:"6px 10px",cursor:"pointer",opacity:tab==="profile"?1:0.45}}>
-            <span style={{fontSize:18}}>👤</span>
-            <span style={{fontSize:9,fontWeight:600,color:tab==="profile"?C.ac:C.t3}}>Konto</span>
+          <div onClick={()=>setTab("profile")} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:3,padding:"6px 12px",cursor:"pointer",opacity:tab==="profile"?1:0.45}}>
+            <span style={{fontSize:22}}>👤</span>
+            <span style={{fontSize:11,fontWeight:600,color:tab==="profile"?C.ac:C.t3}}>Konto</span>
           </div>
         </div>
       )}
 
       {/* ===== PROJECT — SINGLE VIEW ===== */}
       {wiz&&(
-        <div style={{position:"fixed",inset:0,background:C.bg,zIndex:1000,maxWidth:420,margin:"0 auto",display:"flex",flexDirection:"column"}}>
-          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 16px",borderBottom:`1px solid ${C.bd}`,flexShrink:0}}>
-            <div style={{fontSize:16,fontWeight:700}}>Nytt projekt</div>
-            <button onClick={()=>setWiz(false)} style={{width:28,height:28,borderRadius:7,background:C.bg3,border:`1px solid ${C.bd}`,color:C.t3,cursor:"pointer",fontSize:13,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+        <div style={{position:"fixed",inset:0,background:C.bg,zIndex:1000,maxWidth:480,margin:"0 auto",display:"flex",flexDirection:"column"}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"16px 20px",borderBottom:`1px solid ${C.bd}`,flexShrink:0}}>
+            <div style={{fontSize:20,fontWeight:700}}>Nytt projekt</div>
+            <button onClick={()=>setWiz(false)} style={{width:34,height:34,borderRadius:8,background:C.bg3,border:`1px solid ${C.bd}`,color:C.t3,cursor:"pointer",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
           </div>
 
-          <div style={{flex:1,overflowY:"auto",padding:"12px 16px"}}>
+          <div style={{flex:1,overflowY:"auto",padding:"16px 20px"}}>
             {/* 1. CALENDAR — centered, primary */}
-            <div style={{fontSize:11,fontWeight:600,color:C.t3,marginBottom:4}}>Välj deadline</div>
-            <div style={{maxWidth:300,margin:"0 auto 8px"}}>
-              <div style={{background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:10,overflow:"hidden"}}>
-                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 10px",borderBottom:`1px solid ${C.bd}`}}>
-                  <button onClick={()=>setCalMonth(m=>new Date(m.getFullYear(),m.getMonth()-1,1))} style={{background:"none",border:"none",color:C.t2,cursor:"pointer",fontSize:14,padding:"2px 6px",fontFamily:"inherit"}}>‹</button>
-                  <span style={{fontSize:12,fontWeight:700,color:C.t1,textTransform:"capitalize"}}>{MONTHS[calMonth.getMonth()]} {calMonth.getFullYear()}</span>
-                  <button onClick={()=>setCalMonth(m=>new Date(m.getFullYear(),m.getMonth()+1,1))} style={{background:"none",border:"none",color:C.t2,cursor:"pointer",fontSize:14,padding:"2px 6px",fontFamily:"inherit"}}>›</button>
+            <div style={{fontSize:14,fontWeight:600,color:C.t3,marginBottom:6}}>Välj deadline</div>
+            <div style={{margin:"0 auto 12px"}}>
+              <div style={{background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:12,overflow:"hidden"}}>
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",borderBottom:`1px solid ${C.bd}`}}>
+                  {(()=>{
+                    const prevMo=new Date(calMonth.getFullYear(),calMonth.getMonth()-1,1);
+                    const nextMo=new Date(calMonth.getFullYear(),calMonth.getMonth()+1,1);
+                    const prevKey=`${prevMo.getFullYear()}-${String(prevMo.getMonth()+1).padStart(2,"0")}`;
+                    const nextKey=`${nextMo.getFullYear()}-${String(nextMo.getMonth()+1).padStart(2,"0")}`;
+                    const prevCount=wizSteps?wizSteps.filter(s=>s.date.substring(0,7)===prevKey).length:0;
+                    const nextCount=wizSteps?wizSteps.filter(s=>s.date.substring(0,7)===nextKey).length:0;
+                    return(<>
+                      <button onClick={()=>setCalMonth(m=>new Date(m.getFullYear(),m.getMonth()-1,1))}
+                        onDragOver={e=>{e.preventDefault();if(!dragNavTimer.current){dragNavTimer.current=setTimeout(()=>{setCalMonth(m=>new Date(m.getFullYear(),m.getMonth()-1,1));dragNavTimer.current=null},500)}}}
+                        onDragLeave={()=>{if(dragNavTimer.current){clearTimeout(dragNavTimer.current);dragNavTimer.current=null}}}
+                        onDrop={e=>{e.preventDefault();if(dragNavTimer.current){clearTimeout(dragNavTimer.current);dragNavTimer.current=null}}}
+                        style={{background:"none",border:"none",color:C.t2,cursor:"pointer",fontSize:20,padding:"8px 14px",fontFamily:"inherit",position:"relative"}}>
+                        ‹{prevCount>0&&<span style={{position:"absolute",top:-2,left:0,fontSize:9,fontWeight:700,background:C.step,color:"#fff",borderRadius:8,padding:"2px 5px",minWidth:14,textAlign:"center"}}>{prevCount}</span>}
+                      </button>
+                      <span style={{fontSize:15,fontWeight:700,color:C.t1,textTransform:"capitalize"}}>{MONTHS[calMonth.getMonth()]} {calMonth.getFullYear()}</span>
+                      <button onClick={()=>setCalMonth(m=>new Date(m.getFullYear(),m.getMonth()+1,1))}
+                        onDragOver={e=>{e.preventDefault();if(!dragNavTimer.current){dragNavTimer.current=setTimeout(()=>{setCalMonth(m=>new Date(m.getFullYear(),m.getMonth()+1,1));dragNavTimer.current=null},500)}}}
+                        onDragLeave={()=>{if(dragNavTimer.current){clearTimeout(dragNavTimer.current);dragNavTimer.current=null}}}
+                        onDrop={e=>{e.preventDefault();if(dragNavTimer.current){clearTimeout(dragNavTimer.current);dragNavTimer.current=null}}}
+                        style={{background:"none",border:"none",color:C.t2,cursor:"pointer",fontSize:20,padding:"8px 14px",fontFamily:"inherit",position:"relative"}}>
+                        ›{nextCount>0&&<span style={{position:"absolute",top:-2,right:0,fontSize:9,fontWeight:700,background:C.step,color:"#fff",borderRadius:8,padding:"2px 5px",minWidth:14,textAlign:"center"}}>{nextCount}</span>}
+                      </button>
+                    </>);
+                  })()}
                 </div>
-                <div style={{padding:"4px 6px 6px"}}>
-                  <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",textAlign:"center",marginBottom:2}}>
+                <div style={{padding:"8px 10px 10px"}}>
+                  <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",textAlign:"center",marginBottom:4}}>
                     {["M","T","O","T","F","L","S"].map((d,i)=>(
-                      <div key={d+i} style={{fontSize:8,fontWeight:700,color:i>=5?C.t3+"70":C.t3,padding:"2px 0"}}>{d}</div>
+                      <div key={d+i} style={{fontSize:11,fontWeight:700,color:i>=5?C.t3+"70":C.t3,padding:"4px 0"}}>{d}</div>
                     ))}
                   </div>
                   <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",textAlign:"center"}}>
@@ -1450,7 +1543,8 @@ function App(){
                       for(let i=0;i<offset;i++)cells.push(null);
                       for(let i=1;i<=dim;i++)cells.push(i);
                       const stepMap={};// date -> {idx,name}
-                      if(wizSteps)wizSteps.forEach((s,idx)=>{stepMap[s.date]={idx,name:s.name,isLast:idx===wizSteps.length-1}});
+                      const dlIdx2=wizSteps?wizSteps.reduce((a,s,i)=>s.after?a:i,-1):-1;
+                      if(wizSteps)wizSteps.forEach((s,idx)=>{stepMap[s.date]={idx,name:s.name,isLast:idx===dlIdx2,isAfter:!!s.after}});
                       return cells.map((d,i)=>{
                         if(d===null)return <div key={i}/>;
                         const ds=`${yr}-${String(mo+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
@@ -1477,18 +1571,20 @@ function App(){
                             onClick={()=>{
                               if(movingIdx>=0&&!isStep&&!isSel){wizMoveStep(movingIdx,ds);setMovingIdx(-1);return}
                               if(movingIdx>=0&&isStep&&step.idx===movingIdx){setMovingIdx(-1);return}
+                              if(movingIdx>=0&&isStep){setMovingIdx(step.idx);return}
+                              if(isStep){setMovingIdx(step.idx);return}
                               if(!isPastDay&&!isStep)setPDL(ds);
                             }}
-                            style={{padding:"4px 1px",borderRadius:6,position:"relative",
+                            style={{padding:"7px 2px",borderRadius:8,position:"relative",
                               cursor:isStep?"grab":isPastDay?"default":"pointer",
-                              background:isBeingMoved?C.ac+"35":isDragTarget?C.ac+"25":isSel?(isPastDay?C.rd+"40":C.ac):stepInPast?"rgba(255,71,87,.1)":isStep?(wasCustomized?C.ac+"20":C.step+"30"):"transparent",
+                              background:isBeingMoved?C.ac+"35":isDragTarget?C.ac+"25":isSel?(isPastDay?C.rd+"40":C.ac):stepInPast?"rgba(255,71,87,.1)":isStep?(step.isAfter?C.gn+"25":wasCustomized?C.ac+"20":C.step+"30"):"transparent",
                               border:isBeingMoved?`2px solid ${C.ac}`:isDragTarget?`2px dashed ${C.ac}`:"2px solid transparent",
                               transition:"all .15s",userSelect:"none"}}>
-                            <div style={{fontSize:11,fontWeight:isSel||isStep||isDragTarget?700:400,
-                              color:isBeingMoved?C.ac:isDragTarget?C.ac:isSel?(isPastDay?C.rd:"#fff"):stepInPast?C.rd+"80":isStep?(wasCustomized?C.ac:C.step):isPastDay?C.t3+"40":isWknd?C.t3+"70":C.t1}}>
+                            <div style={{fontSize:14,fontWeight:isSel||isStep||isDragTarget?700:400,
+                              color:isBeingMoved?C.ac:isDragTarget?C.ac:isSel?(isPastDay?C.rd:"#fff"):stepInPast?C.rd+"80":isStep?(step.isAfter?C.gn:wasCustomized?C.ac:C.step):isPastDay?C.t3+"40":isWknd?C.t3+"70":C.t1}}>
                               {d}
                             </div>
-                            {isStep&&<div style={{fontSize:6,fontWeight:700,color:wasCustomized?C.ac:C.step,lineHeight:1,marginTop:-1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:"100%",padding:"0 1px"}}>{step.name.split(" ")[0]}</div>}
+                            {isStep&&<div style={{fontSize:8,fontWeight:700,color:step.isAfter?C.gn:wasCustomized?C.ac:C.step,lineHeight:1,marginTop:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:"100%",padding:"0 2px"}}>{step.isAfter?"↪":""}{step.name.split(" ")[0]}</div>}
                           </div>
                         );
                       });
@@ -1497,23 +1593,23 @@ function App(){
                 </div>
               </div>
               {/* Skip weekends — right-aligned under calendar */}
-              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:6}}>
-                {wizSteps&&wizSteps.length>0?<div style={{fontSize:9,color:C.t3,opacity:0.7}}>💡 {movingIdx>=0?"Tryck på en tom dag":"Dra orange steg till ny dag"}</div>:<div/>}
-                <div onClick={()=>setPSkipWknd(v=>!v)} style={{display:"flex",alignItems:"center",gap:5,cursor:"pointer"}}>
-                  <div style={{width:14,height:14,borderRadius:3,border:`2px solid ${pSkipWknd?C.gn:C.bd2}`,background:pSkipWknd?C.gn:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-                    {pSkipWknd&&<span style={{color:"#fff",fontSize:8,fontWeight:700}}>✓</span>}
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:10}}>
+                {wizSteps&&wizSteps.length>0?<div style={{fontSize:11,color:C.t3,opacity:0.7}}>💡 {movingIdx>=0?"Tryck på en tom dag (byt månad med pilarna)":"Klicka/dra steg för att flytta"}</div>:<div/>}
+                <div onClick={()=>setPSkipWknd(v=>!v)} style={{display:"flex",alignItems:"center",gap:6,cursor:"pointer"}}>
+                  <div style={{width:18,height:18,borderRadius:4,border:`2px solid ${pSkipWknd?C.gn:C.bd2}`,background:pSkipWknd?C.gn:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                    {pSkipWknd&&<span style={{color:"#fff",fontSize:10,fontWeight:700}}>✓</span>}
                   </div>
-                  <span style={{fontSize:10,color:C.t3}}>Hoppa över helger</span>
+                  <span style={{fontSize:12,color:C.t3}}>Hoppa över helger</span>
                 </div>
               </div>
             </div>
 
             {/* 2. TEMPLATE — dropdown select */}
-            <div style={{marginBottom:8}}>
-              <div style={{fontSize:11,fontWeight:600,color:C.t3,marginBottom:4}}>Mall</div>
+            <div style={{marginBottom:12}}>
+              <div style={{fontSize:14,fontWeight:600,color:C.t3,marginBottom:6}}>Mall</div>
               <div style={{position:"relative"}}>
                 <select value={pTpl} onChange={e=>setPTpl(e.target.value)}
-                  style={{width:"100%",padding:"10px 12px",paddingRight:32,background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:8,color:C.t1,fontFamily:"inherit",fontSize:14,outline:"none",appearance:"none",cursor:"pointer"}}>
+                  style={{width:"100%",padding:"14px 16px",paddingRight:36,background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:10,color:C.t1,fontFamily:"inherit",fontSize:16,outline:"none",appearance:"none",cursor:"pointer"}}>
                   <option value="">Välj mall...</option>
                   {(()=>{
                     const placed=new Set();
@@ -1531,31 +1627,31 @@ function App(){
                     ));
                   })()}
                 </select>
-                <div style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",pointerEvents:"none",fontSize:10,color:C.t3}}>▼</div>
+                <div style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",pointerEvents:"none",fontSize:12,color:C.t3}}>▼</div>
               </div>
-              <div onClick={()=>openTpl()} style={{fontSize:11,color:C.ac,fontWeight:600,cursor:"pointer",marginTop:4,paddingLeft:2}}>+ Skapa ny mall</div>
+              <div onClick={()=>openTpl()} style={{fontSize:13,color:C.ac,fontWeight:600,cursor:"pointer",marginTop:6,paddingLeft:2}}>+ Skapa ny mall</div>
             </div>
 
             {/* 3. CLIENT — input with dropdown */}
-            <div style={{marginBottom:8}}>
-              <div style={{fontSize:11,fontWeight:600,color:C.t3,marginBottom:4}}>Kund</div>
+            <div style={{marginBottom:12}}>
+              <div style={{fontSize:14,fontWeight:600,color:C.t3,marginBottom:6}}>Kund</div>
               <div style={{position:"relative"}}>
-                <div style={{display:"flex",gap:6,alignItems:"center"}}>
+                <div style={{display:"flex",gap:8,alignItems:"center"}}>
                   <input value={pClient} onFocus={()=>setClientFocus(true)} onBlur={()=>setTimeout(()=>setClientFocus(false),150)}
                     onChange={e=>{setPClient(e.target.value);setClientFocus(true);const ex=data.clients.find(c=>c.name.toLowerCase()===e.target.value.toLowerCase());if(ex)setPColor(ex.color)}} placeholder="Skriv eller välj kund..."
-                    style={{flex:1,padding:"10px 12px",background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:8,color:C.t1,fontFamily:"inherit",fontSize:14,outline:"none"}}/>
-                  <div onClick={()=>setShowColors(v=>!v)} style={{width:30,height:30,borderRadius:7,background:pColor,cursor:"pointer",flexShrink:0,border:"2px solid rgba(255,255,255,.12)"}}/>
+                    style={{flex:1,padding:"14px 16px",background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:10,color:C.t1,fontFamily:"inherit",fontSize:16,outline:"none"}}/>
+                  <div onClick={()=>setShowColors(v=>!v)} style={{width:38,height:38,borderRadius:8,background:pColor,cursor:"pointer",flexShrink:0,border:"2px solid rgba(255,255,255,.12)"}}/>
                 </div>
                 {clientFocus&&data.clients.length>0&&(()=>{
                   const matches=data.clients.filter(c=>!pClient||c.name.toLowerCase().includes(pClient.toLowerCase()));
                   if(!matches.length||(matches.length===1&&matches[0].name.toLowerCase()===pClient.toLowerCase()))return null;
                   return(
-                    <div style={{position:"absolute",left:0,right:38,top:"100%",marginTop:3,background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:8,overflow:"hidden",zIndex:10,boxShadow:"0 8px 24px rgba(0,0,0,.4)"}}>
+                    <div style={{position:"absolute",left:0,right:46,top:"100%",marginTop:4,background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:10,overflow:"hidden",zIndex:10,boxShadow:"0 8px 24px rgba(0,0,0,.4)"}}>
                       {matches.map(c=>(
                         <div key={c.id} onMouseDown={()=>{setPClient(c.name);setPColor(c.color);setClientFocus(false)}}
-                          style={{padding:"8px 12px",cursor:"pointer",display:"flex",alignItems:"center",gap:8,borderBottom:`1px solid ${C.bd}`}}>
-                          <span style={{width:7,height:7,borderRadius:"50%",background:c.color,flexShrink:0}}/>
-                          <span style={{fontSize:13,color:C.t1}}>{c.name}</span>
+                          style={{padding:"12px 16px",cursor:"pointer",display:"flex",alignItems:"center",gap:10,borderBottom:`1px solid ${C.bd}`}}>
+                          <span style={{width:10,height:10,borderRadius:"50%",background:c.color,flexShrink:0}}/>
+                          <span style={{fontSize:15,color:C.t1}}>{c.name}</span>
                         </div>
                       ))}
                     </div>
@@ -1564,66 +1660,78 @@ function App(){
               </div>
             </div>
             {showColors&&(
-              <div style={{display:"flex",gap:4,marginBottom:8,flexWrap:"wrap"}}>
+              <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
                 {CLIENT_COLORS.map(c=>(
-                  <div key={c} onClick={()=>{setPColor(c);setShowColors(false)}} style={{width:22,height:22,borderRadius:5,background:c,cursor:"pointer",border:pColor===c?"2px solid #fff":"2px solid transparent"}}/>
+                  <div key={c} onClick={()=>{setPColor(c);setShowColors(false)}} style={{width:28,height:28,borderRadius:6,background:c,cursor:"pointer",border:pColor===c?"2px solid #fff":"2px solid transparent"}}/>
                 ))}
               </div>
             )}
 
             {/* 4. STEP LIST — with reminders */}
             {wizSteps&&(
-              <div style={{background:C.bg2,border:`1px solid ${C.bd}`,borderRadius:10,padding:10}}>
-                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}}>
-                  <div style={{fontSize:9,fontWeight:700,color:C.t3,textTransform:"uppercase",letterSpacing:0.5}}>📅 {wizSteps.length} steg</div>
+              <div style={{background:C.bg2,border:`1px solid ${C.bd}`,borderRadius:12,padding:14}}>
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
+                  <div style={{fontSize:12,fontWeight:700,color:C.t3,textTransform:"uppercase",letterSpacing:0.5}}>📅 {wizSteps.length} steg</div>
                   {pCustomSteps&&pCustomSteps.some((s,i)=>livePreview&&s.date!==livePreview[i]?.date)&&(
-                    <div onClick={()=>setPCustomSteps(livePreview?livePreview.map(s=>({...s,reminders:["1d"]})):null)} style={{fontSize:9,color:C.ac,fontWeight:600,cursor:"pointer"}}>↺ Återställ</div>
+                    <div onClick={()=>setPCustomSteps(livePreview?livePreview.map(s=>({...s,reminders:["1d"]})):null)} style={{fontSize:12,color:C.ac,fontWeight:600,cursor:"pointer"}}>↺ Återställ</div>
                   )}
                 </div>
                 {/* Moving indicator */}
                 {movingIdx>=0&&wizSteps[movingIdx]&&(
-                  <div style={{fontSize:10,color:C.ac,fontWeight:600,marginBottom:6,padding:"4px 8px",background:C.ac+"10",borderRadius:6}}>
-                    Tryck på ett datum för att flytta "{wizSteps[movingIdx].name}"
+                  <div style={{fontSize:13,color:C.ac,fontWeight:600,marginBottom:8,padding:"8px 12px",background:C.ac+"10",borderRadius:8}}>
+                    Flytta "{wizSteps[movingIdx].name}" — byt månad med ‹ › om steget är i en annan månad
                     <span onClick={()=>setMovingIdx(-1)} style={{marginLeft:8,cursor:"pointer",opacity:0.6}}>✕</span>
                   </div>
                 )}
-                {(()=>{const todayStr=iso(new Date());const hasPast=wizSteps.some(s=>s.date<todayStr);return(<>
-                {hasPast&&<div style={{fontSize:10,color:C.rd,fontWeight:600,marginBottom:6,padding:"4px 8px",background:"rgba(255,71,87,.08)",borderRadius:6}}>⚠️ Steg i det förflutna</div>}
+                {(()=>{const todayStr=iso(new Date());const hasPast=wizSteps.some(s=>s.date<todayStr);
+                const dlIdx=wizSteps.reduce((acc,s,i)=>s.after?acc:i,-1);// last pre-deadline step = deadline
+                return(<>
+                {hasPast&&<div style={{fontSize:13,color:C.rd,fontWeight:600,marginBottom:8,padding:"8px 12px",background:"rgba(255,71,87,.08)",borderRadius:8}}>⚠️ Steg i det förflutna</div>}
                 {wizSteps.map((s,i)=>{
                   const inPast=s.date<todayStr;
-                  const isLast=i===wizSteps.length-1;
+                  const isDL=i===dlIdx;
+                  const isAfter=!!s.after;
                   const wasCustomized=livePreview&&livePreview[i]&&s.date!==livePreview[i].date;
                   return(
-                  <div key={i} style={{padding:"5px 0",borderBottom:i<wizSteps.length-1?`1px solid ${C.bd}`:"none",opacity:inPast?0.4:1}}>
-                    <div style={{display:"flex",alignItems:"center",gap:6}}>
-                      <span style={{fontFamily:"monospace",fontSize:10,color:inPast?C.rd:isLast?C.rd:wasCustomized?C.ac:C.step,minWidth:62,fontWeight:600}}>{fmtDay(s.date)} {fmtShort(s.date)}</span>
-                      <span style={{fontSize:11,fontWeight:isLast?700:400,color:inPast?C.t3:C.t1,textDecoration:inPast?"line-through":"none",flex:1}}>{isLast?"🎯 ":""}{s.name}</span>
-                      {wasCustomized&&<span style={{fontSize:8,color:C.ac,fontWeight:700}}>✎</span>}
+                  <React.Fragment key={i}>
+                  {i>0&&i===dlIdx+1&&isAfter&&(
+                    <div style={{display:"flex",alignItems:"center",gap:8,margin:"12px 0 8px"}}>
+                      <div style={{flex:1,height:1,background:C.gn+"40"}}/>
+                      <span style={{fontSize:10,fontWeight:700,color:C.gn,whiteSpace:"nowrap"}}>UPPFÖLJNING</span>
+                      <div style={{flex:1,height:1,background:C.gn+"40"}}/>
+                    </div>
+                  )}
+                  <div style={{padding:"8px 0",borderBottom:i<wizSteps.length-1&&!(i===dlIdx)?`1px solid ${C.bd}`:"none",opacity:inPast?0.4:1}}>
+                    <div style={{display:"flex",alignItems:"center",gap:8}}>
+                      <span onClick={()=>{const [y,m]=s.date.split("-");setCalMonth(new Date(parseInt(y),parseInt(m)-1,1))}} style={{fontFamily:"monospace",fontSize:13,color:inPast?C.rd:isDL?C.rd:isAfter?C.gn:wasCustomized?C.ac:C.step,minWidth:80,fontWeight:600,cursor:"pointer"}}>{fmtDay(s.date)} {fmtShort(s.date)}</span>
+                      <span style={{fontSize:14,fontWeight:isDL?700:400,color:inPast?C.t3:isAfter?C.gn:C.t1,textDecoration:inPast?"line-through":"none",flex:1}}>{isDL?"🎯 ":isAfter?"↪ ":""}{s.name}</span>
+                      {wasCustomized&&<span style={{fontSize:10,color:C.ac,fontWeight:700}}>✎</span>}
                     </div>
                     {!inPast&&(
-                      <div style={{display:"flex",alignItems:"center",gap:4,marginTop:4,marginLeft:62,flexWrap:"wrap"}}>
+                      <div style={{display:"flex",alignItems:"center",gap:5,marginTop:6,marginLeft:80,flexWrap:"wrap"}}>
                         {[{k:"same",l:"📧 Samma dag"},{k:"1d",l:"1 dag"},{k:"2d",l:"2 dagar"},{k:"3d",l:"3 dagar"},{k:"7d",l:"1 vecka"}].map(r=>{
                           const rem=Array.isArray(s.reminders)?s.reminders:["1d"];
                           const on=rem.includes(r.k);
                           return(
                             <div key={r.k} onClick={()=>wizToggleReminder(i,r.k)}
-                              style={{fontSize:10,padding:"4px 8px",borderRadius:6,cursor:"pointer",fontWeight:on?700:500,
-                                background:on?C.ac+"20":C.bg3,border:`1px solid ${on?C.ac+"50":C.bd}`,color:on?C.ac:C.t3,
+                              style={{fontSize:12,padding:"6px 10px",borderRadius:8,cursor:"pointer",fontWeight:on?700:500,
+                                background:on?(isAfter?C.gn+"20":C.ac+"20"):C.bg3,border:`1px solid ${on?(isAfter?C.gn+"50":C.ac+"50"):C.bd}`,color:on?(isAfter?C.gn:C.ac):C.t3,
                                 transition:"all .15s",lineHeight:1.2}}>{r.l}</div>
                           );
                         })}
                       </div>
                     )}
                   </div>
+                  </React.Fragment>
                 )})}</>)})()}
               </div>
             )}
           </div>
 
           {/* Save button */}
-          <div style={{padding:"10px 16px",borderTop:`1px solid ${C.bd}`,flexShrink:0}}>
+          <div style={{padding:"14px 20px",borderTop:`1px solid ${C.bd}`,flexShrink:0}}>
             <button onClick={wizSave} disabled={!pClient.trim()||!pTpl||!pDL}
-              style={{width:"100%",padding:14,borderRadius:12,background:pClient.trim()&&pTpl&&pDL?C.ac:C.bd,border:"none",color:pClient.trim()&&pTpl&&pDL?"#fff":C.t3,fontSize:15,fontWeight:700,fontFamily:"inherit",cursor:pClient.trim()&&pTpl&&pDL?"pointer":"default",transition:"all .3s"}}>
+              style={{width:"100%",padding:16,borderRadius:14,background:pClient.trim()&&pTpl&&pDL?C.ac:C.bd,border:"none",color:pClient.trim()&&pTpl&&pDL?"#fff":C.t3,fontSize:17,fontWeight:700,fontFamily:"inherit",cursor:pClient.trim()&&pTpl&&pDL?"pointer":"default",transition:"all .3s"}}>
               Skapa projekt
             </button>
           </div>
@@ -1632,7 +1740,7 @@ function App(){
 
       {/* ===== PUSH POPUP ===== */}
       {showPushPopup&&(
-        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:1500,display:"flex",alignItems:"center",justifyContent:"center",maxWidth:420,margin:"0 auto"}}>
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:1500,display:"flex",alignItems:"center",justifyContent:"center",maxWidth:480,margin:"0 auto"}}>
           <div style={{background:C.bg2,border:`1px solid ${C.bd}`,borderRadius:16,padding:"24px 20px",width:"85%",maxWidth:320,textAlign:"center",boxShadow:"0 12px 40px rgba(0,0,0,.5)"}}>
             <div style={{fontSize:32,marginBottom:8}}>✅</div>
             <div style={{fontSize:17,fontWeight:800,color:C.t1,marginBottom:4}}>Projekt skapat!</div>
@@ -1653,7 +1761,7 @@ function App(){
 
       {/* ===== TEMPLATE MODAL ===== */}
       {tplOpen&&(
-        <div style={{position:"fixed",inset:0,background:C.bg,zIndex:1100,maxWidth:420,margin:"0 auto",display:"flex",flexDirection:"column"}}>
+        <div style={{position:"fixed",inset:0,background:C.bg,zIndex:1100,maxWidth:480,margin:"0 auto",display:"flex",flexDirection:"column"}}>
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 20px",borderBottom:`1px solid ${C.bd}`,flexShrink:0}}>
             <div style={{fontSize:17,fontWeight:700}}>{editTplId?"Redigera mall":"Ny mall"}</div>
             <button onClick={()=>setTplOpen(false)} style={{width:32,height:32,borderRadius:8,background:C.bg3,border:`1px solid ${C.bd}`,color:C.t3,cursor:"pointer",fontSize:15,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
@@ -1662,18 +1770,73 @@ function App(){
             <div style={{fontSize:13,fontWeight:600,color:C.t2,marginBottom:8}}>Mallnamn</div>
             <input value={tplName} onChange={e=>setTplName(e.target.value)} placeholder="T.ex. 'TikTok'"
               style={{width:"100%",padding:"14px 16px",background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:10,color:C.t1,fontFamily:"inherit",fontSize:16,outline:"none",marginBottom:20}}/>
-            <div style={{fontSize:13,fontWeight:600,color:C.t2,marginBottom:8}}>Steg</div>
-            {tplSteps.map((s,i)=>(
-              <div key={i} style={{display:"grid",gridTemplateColumns:"24px 1fr 56px 28px",alignItems:"center",gap:6,padding:"10px 12px",background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:8,marginBottom:4}}>
-                <span style={{fontFamily:"monospace",fontSize:11,color:C.t3,textAlign:"center"}}>{i+1}</span>
-                <input value={s.name} onChange={e=>{const n=[...tplSteps];n[i]={...n[i],name:e.target.value};setTplSteps(n)}} placeholder="Stegnamn..."
-                  style={{background:"transparent",border:"none",color:C.t1,fontFamily:"inherit",fontSize:14,outline:"none"}}/>
-                <input type="number" min="0" value={s.days} onChange={e=>{const n=[...tplSteps];n[i]={...n[i],days:parseInt(e.target.value)||0};setTplSteps(n)}}
-                  style={{background:C.bg4,border:`1px solid ${C.bd}`,borderRadius:4,padding:4,textAlign:"center",fontFamily:"monospace",fontSize:12,color:C.t1,width:"100%"}}/>
-                <button onClick={()=>{const n=[...tplSteps];n.splice(i,1);setTplSteps(n)}} style={{background:"none",border:"none",color:C.t3,cursor:"pointer",fontSize:14}}>✕</button>
+
+            {/* PRE-DEADLINE STEPS */}
+            <div style={{fontSize:13,fontWeight:600,color:C.t2,marginBottom:8}}>Steg före deadline</div>
+            {tplSteps.filter(s=>!s.after).map((s,i)=>{
+              const realIdx=tplSteps.indexOf(s);
+              return(
+              <div key={realIdx}
+                draggable
+                onDragStart={e=>{e.dataTransfer.setData("text/plain",String(realIdx));e.dataTransfer.effectAllowed="move"}}
+                onDragOver={e=>{e.preventDefault()}}
+                onDrop={e=>{e.preventDefault();const from=parseInt(e.dataTransfer.getData("text/plain"));if(!isNaN(from)&&from!==realIdx&&!tplSteps[from].after===!tplSteps[realIdx].after){const n=[...tplSteps];const [moved]=n.splice(from,1);n.splice(realIdx,0,moved);setTplSteps(n)}}}
+                style={{display:"grid",gridTemplateColumns:"20px 1fr 56px 28px",alignItems:"center",gap:6,padding:"10px 12px",background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:8,marginBottom:4,cursor:"grab"}}>
+                <span style={{fontSize:14,color:C.t3,cursor:"grab",userSelect:"none"}}>≡</span>
+                <input value={s.name} onChange={e=>{const n=[...tplSteps];n[realIdx]={...n[realIdx],name:e.target.value};setTplSteps(n)}} placeholder="Stegnamn..."
+                  style={{background:"transparent",border:`1px solid transparent`,borderRadius:4,padding:"4px 6px",color:C.t1,fontFamily:"inherit",fontSize:14,outline:"none",transition:"border .15s"}}
+                  onFocus={e=>e.target.style.borderColor=C.bd} onBlur={e=>e.target.style.borderColor="transparent"}/>
+                <div style={{display:"flex",alignItems:"center",gap:2}}>
+                  <input type="number" min="0" value={s.days} onChange={e=>{const n=[...tplSteps];n[realIdx]={...n[realIdx],days:parseInt(e.target.value)||0};setTplSteps(n)}}
+                    style={{background:C.bg4,border:`1px solid ${C.bd}`,borderRadius:4,padding:4,textAlign:"center",fontFamily:"monospace",fontSize:12,color:C.t1,width:"100%"}}/>
+                  <span style={{fontSize:8,color:C.t3,whiteSpace:"nowrap"}}>d</span>
+                </div>
+                <button onClick={()=>{const n=[...tplSteps];n.splice(realIdx,1);setTplSteps(n)}} style={{background:"none",border:"none",color:C.t3,cursor:"pointer",fontSize:14}}>✕</button>
               </div>
-            ))}
-            <button onClick={()=>setTplSteps([...tplSteps,{name:"",days:1}])} style={{width:"100%",padding:12,border:`1px dashed ${C.bd}`,borderRadius:8,background:"transparent",color:C.t3,cursor:"pointer",fontSize:13,fontFamily:"inherit",marginTop:6}}>+ Lägg till steg</button>
+            )})}
+            <button onClick={()=>{
+              const lastPre=tplSteps.filter(s=>!s.after).length;
+              const postStart=tplSteps.findIndex(s=>s.after);
+              const insertAt=postStart>=0?postStart:tplSteps.length;
+              const n=[...tplSteps];n.splice(insertAt,0,{name:"",days:1});setTplSteps(n);
+            }} style={{width:"100%",padding:10,border:`1px dashed ${C.bd}`,borderRadius:8,background:"transparent",color:C.t3,cursor:"pointer",fontSize:12,fontFamily:"inherit",marginTop:4}}>+ Lägg till steg</button>
+
+            {/* DEADLINE SEPARATOR */}
+            <div style={{display:"flex",alignItems:"center",gap:8,margin:"16px 0"}}>
+              <div style={{flex:1,height:1,background:C.rd+"50"}}/>
+              <span style={{fontSize:10,fontWeight:700,color:C.rd,whiteSpace:"nowrap"}}>🎯 DEADLINE</span>
+              <div style={{flex:1,height:1,background:C.rd+"50"}}/>
+            </div>
+
+            {/* POST-DEADLINE STEPS */}
+            <div style={{fontSize:13,fontWeight:600,color:C.t2,marginBottom:8}}>Uppföljning efter deadline</div>
+            {tplSteps.filter(s=>s.after).length===0&&(
+              <div style={{fontSize:11,color:C.t3,marginBottom:8,padding:"8px 12px",background:C.bg3,borderRadius:8,border:`1px solid ${C.bd}`}}>
+                T.ex. skicka faktura, följa upp kund, utvärdering
+              </div>
+            )}
+            {tplSteps.filter(s=>s.after).map((s,i)=>{
+              const realIdx=tplSteps.indexOf(s);
+              return(
+              <div key={realIdx}
+                draggable
+                onDragStart={e=>{e.dataTransfer.setData("text/plain",String(realIdx));e.dataTransfer.effectAllowed="move"}}
+                onDragOver={e=>{e.preventDefault()}}
+                onDrop={e=>{e.preventDefault();const from=parseInt(e.dataTransfer.getData("text/plain"));if(!isNaN(from)&&from!==realIdx&&!tplSteps[from].after===!tplSteps[realIdx].after){const n=[...tplSteps];const [moved]=n.splice(from,1);n.splice(realIdx,0,moved);setTplSteps(n)}}}
+                style={{display:"grid",gridTemplateColumns:"20px 1fr 56px 28px",alignItems:"center",gap:6,padding:"10px 12px",background:C.gn+"08",border:`1px solid ${C.gn}30`,borderRadius:8,marginBottom:4,cursor:"grab"}}>
+                <span style={{fontSize:14,color:C.t3,cursor:"grab",userSelect:"none"}}>≡</span>
+                <input value={s.name} onChange={e=>{const n=[...tplSteps];n[realIdx]={...n[realIdx],name:e.target.value};setTplSteps(n)}} placeholder="T.ex. Skicka faktura..."
+                  style={{background:"transparent",border:`1px solid transparent`,borderRadius:4,padding:"4px 6px",color:C.t1,fontFamily:"inherit",fontSize:14,outline:"none",transition:"border .15s"}}
+                  onFocus={e=>e.target.style.borderColor=C.bd} onBlur={e=>e.target.style.borderColor="transparent"}/>
+                <div style={{display:"flex",alignItems:"center",gap:2}}>
+                  <input type="number" min="1" value={s.days} onChange={e=>{const n=[...tplSteps];n[realIdx]={...n[realIdx],days:parseInt(e.target.value)||1};setTplSteps(n)}}
+                    style={{background:C.bg4,border:`1px solid ${C.bd}`,borderRadius:4,padding:4,textAlign:"center",fontFamily:"monospace",fontSize:12,color:C.t1,width:"100%"}}/>
+                  <span style={{fontSize:8,color:C.t3,whiteSpace:"nowrap"}}>d</span>
+                </div>
+                <button onClick={()=>{const n=[...tplSteps];n.splice(realIdx,1);setTplSteps(n)}} style={{background:"none",border:"none",color:C.t3,cursor:"pointer",fontSize:14}}>✕</button>
+              </div>
+            )})}
+            <button onClick={()=>setTplSteps([...tplSteps,{name:"",days:1,after:true}])} style={{width:"100%",padding:10,border:`1px dashed ${C.gn}50`,borderRadius:8,background:C.gn+"06",color:C.gn,cursor:"pointer",fontSize:12,fontFamily:"inherit",marginTop:4,fontWeight:600}}>+ Lägg till uppföljning</button>
           </div>
           <div style={{padding:"14px 20px",borderTop:`1px solid ${C.bd}`,display:"flex",gap:8,flexShrink:0}}>
             <button onClick={()=>setTplOpen(false)} style={{flex:1,padding:14,borderRadius:12,background:C.bg3,border:`1px solid ${C.bd}`,color:C.t1,fontSize:15,fontWeight:600,fontFamily:"inherit",cursor:"pointer"}}>Avbryt</button>
