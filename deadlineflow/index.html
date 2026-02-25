@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>DeadlineFlow</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📅</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Outfit',sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
+    select option{background:#181824;color:#eaeaf2}
+    ::-webkit-scrollbar{width:4px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:#363648;border-radius:2px}
+    input::placeholder{color:#55556a}
+  </style>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <!-- React -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script>
+    // ===== FIREBASE CONFIG =====
+    // TODO: Replace with your Firebase project config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBMLWZ8bEDPcQuMk3crNzO80J5UzciD82E",
+      authDomain: "deadlineflow-20f74.firebaseapp.com",
+      projectId: "deadlineflow-20f74",
+      storageBucket: "deadlineflow-20f74.firebasestorage.app",
+      messagingSenderId: "11755519930",
+      appId: "1:11755519930:web:5f64d8498db9e13942a783",
+      measurementId: "G-4005VEG7F4"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+    // Firestore helpers
+    async function loadUserData(uid) {
+      try {
+        const doc = await db.collection("users").doc(uid).get();
+        if (doc.exists) return doc.data();
+      } catch(e) { console.error("Load error:", e); }
+      return null;
+    }
+    async function saveUserData(uid, data) {
+      try {
+        await db.collection("users").doc(uid).set(data);
+      } catch(e) { console.error("Save error:", e); }
+    }
+  </script>
+
+  <script type="text/babel">
+    const { useState, useCallback, useMemo, useEffect, useRef } = React;
+
+
+const CLIENT_COLORS=["#6c5ce7","#00d2a0","#f0a030","#ff4757","#0abde3","#e056a0","#2ed573","#ffa502","#a78bfa","#00b894"];
+const DAYS=["sön","mån","tis","ons","tor","fre","lör"];
+const MONTHS=["jan","feb","mar","apr","maj","jun","jul","aug","sep","okt","nov","dec"];
+const gid=()=>Date.now().toString(36)+Math.random().toString(36).substr(2,5);
+const iso=d=>d.toISOString().split("T")[0];
+const fmtShort=s=>{const d=new Date(s);return`${d.getDate()} ${MONTHS[d.getMonth()]}`};
+const fmtDay=s=>DAYS[new Date(s).getDay()];
+const isToday=s=>s===iso(new Date());
+const isPast=s=>new Date(s)<new Date(iso(new Date()));
+const getWeekNum=s=>{const d=new Date(s);d.setHours(0,0,0,0);d.setDate(d.getDate()+3-(d.getDay()+6)%7);const w=new Date(d.getFullYear(),0,4);return 1+Math.round(((d-w)/864e5-3+(w.getDay()+6)%7)/7)};
+function skipWknd(d){while(d.getDay()===0||d.getDay()===6)d.setDate(d.getDate()-1);return d}
+function subBizDays(d,n){let r=n;while(r>0){d.setDate(d.getDate()-1);if(d.getDay()!==0&&d.getDay()!==6)r--}return d}
+function calcSteps(tpl,dl,skip=true){const st=[];let c=new Date(dl);if(skip)skipWknd(c);for(let i=tpl.steps.length-1;i>=0;i--){st.unshift({name:tpl.steps[i].name,date:iso(c),completed:false});if(i>0){if(skip)subBizDays(c,tpl.steps[i].days);else{c.setDate(c.getDate()-tpl.steps[i].days)}}}return st}
+
+// ===== THEMES =====
+const THEMES={
+  midnight:{bg:"#08080d",bg2:"#101018",bg3:"#181824",bg4:"#222230",bd:"#262636",bd2:"#363648",t1:"#eaeaf2",t2:"#8a8aa4",t3:"#55556a",ac:"#6c5ce7",ac2:"#a78bfa",gn:"#00d2a0",rd:"#ff4757",step:"#ffa502",name:"Midnight"},
+  blush:{bg:"#fef6f0",bg2:"#fff8f4",bg3:"#ffffff",bg4:"#f5ebe3",bd:"#e8d8cc",bd2:"#d4c0b0",t1:"#3d2c22",t2:"#8a7060",t3:"#b09880",ac:"#d4766e",ac2:"#e8a598",gn:"#6dba7a",rd:"#d44040",step:"#e8a040",name:"Blush"},
+};
+
+// ===== CATEGORIES =====
+const CATEGORIES=[
+  {id:"content",name:"Content",icon:"🎬",templates:[
+    {id:"t1",name:"TikTok",icon:"🎵",steps:[{name:"Idé & manus",days:2},{name:"Inspelning",days:2},{name:"Redigering",days:3},{name:"Granskning",days:2},{name:"Schemalägg",days:1},{name:"Publicera",days:0}]},
+    {id:"t2",name:"YouTube",icon:"🎬",steps:[{name:"Research & manus",days:3},{name:"Inspelning",days:2},{name:"Grovklipp",days:3},{name:"Finredigering",days:3},{name:"Thumbnail & titel",days:2},{name:"Granskning",days:2},{name:"Publicera",days:0}]},
+    {id:"t3",name:"Instagram Reel",icon:"📸",steps:[{name:"Koncept",days:1},{name:"Inspelning",days:1},{name:"Redigering",days:2},{name:"Copy & hashtags",days:1},{name:"Publicera",days:0}]},
+    {id:"t4",name:"Blogg/Artikel",icon:"📝",steps:[{name:"Research",days:2},{name:"Utkast",days:3},{name:"Redigering",days:2},{name:"SEO & bilder",days:2},{name:"Publicera",days:0}]},
+    {id:"t5",name:"Podcast",icon:"🎙️",steps:[{name:"Planering & gäst",days:2},{name:"Inspelning",days:1},{name:"Redigering & mix",days:3},{name:"Shownotes",days:1},{name:"Publicera",days:0}]},
+  ]},
+  {id:"maleri",name:"Måleri",icon:"🎨",templates:[
+    {id:"t10",name:"Invändigt rum",icon:"🖌️",steps:[{name:"Kundmöte & offert",days:2},{name:"Materialinköp",days:2},{name:"Spackling & slipning",days:2},{name:"Grundstrykning",days:1},{name:"Toppstrykning",days:2},{name:"Slutbesiktning",days:0}]},
+    {id:"t11",name:"Fasadmålning",icon:"🏠",steps:[{name:"Besiktning & offert",days:2},{name:"Ställning/skydd",days:2},{name:"Tvättning",days:1},{name:"Skrapning & lagning",days:3},{name:"Grundning",days:2},{name:"Toppstrykning",days:3},{name:"Städ & besiktning",days:0}]},
+  ]},
+  {id:"golv",name:"Golvslipning",icon:"🪵",templates:[
+    {id:"t20",name:"Golvslipning",icon:"🪵",steps:[{name:"Kundmöte & offert",days:2},{name:"Möbler & skydd",days:1},{name:"Grovslipning",days:1},{name:"Finslipning",days:1},{name:"Lackering/olja",days:2},{name:"Slutbesiktning",days:0}]},
+    {id:"t21",name:"Nyläggning & slipning",icon:"🔨",steps:[{name:"Kundmöte & offert",days:2},{name:"Materialinköp",days:2},{name:"Rivning",days:2},{name:"Läggning",days:3},{name:"Grovslipning",days:1},{name:"Lackering",days:2},{name:"Slutbesiktning",days:0}]},
+  ]},
+  {id:"foto",name:"Fotografering",icon:"📸",templates:[
+    {id:"t30",name:"Produktfoto",icon:"📦",steps:[{name:"Brief & moodboard",days:2},{name:"Förberedelse",days:1},{name:"Fotografering",days:1},{name:"Redigering & retusch",days:3},{name:"Leverans",days:0}]},
+    {id:"t31",name:"Bröllopsfoto",icon:"💒",steps:[{name:"Kundmöte",days:3},{name:"Platsbesök",days:2},{name:"Fotografering",days:1},{name:"Urval & grovretusch",days:7},{name:"Finredigering",days:7},{name:"Album & leverans",days:0}]},
+    {id:"t32",name:"Porträttfoto",icon:"🧑",steps:[{name:"Bokning & brief",days:1},{name:"Fotografering",days:1},{name:"Redigering",days:2},{name:"Leverans",days:0}]},
+  ]},
+  {id:"film",name:"Filmning",icon:"🎥",templates:[
+    {id:"t40",name:"Företagsfilm",icon:"🏢",steps:[{name:"Brief & manus",days:3},{name:"Förproduktion",days:3},{name:"Inspelning",days:2},{name:"Grovklipp",days:3},{name:"Finredigering & ljud",days:3},{name:"Granskning",days:3},{name:"Leverans",days:0}]},
+    {id:"t41",name:"Eventfilm",icon:"🎪",steps:[{name:"Planering",days:2},{name:"Inspelning",days:1},{name:"Grovklipp",days:2},{name:"Finredigering & musik",days:3},{name:"Leverans",days:0}]},
+    {id:"t42",name:"Reklamfilm",icon:"📺",steps:[{name:"Brief & koncept",days:3},{name:"Manus & storyboard",days:3},{name:"Casting & platser",days:3},{name:"Inspelning",days:2},{name:"Grovklipp",days:3},{name:"Color & ljud",days:3},{name:"Kundgranskning",days:3},{name:"Slutleverans",days:0}]},
+  ]},
+  {id:"inredning",name:"Heminredning",icon:"🏡",templates:[
+    {id:"t50",name:"Rumsinredning",icon:"🛋️",steps:[{name:"Kundmöte & brief",days:2},{name:"Moodboard",days:3},{name:"Ritning & 3D",days:5},{name:"Offert & beställning",days:3},{name:"Montering",days:3},{name:"Styling & foto",days:0}]},
+    {id:"t51",name:"Homestaging",icon:"✨",steps:[{name:"Besök & planering",days:2},{name:"Inköp möbler",days:2},{name:"Staging",days:1},{name:"Fotografering",days:0}]},
+  ]},
+  {id:"privat",name:"Privat",icon:"🗓️",templates:[
+    {id:"t60",name:"Event/fest",icon:"🎉",steps:[{name:"Planering & budget",days:5},{name:"Boka lokal",days:5},{name:"Inbjudningar",days:3},{name:"Förberedelser",days:5},{name:"Event",days:0}]},
+    {id:"t61",name:"Flytt",icon:"📦",steps:[{name:"Planering & rensning",days:7},{name:"Boka flyttfirma",days:3},{name:"Packning",days:7},{name:"Flytt",days:1},{name:"Uppackning",days:0}]},
+    {id:"t62",name:"Renovering",icon:"🔧",steps:[{name:"Planering & budget",days:5},{name:"Materialinköp",days:5},{name:"Rivning",days:3},{name:"Byggnation",days:7},{name:"Målning/finish",days:5},{name:"Städ & klart",days:0}]},
+  ]},
+  {id:"ovrigt",name:"Övrigt",icon:"📋",templates:[
+    {id:"t70",name:"Kundleverans",icon:"📤",steps:[{name:"Brief & kravspec",days:2},{name:"Första utkast",days:3},{name:"Feedback",days:2},{name:"Revidering",days:2},{name:"Slutleverans",days:0}]},
+    {id:"t71",name:"Kampanj",icon:"📣",steps:[{name:"Strategi & plan",days:3},{name:"Skapa material",days:4},{name:"Granskning",days:2},{name:"Schemalägg",days:1},{name:"Lansering",days:0}]},
+    {id:"t72",name:"Utbildning/Kurs",icon:"🎓",steps:[{name:"Kursplan",days:3},{name:"Skapa material",days:5},{name:"Testgenomgång",days:2},{name:"Justering",days:2},{name:"Publicering",days:0}]},
+  ]},
+];
+
+let C=THEMES.midnight;
+
+// ===== LOGIN SCREEN =====
+function LoginScreen({onLogin}){
+  const [email,setEmail]=useState("");
+  const [pass,setPass]=useState("");
+  const [isSignup,setIsSignup]=useState(false);
+  const [err,setErr]=useState("");
+  const [loading,setLoading]=useState(false);
+
+  const doEmail=async()=>{
+    if(!email||!pass){setErr("Fyll i e-post och lösenord");return}
+    setLoading(true);setErr("");
+    try{
+      let cred;
+      if(isSignup) cred=await auth.createUserWithEmailAndPassword(email,pass);
+      else cred=await auth.signInWithEmailAndPassword(email,pass);
+      onLogin({type:"email",email:cred.user.email,uid:cred.user.uid});
+    }catch(e){
+      if(e.code==="auth/user-not-found")setErr("Inget konto hittades — skapa ett nytt");
+      else if(e.code==="auth/wrong-password")setErr("Fel lösenord");
+      else if(e.code==="auth/email-already-in-use")setErr("E-posten används redan");
+      else if(e.code==="auth/weak-password")setErr("Lösenordet måste vara minst 6 tecken");
+      else setErr(e.message);
+    }
+    setLoading(false);
+  };
+
+  const doGoogle=async()=>{
+    setLoading(true);setErr("");
+    try{
+      const cred=await auth.signInWithPopup(googleProvider);
+      onLogin({type:"google",email:cred.user.email,uid:cred.user.uid});
+    }catch(e){setErr(e.message)}
+    setLoading(false);
+  };
+
+  return(
+    <div style={{position:"fixed",inset:0,background:C.bg,zIndex:3000,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24,maxWidth:420,margin:"0 auto"}}>
+      <div style={{width:56,height:56,background:`linear-gradient(135deg,${C.ac},${C.ac}88)`,borderRadius:16,display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,fontWeight:800,color:"#fff",marginBottom:20}}>DF</div>
+      <h1 style={{fontSize:24,fontWeight:800,color:C.t1,marginBottom:4}}>DeadlineFlow</h1>
+      <p style={{fontSize:13,color:C.t3,marginBottom:28}}>Planera. Följ upp. Leverera.</p>
+
+      {err&&<div style={{padding:"8px 14px",background:C.rd+"15",border:`1px solid ${C.rd}30`,borderRadius:8,marginBottom:12,fontSize:12,color:C.rd,maxWidth:300,width:"100%",textAlign:"center"}}>{err}</div>}
+
+      <div style={{width:"100%",maxWidth:300,display:"flex",flexDirection:"column",gap:8}}>
+        <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="E-post" type="email"
+          style={{padding:"12px 14px",background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:10,color:C.t1,fontFamily:"inherit",fontSize:14,outline:"none"}}/>
+        <input value={pass} onChange={e=>setPass(e.target.value)} placeholder="Lösenord" type="password"
+          onKeyDown={e=>e.key==="Enter"&&doEmail()}
+          style={{padding:"12px 14px",background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:10,color:C.t1,fontFamily:"inherit",fontSize:14,outline:"none"}}/>
+        <button onClick={doEmail} disabled={loading}
+          style={{padding:14,borderRadius:10,background:C.ac,border:"none",color:"#fff",fontSize:15,fontWeight:700,fontFamily:"inherit",cursor:"pointer",opacity:loading?0.6:1}}>
+          {loading?"...":isSignup?"Skapa konto":"Logga in"}
+        </button>
+        <div onClick={()=>setIsSignup(v=>!v)} style={{fontSize:11,color:C.ac,textAlign:"center",cursor:"pointer",padding:4}}>
+          {isSignup?"Har redan konto? Logga in":"Inget konto? Skapa ett"}
+        </div>
+      </div>
+
+      <div style={{display:"flex",alignItems:"center",gap:12,margin:"20px 0",width:"100%",maxWidth:300}}>
+        <div style={{flex:1,height:1,background:C.bd}}/><span style={{fontSize:11,color:C.t3}}>eller</span><div style={{flex:1,height:1,background:C.bd}}/>
+      </div>
+
+      <button onClick={doGoogle} disabled={loading}
+        style={{width:"100%",maxWidth:300,padding:14,borderRadius:10,background:C.bg3,border:`1px solid ${C.bd}`,color:C.t1,fontSize:14,fontWeight:600,fontFamily:"inherit",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:10,opacity:loading?0.6:1}}>
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Logga in med Google
+      </button>
+
+      <button onClick={()=>onLogin({type:"test",uid:"test_user"})} disabled={loading}
+        style={{marginTop:12,background:"none",border:"none",color:C.t3,fontSize:12,cursor:"pointer",fontFamily:"inherit",padding:8}}>
+        Fortsätt utan konto (test) →
+      </button>
+    </div>
+  );
+}
+
+
+// ===== CATEGORY PICKER (after onboarding) =====
+function CategoryPicker({onDone}){
+  const [picked,setPicked]=useState([]);
+  const toggle=id=>setPicked(p=>p.includes(id)?p.filter(x=>x!==id):[...p,id]);
+  return(
+    <div style={{position:"fixed",inset:0,background:C.bg,zIndex:2500,display:"flex",flexDirection:"column",maxWidth:420,margin:"0 auto"}}>
+      <div style={{flex:1,overflowY:"auto",padding:"32px 20px 100px"}}>
+        <div style={{textAlign:"center",marginBottom:24}}>
+          <div style={{fontSize:28,marginBottom:6}}>👋</div>
+          <h2 style={{fontSize:20,fontWeight:800,color:C.t1,marginBottom:4}}>Vad planerar du?</h2>
+          <p style={{fontSize:13,color:C.t3}}>Välj en eller flera kategorier — du får färdiga mallar direkt.</p>
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+          {CATEGORIES.map(cat=>{
+            const sel=picked.includes(cat.id);
+            return(
+              <div key={cat.id} onClick={()=>toggle(cat.id)}
+                style={{padding:"16px 12px",background:sel?C.ac+"15":C.bg3,border:`2px solid ${sel?C.ac:C.bd}`,borderRadius:14,cursor:"pointer",textAlign:"center",transition:"all .2s"}}>
+                <div style={{fontSize:24,marginBottom:4}}>{cat.icon}</div>
+                <div style={{fontSize:13,fontWeight:700,color:sel?C.ac:C.t1}}>{cat.name}</div>
+                <div style={{fontSize:10,color:C.t3,marginTop:2}}>{cat.templates.length} mallar</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div style={{padding:"12px 20px",borderTop:`1px solid ${C.bd}`,flexShrink:0}}>
+        <button onClick={()=>onDone(picked.length?picked:["ovrigt"])}
+          style={{width:"100%",padding:14,borderRadius:12,background:C.ac,border:"none",color:"#fff",fontSize:15,fontWeight:700,fontFamily:"inherit",cursor:"pointer"}}>
+          {picked.length?`Starta med ${picked.length} ${picked.length===1?"kategori":"kategorier"}`:"Hoppa över"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ===== CONFETTI BURST =====
+function ConfettiBurst({delay=0}){
+  const ref=useRef(null);
+  useEffect(()=>{
+    const timer=setTimeout(()=>{
+      const canvas=ref.current;if(!canvas)return;
+      const ctx=canvas.getContext("2d");
+      const W=canvas.offsetWidth,H=canvas.offsetHeight;
+      canvas.width=W*2;canvas.height=H*2;ctx.scale(2,2);
+      const colors=["#2ed573","#00d2a0","#7bed9f","#a8e6cf"];
+      const particles=[];
+      for(let i=0;i<16;i++){
+        const angle=-Math.PI/2+(Math.random()-0.5)*Math.PI;
+        particles.push({
+          x:W/2+(Math.random()-0.5)*8,
+          y:H/2+(Math.random()-0.5)*6,
+          vx:Math.cos(angle)*(0.4+Math.random()*1),
+          vy:-0.6-Math.random()*1.4,
+          w:1.5+Math.random()*2.5,h:1+Math.random()*2,
+          color:colors[Math.floor(Math.random()*colors.length)],
+          rot:Math.random()*360,
+          rv:2+Math.random()*4*(Math.random()>0.5?1:-1),
+          life:1,decay:0.015+Math.random()*0.008,
+          gravity:0.03,
+        });
+      }
+      let raf;
+      const draw=()=>{
+        ctx.clearRect(0,0,W,H);
+        let alive=false;
+        particles.forEach(p=>{
+          if(p.life<=0)return;
+          alive=true;
+          p.x+=p.vx;p.y+=p.vy;p.vy+=p.gravity;
+          p.rot+=p.rv;p.life-=p.decay;
+          ctx.save();
+          ctx.translate(p.x,p.y);
+          ctx.rotate(p.rot*Math.PI/180);
+          ctx.globalAlpha=Math.min(1,p.life*2);
+          ctx.fillStyle=p.color;
+          ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+          ctx.restore();
+        });
+        if(alive)raf=requestAnimationFrame(draw);
+      };
+      raf=requestAnimationFrame(draw);
+      return()=>cancelAnimationFrame(raf);
+    },delay);
+    return()=>clearTimeout(timer);
+  },[delay]);
+  return <canvas ref={ref} style={{position:"absolute",left:"50%",top:"50%",transform:"translate(-50%,-50%)",width:70,height:70,zIndex:6,pointerEvents:"none"}}/>;
+}
+
+// ===== ONBOARDING =====
+function Onboarding({onDone}){
+  const [slide,setSlide]=useState(0);
+  const [f,setF]=useState(0);
+  const [pct,setPct]=useState(0);
+  const [s3Done,setS3Done]=useState([]);
+  const [slideStarted,setSlideStarted]=useState({0:true});
+  const [revisiting,setRevisiting]=useState(false);
+
+  const totalFrames=[10,7,1];
+  
+  const goSlide=(s)=>{
+    const alreadySeen=!!slideStarted[s];
+    setRevisiting(alreadySeen);
+    setSlide(s);
+    if(!alreadySeen){
+      setSlideStarted(prev=>({...prev,[s]:true}));
+      setF(0);setPct(0);
+    }
+  };
+
+  useEffect(()=>{
+    if(!slideStarted[slide]||revisiting)return;
+    const iv=setInterval(()=>setF(n=>{
+      const next=n+1;
+      if(next>=totalFrames[slide]){clearInterval(iv);return totalFrames[slide]-1}
+      return next;
+    }),900);
+    return()=>clearInterval(iv);
+  },[slide,slideStarted]);
+
+  // Smooth percentage counter during loading
+  const loadActive=slide===1&&f>=1&&f<=2;
+  useEffect(()=>{
+    if(!loadActive)return;
+    setPct(0);
+    const start=performance.now();
+    const dur=2400;
+    let raf;
+    const tick=()=>{const p=Math.min((performance.now()-start)/dur,1);setPct(Math.round(p*100));if(p<1)raf=requestAnimationFrame(tick)};
+    raf=requestAnimationFrame(tick);
+    return()=>cancelAnimationFrame(raf);
+  },[loadActive]);
+
+  const remLabels=["Samma dag","1 dag innan","3 dagar innan"];
+  const remsOn=slide===0?Math.min(Math.floor((f+1)/2),3):3;
+  const chipX=[30,118,216];
+  const s1Idx=Math.min(Math.floor(f/2),2);
+  const s1Click=slide===0&&f<6&&f%2===1;
+
+  // Slide 2: f0=cursor, f1=click+expand+loading, f2=loading, f3+=reveal
+  const s2Expanding=slide===1&&f>=1;
+  const s2Loading=slide===1&&(f===1||f===2);
+  const s2Reveal=slide===1&&f>=3;
+
+  return(
+    <div style={{position:"fixed",inset:0,background:C.bg,zIndex:2000,maxWidth:420,margin:"0 auto",display:"flex",flexDirection:"column",padding:"24px 20px 20px"}}>
+      <div style={{flex:1,display:"flex",flexDirection:"column",justifyContent:"center",overflowY:"auto"}}>
+
+        {/* ===== SLIDE 1: Template + animated reminder chips ===== */}
+        {slide===0&&(
+          <div>
+            <h2 style={{fontSize:20,fontWeight:800,color:C.t1,marginBottom:4,textAlign:"center"}}>Skapa en projektmall</h2>
+            <p style={{fontSize:13,color:C.t2,lineHeight:1.5,textAlign:"center",marginBottom:16}}>Lägg till steg, ange dagar och påminnelser!</p>
+            <div style={{background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:12,padding:14,maxWidth:320,margin:"0 auto"}}>
+              <div style={{fontSize:14,fontWeight:700,color:C.ac,marginBottom:6}}>TikTok</div>
+              {["Skriva utkast idé","Skicka utkast","Godkänt utkast","Inspelning","Redigering","Publicera"].map((name,i)=>(
+                <div key={i} style={{display:"flex",alignItems:"center",gap:8,padding:"4px 0",borderBottom:i<5?`1px solid ${C.bd}`:"none"}}>
+                  <span style={{fontFamily:"monospace",fontSize:10,color:C.t3,width:16,textAlign:"center"}}>{i+1}</span>
+                  <span style={{flex:1,fontSize:12,color:C.t1}}>{name}</span>
+                  <span style={{fontFamily:"monospace",fontSize:11,color:C.ac,background:C.ac+"15",padding:"2px 6px",borderRadius:4}}>{[2,1,2,2,2,0][i]}d</span>
+                </div>
+              ))}
+              <div style={{marginTop:10,paddingTop:8,borderTop:`1px solid ${C.bd}`}}>
+                <div style={{fontSize:10,fontWeight:600,color:C.t3,marginBottom:8,textTransform:"uppercase",letterSpacing:0.5}}>Påminnelser</div>
+                <div style={{display:"flex",gap:6}}>
+                  {remLabels.map((r,i)=>(
+                    <span key={i} style={{padding:"5px 10px",borderRadius:14,fontSize:11,fontWeight:600,border:`1px solid ${i<remsOn?C.ac:C.bd}`,background:i<remsOn?C.ac+"20":"transparent",color:i<remsOn?C.ac:C.t3,transition:"all .4s ease"}}>{r}</span>
+                  ))}
+                </div>
+                {/* Cursor below chips, centered on active chip, slightly right */}
+                <div style={{position:"relative",height:28}}>
+                  <div style={{position:"absolute",left:chipX[s1Idx]+12,top:-8,pointerEvents:"none",transition:"left .5s cubic-bezier(.25,.1,.25,1)",filter:"drop-shadow(0 2px 4px rgba(0,0,0,.5))"}}>
+                    <svg width="14" height="18" viewBox="0 0 14 18"><path d="M1 1l11 7.5-5 1L5 15z" fill="#fff" stroke="#222" strokeWidth="1"/></svg>
+                    {s1Click&&<div key={f} style={{position:"absolute",left:0,top:0,width:12,height:12,borderRadius:"50%",background:C.ac+"60",animation:"ripple .4s ease-out forwards"}}/>}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ===== SLIDE 2: Calendar click → deadlines appear backwards ===== */}
+        {slide===1&&(
+          <div>
+            <h2 style={{fontSize:20,fontWeight:800,color:C.t1,marginBottom:4,textAlign:"center"}}>Ange deadline</h2>
+            <p style={{fontSize:13,color:C.t2,lineHeight:1.5,textAlign:"center",marginBottom:12}}>Ange deadline — vi sköter resten.</p>
+            <div style={{maxWidth:280,margin:"0 auto"}}>
+              {/* Deadline + button */}
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:10,position:"relative"}}>
+                <div>
+                  <div style={{fontSize:10,color:C.t3,fontWeight:600,textTransform:"uppercase",letterSpacing:0.5}}>Deadline</div>
+                  <div style={{fontFamily:"monospace",fontSize:16,fontWeight:700,color:C.t1}}>17 mars</div>
+                </div>
+                <div style={{padding:"8px 14px",borderRadius:8,background:s2Expanding?C.gn:C.ac,color:"#fff",fontSize:12,fontWeight:700,transition:"background .4s ease"}}>{s2Expanding?"Klart ✓":"Skapa"}</div>
+                {slide===1&&f===0&&(
+                  <div style={{position:"absolute",right:14,top:30,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,.5))",animation:"cursorMove .8s cubic-bezier(.25,.1,.25,1) forwards"}}>
+                    <svg width="14" height="18" viewBox="0 0 14 18"><path d="M1 1l11 7.5-5 1L5 15z" fill="#fff" stroke="#222" strokeWidth="1"/></svg>
+                  </div>
+                )}
+              </div>
+
+              {/* Calendar grows below - smooth maxHeight with long ease */}
+              <div style={{maxHeight:s2Expanding?350:0,overflow:"hidden",transition:revisiting?"none":"max-height 1.2s cubic-bezier(0.4, 0, 0.2, 1)"}}>
+                <div style={{marginTop:10,position:"relative"}}>
+                  {/* Calendar content */}
+                  <div style={{filter:s2Reveal||revisiting?"blur(0)":"blur(5px)",opacity:s2Reveal||revisiting?1:0.4,transition:revisiting?"none":"filter .7s ease, opacity .7s ease"}}>
+                    <div style={{background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:12,overflow:"hidden"}}>
+                      <div style={{background:C.ac+"10",padding:"8px 10px",borderBottom:`1px solid ${C.bd}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                        <span style={{fontSize:11,fontWeight:700,color:C.ac}}>Mars 2026</span>
+                        <span style={{fontSize:10,color:C.t3}}>TikTok — Nike</span>
+                      </div>
+                      <div style={{padding:"6px 4px 8px",display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:0,textAlign:"center"}}>
+                        {["M","T","O","T","F","L","S"].map((d,i)=>(
+                          <div key={d+i} style={{fontSize:8,fontWeight:700,color:i>=5?C.t3+"70":C.t3,padding:"2px 0"}}>{d}</div>
+                        ))}
+                        {(()=>{
+                          const stepDays={4:{name:"Utkast",order:5},6:{name:"Skicka",order:4},9:{name:"Godkänt",order:3},11:{name:"Insp.",order:2},13:{name:"Redig.",order:1},17:{name:"🎯 Pub.",order:0}};
+                          const cells=[];for(let i=0;i<6;i++)cells.push(null);for(let i=1;i<=31;i++)cells.push(i);
+                          return cells.map((d,i)=>{
+                            const isWknd=d!==null&&(i%7===5||i%7===6);
+                            const step=d!==null?stepDays[d]:null;
+                            const isDeadline=d===17;
+                            const shouldPop=step&&s2Reveal;
+                            const popDelay=step?step.order*0.12:0;
+                            const isLastPop=step&&step.order===5;
+                            return(
+                              <div key={i} style={{padding:"2px 1px",minHeight:30,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",borderRadius:5,position:isLastPop?"relative":"static",overflow:isLastPop?"visible":"hidden",
+                                background:shouldPop?(isDeadline?"rgba(255,71,87,.18)":"rgba(46,213,115,.18)"):"transparent",
+                                animation:shouldPop&&!revisiting?`stepPop .4s cubic-bezier(.34,1.56,.64,1) ${popDelay}s both`:"none"}}>
+                                <div style={{fontSize:9,fontWeight:step&&shouldPop?700:400,color:d===null?"transparent":step&&shouldPop?(isDeadline?C.rd:C.gn):isWknd?C.t3+"50":C.t2}}>{d!==null?d:""}</div>
+                                {step&&<div style={{fontSize:6,fontWeight:700,color:isDeadline?C.rd:C.gn,lineHeight:1,marginTop:1,whiteSpace:"nowrap",opacity:shouldPop?1:0}}>{step.name}</div>}
+                                {isLastPop&&shouldPop&&!revisiting&&<ConfettiBurst delay={popDelay*1000+300}/>}
+                              </div>
+                            );
+                          });
+                        })()}
+                      </div>
+                    </div>
+                  </div>
+                  {/* Loading overlay */}
+                  {s2Loading&&(
+                    <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:5}}>
+                      <div style={{fontSize:13,color:C.t1,fontWeight:600,marginBottom:10}}>{pct<35?"Skriver in i kalendern...":pct<70?"Hoppar över helger...":"Skapar påminnelser..."}</div>
+                      <div style={{width:"70%",height:3,borderRadius:4,background:C.bd,overflow:"hidden"}}>
+                        <div style={{height:"100%",borderRadius:4,background:`linear-gradient(90deg, ${C.gn}, #2ed573)`,animation:"loadbar 2.4s ease-in-out forwards"}}/>
+                      </div>
+                      <div style={{fontFamily:"monospace",fontSize:10,color:C.t3,marginTop:6}}>{pct}%</div>
+                    </div>
+                  )}
+                </div>
+                {/* Result text — appears with the step pops */}
+                <div style={{textAlign:"center",marginTop:8,overflow:"hidden"}}>
+                  <div style={{fontSize:13,fontWeight:700,color:C.gn,opacity:s2Reveal?1:0,transform:s2Reveal?"translateY(0)":"translateY(8px)",transition:"opacity .4s ease, transform .4s cubic-bezier(.34,1.56,.64,1)"}}>
+                    ✅ 6 steg inplanerade!
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ===== SLIDE 3: Week view — interactive ===== */}
+        {slide===2&&(()=>{
+          return(
+          <div>
+            <h2 style={{fontSize:20,fontWeight:800,color:C.t1,marginBottom:4,textAlign:"center"}}>Checka av, håll koll</h2>
+            <p style={{fontSize:13,color:C.t2,lineHeight:1.5,textAlign:"center",marginBottom:16}}>Testa! Tryck på en checkbox.</p>
+            <div style={{background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:12,padding:14,maxWidth:320,margin:"0 auto"}}>
+              {[
+                {id:0,day:"mån",num:"3",task:"Skriva utkast idé",client:"Nike",past:true},
+                {id:1,day:"tis",num:"4",past:true},
+                {id:2,day:"ons",num:"5",task:"Skicka utkast",client:"Nike",today:true},
+                {id:3,day:"tor",num:"6"},
+                {id:4,day:"fre",num:"7",task:"Godkänt utkast",client:"Nike"},
+              ].map((r,i)=>{
+                const done=s3Done.includes(r.id)||r.past;
+                const empty=!r.task;
+                return(
+                <div key={i} style={{display:"flex",gap:8,padding:"4px 0",alignItems:"center",opacity:empty?0.35:1}}>
+                  <div style={{width:30}}>
+                    <div style={{fontSize:8,fontWeight:700,color:r.today?C.ac:C.t3,textTransform:"uppercase"}}>{r.day}</div>
+                    <div style={{fontFamily:"monospace",fontSize:15,fontWeight:800,color:r.today?C.ac:done||r.past?C.t3:C.t1,lineHeight:1,textDecoration:done&&!r.today?"line-through":"none"}}>{r.num}</div>
+                  </div>
+                  {r.task?(
+                    <div onClick={()=>!r.past&&setS3Done(d=>d.includes(r.id)?d.filter(x=>x!==r.id):[...d,r.id])}
+                      style={{flex:1,display:"flex",alignItems:"center",gap:7,padding:"7px 9px",background:r.today&&!done?C.ac+"0a":C.bg4,border:`1px solid ${r.today&&!done?C.ac+"30":C.bd}`,borderRadius:8,borderLeft:"3px solid #6c5ce7",opacity:done?0.35:1,cursor:r.past?"default":"pointer",transition:"opacity .3s ease"}}>
+                      <div style={{width:14,height:14,border:`2px solid ${done?C.gn:C.bd2}`,borderRadius:3,background:done?C.gn:"transparent",display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s ease",flexShrink:0}}>
+                        {done&&<span style={{color:"#fff",fontSize:8,fontWeight:700}}>✓</span>}
+                      </div>
+                      <div style={{flex:1}}>
+                        <div style={{fontSize:11,fontWeight:600,textDecoration:done?"line-through":"none",color:done?C.t3:C.t1,transition:"all .2s"}}>{r.task}</div>
+                        <div style={{fontSize:9,color:C.t3}}>{r.client}</div>
+                      </div>
+                      {r.today&&!done&&<span style={{fontSize:8,fontWeight:700,padding:"2px 5px",borderRadius:5,background:C.ac+"20",color:C.ac}}>IDAG</span>}
+                    </div>
+                  ):(
+                    <div style={{flex:1,height:28,display:"flex",alignItems:"center"}}><div style={{width:16,borderTop:`1px dashed ${C.bd}`}}/></div>
+                  )}
+                </div>
+              )})}
+            </div>
+          </div>
+        );})()}
+
+      </div>
+      {/* Dots */}
+      <div style={{display:"flex",gap:8,justifyContent:"center",marginBottom:16,marginTop:16}}>
+        {[0,1,2].map(i=>(
+          <div key={i} style={{width:i===slide?24:8,height:8,borderRadius:4,background:i===slide?C.ac:C.bd2,transition:"all .3s",cursor:"pointer"}} onClick={()=>goSlide(i)}/>
+        ))}
+      </div>
+      {/* Buttons */}
+      <div style={{display:"flex",gap:10,maxWidth:360,width:"100%",margin:"0 auto"}}>
+        {slide<2?(
+          <>
+            <button onClick={onDone} style={{flex:1,padding:14,borderRadius:12,background:C.bg3,border:`1px solid ${C.bd}`,color:C.t3,fontSize:15,fontWeight:600,fontFamily:"inherit",cursor:"pointer"}}>Hoppa över</button>
+            <button onClick={()=>goSlide(slide+1)} style={{flex:2,padding:14,borderRadius:12,background:C.ac,border:"none",color:"#fff",fontSize:15,fontWeight:600,fontFamily:"inherit",cursor:"pointer"}}>Nästa →</button>
+          </>
+        ):(
+          <button onClick={onDone} style={{flex:1,padding:16,borderRadius:12,background:C.ac,border:"none",color:"#fff",fontSize:16,fontWeight:700,fontFamily:"inherit",cursor:"pointer"}}>Kom igång 🚀</button>
+        )}
+      </div>
+      <style>{`
+@keyframes ripple{0%{transform:scale(0.3);opacity:0.8}100%{transform:scale(2.5);opacity:0}}
+@keyframes sparkfly{0%{transform:scale(0) translateY(0);opacity:1}40%{transform:scale(1.3) translateY(-12px);opacity:1}100%{transform:scale(0) translateY(-35px);opacity:0}}
+@keyframes pulse{0%{opacity:0.2;transform:scale(0.8)}100%{opacity:1;transform:scale(1.2)}}
+@keyframes loadbar{0%{width:0%}100%{width:100%}}
+@keyframes cursorMove{0%{right:-10px;top:50px;opacity:0}20%{opacity:1}100%{right:14px;top:30px;opacity:1}}
+@keyframes stepPop{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes sheetUp{0%{transform:translateY(100%)}100%{transform:translateY(0)}}
+`}</style>
+    </div>
+  );
+}
+
+// ===== WEEK VIEW =====
+function WeekView({data,onToggle}){
+  const [expanded,setExpanded]=useState({});
+
+  const tasks=useMemo(()=>{
+    const t=[];
+    data.projects.forEach(p=>{const c=data.clients.find(x=>x.id===p.clientId);
+      p.steps.forEach((s,i)=>{t.push({pid:p.id,si:i,name:s.name,date:s.date,done:s.completed,client:c?c.name:"",color:c?c.color:"#6c5ce7",pname:p.name,isDL:i===p.steps.length-1})})});
+    return t.sort((a,b)=>a.date.localeCompare(b.date));
+  },[data]);
+
+  const byDate=useMemo(()=>{const m={};tasks.forEach(t=>{if(!m[t.date])m[t.date]=[];m[t.date].push(t)});return m},[tasks]);
+
+  if(!data.projects.length) return(
+    <div style={{textAlign:"center",padding:"80px 20px"}}>
+      <div style={{fontSize:44,marginBottom:12,opacity:0.6}}>📋</div>
+      <div style={{fontSize:18,fontWeight:700,color:C.t1,marginBottom:6}}>Inga projekt ännu</div>
+      <p style={{fontSize:14,color:C.t3}}>Tryck + nedan för att komma igång</p>
+    </div>
+  );
+
+  const today=new Date(),todayS=iso(today);
+  const todayDow=today.getDay();
+  const isWeekend=todayDow===0||todayDow===6;
+
+  const todayTasks=byDate[todayS]||[];
+  const todayUndone=todayTasks.filter(t=>!t.done);
+  const todayDone=todayTasks.filter(t=>t.done);
+  const overdue=tasks.filter(t=>!t.done&&isPast(t.date)&&!isToday(t.date));
+
+  const upcoming=[];
+  const d2=new Date(today);d2.setDate(d2.getDate()+1);
+  let count=0;
+  while(count<4&&upcoming.length<10){
+    const ds=iso(d2);
+    if(d2.getDay()!==0&&d2.getDay()!==6){
+      const dt=byDate[ds];
+      if(dt&&dt.length>0)upcoming.push({date:ds,dow:d2.getDay(),num:d2.getDate(),tasks:dt});
+      count++;
+    }
+    d2.setDate(d2.getDate()+1);
+  }
+
+  const futureStart=new Date(today);futureStart.setDate(futureStart.getDate()+8);
+  while(futureStart.getDay()!==1)futureStart.setDate(futureStart.getDate()+1);
+  const futureEnd=new Date(today);futureEnd.setDate(futureEnd.getDate()+56);
+  const weeks=[];let cw=null,cDays=[];
+  const fd=new Date(futureStart);
+  while(fd<=futureEnd){
+    const ds=iso(fd),wn=getWeekNum(ds),dow=fd.getDay();
+    if(wn!==cw){
+      if(cw!==null&&cDays.length)weeks.push({wn:cw,days:cDays});
+      cw=wn;cDays=[];
+    }
+    if(dow===6||dow===0){fd.setDate(fd.getDate()+1);continue}
+    const dt=byDate[ds]||[];
+    cDays.push({ds,dow,num:fd.getDate(),tasks:dt});
+    fd.setDate(fd.getDate()+1);
+  }
+  if(cDays.length)weeks.push({wn:cw,days:cDays});
+
+  const TaskCard=({t,accent,compact})=>(
+    <div onClick={()=>onToggle(t.pid,t.si)}
+      style={{display:"flex",alignItems:"center",gap:compact?8:12,padding:compact?"8px 10px":"14px 16px",background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:compact?10:14,borderLeft:`3px solid ${t.color}`,cursor:"pointer",opacity:t.done?0.35:1,transition:"opacity .3s"}}>
+      <div style={{width:compact?16:22,height:compact?16:22,border:`2px solid ${t.done?C.gn:C.bd2}`,borderRadius:compact?4:7,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:t.done?C.gn:"transparent",transition:"all .2s"}}>
+        {t.done&&<span style={{color:"#fff",fontSize:compact?9:12,fontWeight:700}}>✓</span>}
+      </div>
+      <div style={{flex:1,minWidth:0}}>
+        <div style={{fontSize:compact?12:15,fontWeight:compact?500:600,textDecoration:t.done?"line-through":"none",color:t.done?C.t3:C.t1}}>{t.isDL?"🎯 ":""}{t.name}</div>
+        <div style={{fontSize:compact?9:12,color:C.t3,marginTop:compact?0:2}}>{t.client}{compact?"":" · "+t.pname}</div>
+      </div>
+      {accent&&!t.done&&<div style={{width:6,height:6,borderRadius:"50%",background:C.ac,flexShrink:0}}/>}
+    </div>
+  );
+
+  return(
+    <div style={{paddingBottom:80}}>
+      {overdue.length>0&&(
+        <div style={{marginBottom:16,padding:"14px 16px",background:"rgba(255,71,87,.06)",border:"1px solid rgba(255,71,87,.12)",borderRadius:16}}>
+          <div style={{fontSize:13,fontWeight:700,color:C.rd,marginBottom:10}}>⚠️ {overdue.length} försenade</div>
+          <div style={{display:"flex",flexDirection:"column",gap:6}}>
+            {overdue.slice(0,3).map(t=>(
+              <div key={`o-${t.pid}-${t.si}`} onClick={()=>onToggle(t.pid,t.si)}
+                style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"rgba(255,71,87,.04)",borderRadius:10,cursor:"pointer",border:`1px solid rgba(255,71,87,.1)`}}>
+                <div style={{width:18,height:18,border:`2px solid ${C.rd}`,borderRadius:5,flexShrink:0}}/>
+                <div style={{flex:1}}><span style={{fontSize:13,fontWeight:600,color:C.rd}}>{t.name}</span></div>
+                <span style={{fontSize:11,color:C.t3}}>{t.client}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ===== HERO: TODAY ===== */}
+      <div style={{marginBottom:20}}>
+        <div style={{display:"flex",alignItems:"baseline",justifyContent:"space-between",marginBottom:12}}>
+          <div>
+            <div style={{fontSize:22,fontWeight:800,color:C.t1}}>{isWeekend?"Helg":"Idag"}</div>
+            <div style={{fontSize:13,color:C.ac,fontWeight:600,marginTop:2}}>{DAYS[todayDow]} {today.getDate()} {MONTHS[today.getMonth()]}</div>
+          </div>
+          {todayUndone.length>0&&(
+            <div style={{fontSize:12,color:C.t3}}>{todayDone.length}/{todayTasks.length} klara</div>
+          )}
+        </div>
+
+        {todayTasks.length===0?(
+          <div style={{padding:"28px 20px",background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:16,textAlign:"center"}}>
+            <div style={{fontSize:13,color:C.t3}}>{isWeekend?"Njut av helgen 🌿":"Inga uppgifter idag 🎉"}</div>
+          </div>
+        ):(
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {todayTasks.map(t=><TaskCard key={`${t.pid}-${t.si}`} t={t} accent/>)}
+          </div>
+        )}
+
+        {todayTasks.length>0&&(
+          <div style={{display:"flex",gap:3,marginTop:10}}>
+            {todayTasks.map((t,i)=><div key={i} style={{flex:1,height:3,borderRadius:2,background:t.done?C.gn:C.bd2,transition:"background .3s"}}/>)}
+          </div>
+        )}
+      </div>
+
+      {/* ===== NEXT UP ===== */}
+      {upcoming.length>0&&(
+        <div style={{marginBottom:20}}>
+          <div style={{fontSize:14,fontWeight:700,color:C.t2,marginBottom:10}}>Nästa upp</div>
+          <div style={{display:"flex",flexDirection:"column",gap:6}}>
+            {upcoming.map(day=>(
+              <div key={day.date}>
+                <div style={{fontSize:11,fontWeight:600,color:C.t3,marginBottom:4,marginLeft:2}}>{DAYS[day.dow]} {day.num} {MONTHS[new Date(day.date).getMonth()]}</div>
+                {day.tasks.map(t=>(
+                  <TaskCard key={`${t.pid}-${t.si}`} t={t} compact/>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ===== FUTURE WEEKS ===== */}
+      {weeks.filter(w=>w.days.some(d=>d.tasks.length>0)).length>0&&(
+        <div>
+          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
+            <div style={{flex:1,height:1,background:C.bd}}/>
+            <span style={{fontSize:10,color:C.t3,fontWeight:600,textTransform:"uppercase",letterSpacing:1}}>Längre fram</span>
+            <div style={{flex:1,height:1,background:C.bd}}/>
+          </div>
+          {weeks.map(w=>{
+            const cnt=w.days.reduce((s,d)=>s+d.tasks.filter(t=>!t.done).length,0);
+            if(cnt===0)return null;
+            const isOpen=expanded[w.wn];
+            return(
+              <div key={w.wn} style={{marginBottom:4}}>
+                <div onClick={()=>setExpanded(e=>({...e,[w.wn]:!e[w.wn]}))} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 14px",background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:isOpen?"12px 12px 0 0":12,cursor:"pointer"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:8}}>
+                    <span style={{fontSize:10,color:C.t3,transition:"transform .2s",transform:isOpen?"rotate(90deg)":"rotate(0)",display:"inline-block"}}>▶</span>
+                    <span style={{fontSize:13,fontWeight:600,color:C.t2}}>Vecka {w.wn}</span>
+                  </div>
+                  <span style={{fontSize:11,fontWeight:700,padding:"3px 10px",borderRadius:8,background:C.ac+"12",color:C.ac}}>{cnt}</span>
+                </div>
+                {isOpen&&(
+                  <div style={{padding:"10px 14px",background:C.bg2,border:`1px solid ${C.bd}`,borderTop:"none",borderRadius:"0 0 12px 12px"}}>
+                    {w.days.filter(d=>d.tasks.length>0).map(day=>(
+                      <div key={day.ds} style={{marginBottom:8}}>
+                        <div style={{fontSize:10,fontWeight:600,color:C.t3,marginBottom:4}}>{DAYS[day.dow]} {day.num}</div>
+                        {day.tasks.map(t=>(
+                          <TaskCard key={`${t.pid}-${t.si}`} t={t} compact/>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+    </div>
+  );
+}
+
+// ===== PROJECTS VIEW =====
+function ProjectsView({data,onDelete}){
+  const active=data.projects.filter(p=>!p.steps.every(s=>s.completed));
+  const done=data.projects.filter(p=>p.steps.every(s=>s.completed));
+  return(
+    <div style={{paddingBottom:80}}>
+      {active.length===0&&<p style={{color:C.t3,fontSize:14,textAlign:"center",padding:40}}>Inga aktiva projekt.</p>}
+      {active.map(p=>{
+        const c=data.clients.find(x=>x.id===p.clientId);const cl=c?c.color:C.ac;
+        const dn=p.steps.filter(s=>s.completed).length;const dl=p.steps[p.steps.length-1];
+        return(
+          <div key={p.id} style={{background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:12,padding:16,marginBottom:10,borderLeft:`3px solid ${cl}`}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"start"}}>
+              <div><div style={{fontSize:16,fontWeight:700}}>{p.name}</div><div style={{fontSize:12,fontWeight:600,color:cl,marginTop:2}}>{c?c.name:""}</div></div>
+              <div style={{textAlign:"right"}}><div style={{fontFamily:"monospace",fontSize:11,color:C.t3}}>Deadline {fmtShort(dl.date)}</div><div style={{fontSize:11,color:C.t2}}>{dn}/{p.steps.length}</div></div>
+            </div>
+            <div style={{display:"flex",gap:3,margin:"10px 0 8px"}}>{p.steps.map((s,i)=><div key={i} style={{flex:1,height:4,borderRadius:2,background:s.completed?C.gn:C.bd2}}/>)}</div>
+            <div style={{display:"flex",justifyContent:"flex-end"}}><button onClick={()=>onDelete(p.id)} style={{background:"none",border:"none",color:C.t3,fontSize:11,cursor:"pointer",padding:"4px 8px"}}>🗑 Radera</button></div>
+          </div>
+        );
+      })}
+      {done.length>0&&<>
+        <div style={{fontSize:11,fontWeight:600,color:C.t3,margin:"20px 0 10px",textTransform:"uppercase"}}>Avslutade</div>
+        {done.map(p=>{const c=data.clients.find(x=>x.id===p.clientId);return(
+          <div key={p.id} style={{background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:12,padding:14,marginBottom:6,opacity:0.3}}>
+            <div style={{display:"flex",justifyContent:"space-between"}}><span style={{fontSize:14,fontWeight:600}}>{p.name}</span>
+            <button onClick={()=>onDelete(p.id)} style={{background:"none",border:"none",color:C.t3,fontSize:11,cursor:"pointer"}}>🗑</button></div>
+          </div>
+        )})}
+      </>}
+    </div>
+  );
+}
+
+// ===== TEMPLATES VIEW =====
+function TemplatesView({data,onEdit,onDelete,onNew}){
+  const [collapsed,setCollapsed]=useState({});
+  const toggle=id=>setCollapsed(c=>({...c,[id]:!c[id]}));
+
+  // Group templates by category
+  const groups=useMemo(()=>{
+    const g=[];
+    const placed=new Set();
+    CATEGORIES.forEach(cat=>{
+      const tpls=data.templates.filter(t=>cat.templates.some(ct=>ct.id===t.id));
+      if(tpls.length){g.push({id:cat.id,name:cat.name,icon:cat.icon,templates:tpls});tpls.forEach(t=>placed.add(t.id))}
+    });
+    const custom=data.templates.filter(t=>!placed.has(t.id));
+    if(custom.length)g.push({id:"_custom",name:"Egna mallar",icon:"✏️",templates:custom});
+    return g;
+  },[data.templates]);
+
+  const TplCard=({t})=>(
+    <div onClick={()=>onEdit(t.id)} style={{background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:10,padding:"12px 14px",marginBottom:6,cursor:"pointer"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"start"}}>
+        <div><div style={{fontSize:14,fontWeight:600,color:C.t1}}>{t.icon} {t.name}</div><div style={{fontSize:10,color:C.t3,marginTop:2}}>{t.steps.length} steg · {t.steps.reduce((a,x)=>a+x.days,0)} dagar</div></div>
+        <button onClick={e=>{e.stopPropagation();onDelete(t.id)}} style={{background:"none",border:"none",color:C.t3,cursor:"pointer",fontSize:12,padding:4}}>✕</button>
+      </div>
+      <div style={{display:"flex",flexWrap:"wrap",gap:3,marginTop:6}}>{t.steps.map((s,i)=><span key={i} style={{fontSize:9,padding:"2px 6px",borderRadius:4,background:C.bg4,color:C.t2}}>{s.name}</span>)}</div>
+    </div>
+  );
+
+  return(
+    <div style={{paddingBottom:80}}>
+      {groups.map(g=>{
+        const isOpen=!collapsed[g.id];
+        return(
+          <div key={g.id} style={{marginBottom:12}}>
+            <div onClick={()=>toggle(g.id)} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 12px",background:C.bg2,border:`1px solid ${C.bd}`,borderRadius:isOpen?"10px 10px 0 0":10,cursor:"pointer"}}>
+              <div style={{display:"flex",alignItems:"center",gap:8}}>
+                <span style={{fontSize:10,color:C.t3,transition:"transform .2s",transform:isOpen?"rotate(90deg)":"rotate(0)",display:"inline-block"}}>▶</span>
+                <span style={{fontSize:16}}>{g.icon}</span>
+                <span style={{fontSize:14,fontWeight:700,color:C.t1}}>{g.name}</span>
+              </div>
+              <span style={{fontSize:11,fontWeight:600,padding:"2px 8px",borderRadius:6,background:C.ac+"12",color:C.ac}}>{g.templates.length}</span>
+            </div>
+            {isOpen&&(
+              <div style={{padding:"8px 10px",background:C.bg2+"80",border:`1px solid ${C.bd}`,borderTop:"none",borderRadius:"0 0 10px 10px"}}>
+                {g.templates.map(t=><TplCard key={t.id} t={t}/>)}
+              </div>
+            )}
+          </div>
+        );
+      })}
+      {groups.length===0&&<p style={{color:C.t3,fontSize:13,textAlign:"center",padding:40}}>Inga mallar — välj kategorier eller skapa egna.</p>}
+      <button onClick={onNew} style={{width:"100%",padding:14,border:`1px dashed ${C.bd}`,borderRadius:12,background:"transparent",color:C.t3,cursor:"pointer",fontSize:14,fontFamily:"inherit"}}>+ Ny mall</button>
+    </div>
+  );
+}
+
+// ===== CALENDAR OVERVIEW =====
+function CalendarOverview({data,month,setMonth,onToggle,onPush}){
+  const tasks=useMemo(()=>{
+    const t=[];
+    data.projects.forEach(p=>{const c=data.clients.find(x=>x.id===p.clientId);
+      p.steps.forEach((s,i)=>{t.push({pid:p.id,si:i,name:s.name,date:s.date,done:s.completed,client:c?c.name:"",color:c?c.color:C.ac,pname:p.name,isDL:i===p.steps.length-1,pushed:!!s.pushedToGcal})})});
+    return t;
+  },[data]);
+
+  const byDate=useMemo(()=>{const m={};tasks.forEach(t=>{if(!m[t.date])m[t.date]=[];m[t.date].push(t)});return m},[tasks]);
+
+  const yr=month.getFullYear(),mo=month.getMonth();
+  const offset=(new Date(yr,mo,1).getDay()+6)%7;
+  const dim=new Date(yr,mo+1,0).getDate();
+  const todayStr=iso(new Date());
+  const cells=[];
+  for(let i=0;i<offset;i++)cells.push(null);
+  for(let i=1;i<=dim;i++)cells.push(i);
+
+  const [selDate,setSelDate]=useState(null);
+  const selTasks=selDate?byDate[selDate]||[]:[];
+
+  // Count unpushed future tasks
+  const unpushed=tasks.filter(t=>!t.pushed&&!t.done&&t.date>=todayStr);
+
+  return(
+    <div style={{paddingBottom:80}}>
+      {/* Month nav */}
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
+        <button onClick={()=>setMonth(new Date(yr,mo-1,1))} style={{background:"none",border:"none",color:C.t2,cursor:"pointer",fontSize:18,fontFamily:"inherit",padding:"4px 8px"}}>‹</button>
+        <span style={{fontSize:16,fontWeight:700,color:C.t1,textTransform:"capitalize"}}>{MONTHS[mo]} {yr}</span>
+        <button onClick={()=>setMonth(new Date(yr,mo+1,1))} style={{background:"none",border:"none",color:C.t2,cursor:"pointer",fontSize:18,fontFamily:"inherit",padding:"4px 8px"}}>›</button>
+      </div>
+
+      {/* Calendar grid */}
+      <div style={{background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:12,padding:8,marginBottom:12}}>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",textAlign:"center",marginBottom:4}}>
+          {["M","T","O","T","F","L","S"].map((d,i)=><div key={d+i} style={{fontSize:9,fontWeight:700,color:i>=5?C.t3+"70":C.t3,padding:"4px 0"}}>{d}</div>)}
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:2}}>
+          {cells.map((d,i)=>{
+            if(d===null)return <div key={i}/>;
+            const ds=`${yr}-${String(mo+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+            const dayTasks=byDate[ds]||[];
+            const isTdy=ds===todayStr;
+            const isSel=ds===selDate;
+            const isPast=ds<todayStr;
+            const colors=[...new Set(dayTasks.filter(t=>!isPast||!t.done).map(t=>t.color))];
+            return(
+              <div key={i} onClick={()=>setSelDate(ds===selDate?null:ds)}
+                style={{padding:"6px 2px 4px",borderRadius:8,cursor:"pointer",textAlign:"center",
+                  opacity:isPast?0.3:1,
+                  background:isSel?C.ac+"20":isTdy?C.ac+"08":"transparent",
+                  border:isSel?`2px solid ${C.ac}`:isTdy?`2px solid ${C.ac}30`:"2px solid transparent",
+                  transition:"all .15s",minHeight:38}}>
+                <div style={{fontSize:12,fontWeight:isTdy||isSel?700:400,color:isPast?C.t3:isSel?C.ac:isTdy?C.ac:i%7>=5?C.t3:C.t1}}>{d}</div>
+                {!isPast&&colors.length>0&&(
+                  <div style={{display:"flex",gap:2,justifyContent:"center",marginTop:2,flexWrap:"wrap"}}>
+                    {colors.slice(0,3).map((cl,ci)=><div key={ci} style={{width:5,height:5,borderRadius:"50%",background:cl}}/>)}
+                    {colors.length>3&&<div style={{width:5,height:5,borderRadius:"50%",background:C.t3,fontSize:4,display:"flex",alignItems:"center",justifyContent:"center",color:C.bg}}>+</div>}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Push to Google Calendar — only unpushed */}
+      <button onClick={()=>{if(unpushed.length)onPush();else alert("Alla uppgifter är redan synkade!")}}
+        style={{width:"100%",padding:"12px 16px",background:unpushed.length?C.bg3:C.bg3,border:`1px solid ${unpushed.length?C.ac+"50":C.bd}`,borderRadius:10,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:16,fontFamily:"inherit",opacity:unpushed.length?1:0.5}}>
+        <span style={{fontSize:16}}>📤</span>
+        <span style={{fontSize:13,fontWeight:600,color:unpushed.length?C.ac:C.t3}}>
+          {unpushed.length?`Pusha ${unpushed.length} nya till Google Calendar`:"✓ Allt synkat"}
+        </span>
+      </button>
+
+      {/* Selected day detail */}
+      {selDate&&(
+        <div style={{marginBottom:16}}>
+          <div style={{fontSize:13,fontWeight:700,color:C.t1,marginBottom:8}}>{fmtDay(selDate)} {fmtShort(selDate)}</div>
+          {selTasks.length===0?(
+            <div style={{padding:16,background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:10,textAlign:"center"}}>
+              <span style={{fontSize:12,color:C.t3}}>Inga uppgifter</span>
+            </div>
+          ):(
+            <div style={{display:"flex",flexDirection:"column",gap:6}}>
+              {selTasks.map(t=>(
+                <div key={`${t.pid}-${t.si}`} onClick={()=>onToggle(t.pid,t.si)}
+                  style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:10,borderLeft:`3px solid ${t.color}`,cursor:"pointer",opacity:t.done?0.35:1,transition:"opacity .3s"}}>
+                  <div style={{width:18,height:18,border:`2px solid ${t.done?C.gn:C.bd2}`,borderRadius:5,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:t.done?C.gn:"transparent"}}>
+                    {t.done&&<span style={{color:"#fff",fontSize:10,fontWeight:700}}>✓</span>}
+                  </div>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:13,fontWeight:600,color:t.done?C.t3:C.t1,textDecoration:t.done?"line-through":"none"}}>{t.isDL?"🎯 ":""}{t.name}</div>
+                    <div style={{fontSize:10,color:C.t3}}>{t.client} · {t.pname}</div>
+                  </div>
+                  {t.pushed&&<span style={{fontSize:9,color:C.gn}}>☁️</span>}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Month summary */}
+      {(()=>{
+        const monthTasks=tasks.filter(t=>t.date.startsWith(`${yr}-${String(mo+1).padStart(2,"0")}`));
+        const done=monthTasks.filter(t=>t.done).length;
+        const total=monthTasks.length;
+        if(!total)return null;
+        const pushed=monthTasks.filter(t=>t.pushed).length;
+        return(
+          <div style={{background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:10,padding:12}}>
+            <div style={{fontSize:11,fontWeight:700,color:C.t3,marginBottom:6,textTransform:"uppercase"}}>Sammanfattning</div>
+            <div style={{display:"flex",justifyContent:"space-around",textAlign:"center"}}>
+              <div><div style={{fontSize:20,fontWeight:800,color:C.t1}}>{total}</div><div style={{fontSize:10,color:C.t3}}>Uppgifter</div></div>
+              <div><div style={{fontSize:20,fontWeight:800,color:C.gn}}>{done}</div><div style={{fontSize:10,color:C.t3}}>Klara</div></div>
+              <div><div style={{fontSize:20,fontWeight:800,color:total-done>0?C.step:C.gn}}>{total-done}</div><div style={{fontSize:10,color:C.t3}}>Kvar</div></div>
+              <div><div style={{fontSize:20,fontWeight:800,color:pushed?C.ac:C.t3}}>{pushed}</div><div style={{fontSize:10,color:C.t3}}>Synkade</div></div>
+            </div>
+            {total>0&&<div style={{display:"flex",gap:2,marginTop:8}}><div style={{flex:done,height:4,borderRadius:2,background:C.gn,transition:"flex .5s"}}/><div style={{flex:total-done||0.01,height:4,borderRadius:2,background:C.bd2}}/></div>}
+          </div>
+        );
+      })()}
+    </div>
+  );
+}
+
+// ===== MAIN =====
+function App(){
+  const [theme,setTheme]=useState("midnight");
+  C=THEMES[theme]; // Update module-level C each render
+
+  // Auth flow
+  const [authState,setAuthState]=useState(null); // null=login, {type,email?}
+  const [showCatPicker,setShowCatPicker]=useState(false);
+
+  const [data,setData]=useState({clients:[],templates:[],projects:[]});
+  const [tab,setTab]=useState("week");
+  const [toast,setToast]=useState("");
+  const [showOnboard,setShowOnboard]=useState(true);
+  const [calOverviewMonth,setCalOverviewMonth]=useState(()=>{const n=new Date();return new Date(n.getFullYear(),n.getMonth(),1)});
+
+  // Project creation - single view
+  const [wiz,setWiz]=useState(false);
+  const [pClient,setPClient]=useState("");
+  const [pTpl,setPTpl]=useState("");
+  const [pName,setPName]=useState("");
+  const [pDL,setPDL]=useState("");
+  const [pColor,setPColor]=useState(CLIENT_COLORS[0]);
+  const [pSkipWknd,setPSkipWknd]=useState(true);
+  const [showColors,setShowColors]=useState(false);
+  const [clientFocus,setClientFocus]=useState(false);
+  const [calMonth,setCalMonth]=useState(()=>{const n=new Date();return new Date(n.getFullYear(),n.getMonth(),1)});
+  const [pCustomSteps,setPCustomSteps]=useState(null);
+  const [movingIdx,setMovingIdx]=useState(-1);
+  const wizLongPress=useRef(null);
+  const [wizDragOver,setWizDragOver]=useState(null);
+  const [showPushPopup,setShowPushPopup]=useState(false);
+
+  // Template modal
+  const [tplOpen,setTplOpen]=useState(false);
+  const [tplName,setTplName]=useState("");
+  const [tplSteps,setTplSteps]=useState([]);
+  const [editTplId,setEditTplId]=useState(null);
+
+  const msg=m=>{setToast(m);setTimeout(()=>setToast(""),3000)};
+  const upd=useCallback(fn=>{setData(d=>{const n=JSON.parse(JSON.stringify(d));fn(n);return n})},[]);
+  const toggle=useCallback((pid,si)=>{upd(d=>{const p=d.projects.find(x=>x.id===pid);if(p)p.steps[si].completed=!p.steps[si].completed})},[upd]);
+
+  // Push unpushed future steps to Google Calendar
+  const pushToGcal=useCallback(()=>{
+    const todayStr=iso(new Date());
+    // Count first
+    let count=0;
+    data.projects.forEach(p=>{p.steps.forEach(s=>{if(!s.pushedToGcal&&!s.completed&&s.date>=todayStr)count++})});
+    if(!count)return;
+    upd(d=>{
+      d.projects.forEach(p=>{
+        p.steps.forEach(s=>{
+          if(!s.pushedToGcal&&!s.completed&&s.date>=todayStr){
+            s.pushedToGcal=true;
+            // Production: google.calendar.events.insert({summary: s.name, start: {date: s.date}, ...})
+          }
+        });
+      });
+    });
+    msg(`☁️ ${count} uppgifter pushade till Google Calendar`);
+  },[upd,data]);
+
+  // Cloud sync — save to Firestore on every change
+  const saveTimer=useRef(null);
+  useEffect(()=>{
+    if(!authState||authState.type==="test")return;
+    if(saveTimer.current)clearTimeout(saveTimer.current);
+    saveTimer.current=setTimeout(()=>{
+      saveUserData(authState.uid,data);
+    },1000);
+    return ()=>{if(saveTimer.current)clearTimeout(saveTimer.current)};
+  },[data,authState]);
+
+  // Login handler — load from Firestore
+  const handleLogin=async(info)=>{
+    setAuthState(info);
+    if(info.type!=="test"&&info.uid){
+      const saved=await loadUserData(info.uid);
+      if(saved&&saved.projects&&saved.projects.length>0){
+        setData(saved);
+        setShowOnboard(false);setShowCatPicker(false);
+        msg("☁️ Data laddad från molnet");
+        return;
+      }
+    }
+    setShowOnboard(true);
+  };
+
+  // Category picker done
+  const handleCatDone=(catIds)=>{
+    setShowCatPicker(false);
+    const tpls=CATEGORIES.filter(c=>catIds.includes(c.id)).flatMap(c=>c.templates);
+    upd(d=>{d.templates=[...tpls]});
+    msg("✅ Mallar laddade!");
+  };
+
+  // Logout
+  const handleLogout=async()=>{
+    try{await auth.signOut()}catch(e){}
+    setAuthState(null);setData({clients:[],templates:[],projects:[]});
+    setShowOnboard(true);setShowCatPicker(false);setTab("week");
+  };
+
+  // === PROJECT CREATION ===
+  const startWiz=()=>{
+    setPClient("");setPTpl(data.templates[0]?.id||"");setPName("");setPDL("");setPSkipWknd(true);setShowColors(false);setClientFocus(false);
+    setPCustomSteps(null);setMovingIdx(-1);setWizDragOver(null);
+    const used=data.clients.map(c=>c.color);setPColor(CLIENT_COLORS.find(c=>!used.includes(c))||CLIENT_COLORS[0]);
+    setCalMonth(new Date(new Date().getFullYear(),new Date().getMonth(),1));
+    setWiz(true);
+  };
+
+  // Live preview — computed whenever inputs change
+  const livePreview=useMemo(()=>{
+    if(!pTpl||!pDL)return null;
+    const tpl=data.templates.find(t=>t.id===pTpl);
+    if(!tpl)return null;
+    return calcSteps(tpl,pDL,pSkipWknd);
+  },[pTpl,pDL,pSkipWknd,data.templates]);
+
+  // Sync: when base calc changes, reset custom overrides
+  useEffect(()=>{
+    if(livePreview)setPCustomSteps(livePreview.map(s=>({...s,reminders:["1d"]})));
+    else setPCustomSteps(null);
+  },[livePreview]);
+
+  // The steps to display/save (custom or calculated)
+  const wizSteps=pCustomSteps||livePreview;
+
+  // Move a wizard step to a new date
+  const wizMoveStep=(idx,newDate)=>{
+    setPCustomSteps(prev=>{
+      if(!prev)return prev;
+      const n=[...prev.map(s=>({...s}))];
+      n[idx]={...n[idx],date:newDate};
+      return n;
+    });
+  };
+
+  // Toggle reminder for a wizard step
+  const wizToggleReminder=(idx,key)=>{
+    setPCustomSteps(prev=>{
+      if(!prev)return prev;
+      const n=[...prev.map(s=>({...s}))];
+      const cur=Array.isArray(n[idx].reminders)?[...n[idx].reminders]:["1d"];
+      if(cur.includes(key))n[idx]={...n[idx],reminders:cur.filter(k=>k!==key)};
+      else n[idx]={...n[idx],reminders:[...cur,key]};
+      return n;
+    });
+  };
+
+  const wizSave=()=>{
+    if(!pClient.trim()){msg("Ange kundnamn");return}
+    if(!pTpl){msg("Välj mall");return}
+    if(!pDL){msg("Välj deadline");return}
+    if(!wizSteps){msg("Inga steg beräknade");return}
+    upd(d=>{
+      let cl=d.clients.find(c=>c.name.toLowerCase()===pClient.trim().toLowerCase());
+      if(!cl){cl={id:gid(),name:pClient.trim(),color:pColor};d.clients.push(cl)}
+      const tpl=d.templates.find(t=>t.id===pTpl);
+      const nm=pName.trim()||`${tpl.name} — ${pClient.trim()}`;
+      const steps=wizSteps.map(s=>({...s,reminders:Array.isArray(s.reminders)?s.reminders:["1d"]}));
+      d.projects.push({id:gid(),clientId:cl.id,templateId:pTpl,templateName:tpl.name,name:nm,deadline:pDL,steps,createdAt:new Date().toISOString()});
+    });
+    setWiz(false);setShowPushPopup(true);
+  };
+
+  const delProject=id=>{upd(d=>{d.projects=d.projects.filter(x=>x.id!==id)});msg("🗑 Borttaget")};
+
+  // === TEMPLATE ===
+  const openTpl=(id=null)=>{
+    if(id){const t=data.templates.find(x=>x.id===id);setTplName(t.name);setTplSteps(t.steps.map(s=>({...s})));setEditTplId(id)}
+    else{setTplName("");setTplSteps([{name:"Steg 1",days:2},{name:"Publicera",days:0}]);setEditTplId(null)}
+    setTplOpen(true);
+  };
+  const saveTpl=()=>{
+    if(!tplName){msg("Ange mallnamn");return}
+    const valid=tplSteps.filter(s=>s.name.trim());
+    if(valid.length<2){msg("Minst 2 steg");return}
+    let newId=null;
+    upd(d=>{
+      if(editTplId){const i=d.templates.findIndex(t=>t.id===editTplId);d.templates[i]={...d.templates[i],name:tplName,steps:valid}}
+      else{newId=gid();d.templates.push({id:newId,name:tplName,icon:"📋",steps:valid})}
+    });
+    if(newId&&wiz)setPTpl(newId);
+    setTplOpen(false);msg("✅ Mall sparad");
+  };
+  const delTpl=id=>{upd(d=>{d.templates=d.templates.filter(x=>x.id!==id)});msg("Mall raderad")};
+
+  return(
+    <div style={{fontFamily:"'Outfit',sans-serif",background:C.bg,color:C.t1,height:"100vh",display:"flex",flexDirection:"column",position:"relative",maxWidth:420,margin:"0 auto",boxShadow:"0 0 40px rgba(0,0,0,.3)"}}>
+
+      {/* LOGIN */}
+      {!authState&&<LoginScreen onLogin={handleLogin}/>}
+
+      {/* ONBOARDING */}
+      {authState&&showOnboard&&<Onboarding onDone={()=>{setShowOnboard(false);setShowCatPicker(true)}}/>}
+
+      {/* CATEGORY PICKER */}
+      {authState&&showCatPicker&&<CategoryPicker onDone={handleCatDone}/>}
+
+      {/* TOPBAR */}
+      <div style={{padding:"16px 20px 8px",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <div style={{fontSize:24,fontWeight:800,color:C.t1}}>DeadlineFlow</div>
+        <div style={{display:"flex",alignItems:"center",gap:8}}>
+          {/* Theme toggle */}
+          <div onClick={()=>setTheme(t=>t==="midnight"?"blush":"midnight")}
+            style={{width:40,height:22,borderRadius:11,background:theme==="blush"?C.ac:C.bd2,cursor:"pointer",position:"relative",transition:"background .3s"}}>
+            <div style={{position:"absolute",top:2,left:theme==="blush"?20:2,width:18,height:18,borderRadius:9,background:theme==="blush"?"#fff":C.t1,transition:"left .3s",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10}}>
+              {theme==="blush"?"🌸":"🌙"}
+            </div>
+          </div>
+          {authState&&authState.type!=="test"&&<div style={{width:28,height:28,borderRadius:8,background:C.ac+"25",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,color:C.ac}}>☁️</div>}
+        </div>
+      </div>
+
+      {/* MAIN */}
+      <div style={{flex:1,overflowY:"auto",padding:"4px 16px 100px"}}>
+        {tab==="week"&&<WeekView data={data} onToggle={toggle}/>}
+        {tab==="calendar"&&<CalendarOverview data={data} month={calOverviewMonth} setMonth={setCalOverviewMonth} onToggle={toggle} onPush={pushToGcal}/>}
+        {tab==="templates"&&<TemplatesView data={data} onEdit={id=>openTpl(id)} onDelete={delTpl} onNew={()=>openTpl()}/>}
+      </div>
+
+      {/* BOTTOM TAB BAR */}
+      {!wiz&&!tplOpen&&(
+        <div style={{position:"fixed",bottom:0,left:0,right:0,maxWidth:420,margin:"0 auto",background:C.bg2,borderTop:`1px solid ${C.bd}`,display:"flex",alignItems:"flex-end",justifyContent:"space-around",padding:"6px 8px 12px",zIndex:500}}>
+          <div onClick={()=>setTab("templates")} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,padding:"6px 10px",cursor:"pointer",opacity:tab==="templates"?1:0.45,transition:"opacity .2s"}}>
+            <span style={{fontSize:18}}>⚙️</span>
+            <span style={{fontSize:9,fontWeight:600,color:tab==="templates"?C.ac:C.t3}}>Mallar</span>
+          </div>
+
+          <div onClick={()=>setTab("week")} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,padding:"6px 10px",cursor:"pointer",opacity:tab==="week"?1:0.45,transition:"opacity .2s"}}>
+            <span style={{fontSize:18}}>📋</span>
+            <span style={{fontSize:9,fontWeight:600,color:tab==="week"?C.ac:C.t3}}>Uppgifter</span>
+          </div>
+
+          {/* Center FAB */}
+          <div onClick={startWiz} style={{marginTop:-22,display:"flex",flexDirection:"column",alignItems:"center",gap:2,cursor:"pointer"}}>
+            <div style={{width:52,height:52,borderRadius:16,background:C.ac,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:`0 4px 20px ${C.ac}50`}}>
+              <span style={{fontSize:26,color:"#fff",lineHeight:1}}>+</span>
+            </div>
+            <span style={{fontSize:9,fontWeight:600,color:C.ac}}>Nytt</span>
+          </div>
+
+          <div onClick={()=>setTab("calendar")} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,padding:"6px 10px",cursor:"pointer",opacity:tab==="calendar"?1:0.45,transition:"opacity .2s"}}>
+            <span style={{fontSize:18}}>📅</span>
+            <span style={{fontSize:9,fontWeight:600,color:tab==="calendar"?C.ac:C.t3}}>Kalender</span>
+          </div>
+
+          <div onClick={handleLogout} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,padding:"6px 10px",cursor:"pointer",opacity:0.45}}>
+            <span style={{fontSize:18}}>👤</span>
+            <span style={{fontSize:9,fontWeight:600,color:C.t3}}>Konto</span>
+          </div>
+        </div>
+      )}
+
+      {/* ===== PROJECT — SINGLE VIEW ===== */}
+      {wiz&&(
+        <div style={{position:"fixed",inset:0,background:C.bg,zIndex:1000,maxWidth:420,margin:"0 auto",display:"flex",flexDirection:"column"}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 16px",borderBottom:`1px solid ${C.bd}`,flexShrink:0}}>
+            <div style={{fontSize:16,fontWeight:700}}>Nytt projekt</div>
+            <button onClick={()=>setWiz(false)} style={{width:28,height:28,borderRadius:7,background:C.bg3,border:`1px solid ${C.bd}`,color:C.t3,cursor:"pointer",fontSize:13,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+          </div>
+
+          <div style={{flex:1,overflowY:"auto",padding:"12px 16px"}}>
+            {/* 1. CALENDAR — centered, primary */}
+            <div style={{fontSize:11,fontWeight:600,color:C.t3,marginBottom:4}}>Välj deadline</div>
+            <div style={{maxWidth:300,margin:"0 auto 8px"}}>
+              <div style={{background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:10,overflow:"hidden"}}>
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 10px",borderBottom:`1px solid ${C.bd}`}}>
+                  <button onClick={()=>setCalMonth(m=>new Date(m.getFullYear(),m.getMonth()-1,1))} style={{background:"none",border:"none",color:C.t2,cursor:"pointer",fontSize:14,padding:"2px 6px",fontFamily:"inherit"}}>‹</button>
+                  <span style={{fontSize:12,fontWeight:700,color:C.t1,textTransform:"capitalize"}}>{MONTHS[calMonth.getMonth()]} {calMonth.getFullYear()}</span>
+                  <button onClick={()=>setCalMonth(m=>new Date(m.getFullYear(),m.getMonth()+1,1))} style={{background:"none",border:"none",color:C.t2,cursor:"pointer",fontSize:14,padding:"2px 6px",fontFamily:"inherit"}}>›</button>
+                </div>
+                <div style={{padding:"4px 6px 6px"}}>
+                  <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",textAlign:"center",marginBottom:2}}>
+                    {["M","T","O","T","F","L","S"].map((d,i)=>(
+                      <div key={d+i} style={{fontSize:8,fontWeight:700,color:i>=5?C.t3+"70":C.t3,padding:"2px 0"}}>{d}</div>
+                    ))}
+                  </div>
+                  <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",textAlign:"center"}}>
+                    {(()=>{
+                      const yr=calMonth.getFullYear(),mo=calMonth.getMonth();
+                      const first=new Date(yr,mo,1).getDay();
+                      const offset=(first+6)%7;
+                      const dim=new Date(yr,mo+1,0).getDate();
+                      const todayStr=iso(new Date());
+                      const cells=[];
+                      for(let i=0;i<offset;i++)cells.push(null);
+                      for(let i=1;i<=dim;i++)cells.push(i);
+                      const stepMap={};// date -> {idx,name}
+                      if(wizSteps)wizSteps.forEach((s,idx)=>{stepMap[s.date]={idx,name:s.name,isLast:idx===wizSteps.length-1}});
+                      return cells.map((d,i)=>{
+                        if(d===null)return <div key={i}/>;
+                        const ds=`${yr}-${String(mo+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+                        const isSel=pDL===ds;
+                        const step=stepMap[ds];
+                        const isStep=!!step&&!isSel;
+                        const isPastDay=ds<todayStr;
+                        const isWknd=i%7===5||i%7===6;
+                        const stepInPast=isStep&&isPastDay;
+                        const isDragTarget=wizDragOver===ds&&!isStep&&!isSel;
+                        const isBeingMoved=movingIdx>=0&&step&&step.idx===movingIdx;
+                        const wasCustomized=isStep&&livePreview&&livePreview[step.idx]&&ds!==livePreview[step.idx].date;
+                        return(
+                          <div key={i}
+                            draggable={isStep&&!isPastDay}
+                            onDragStart={e=>{if(step){e.dataTransfer.setData("text/plain",String(step.idx));e.dataTransfer.effectAllowed="move"}}}
+                            onDragOver={e=>{e.preventDefault();setWizDragOver(ds)}}
+                            onDragLeave={()=>setWizDragOver(null)}
+                            onDrop={e=>{e.preventDefault();setWizDragOver(null);try{const idx=parseInt(e.dataTransfer.getData("text/plain"));if(!isNaN(idx)&&!isPastDay)wizMoveStep(idx,ds)}catch(err){}}}
+                            onTouchStart={()=>{if(isStep&&!isPastDay){wizLongPress.current=setTimeout(()=>setMovingIdx(step.idx),400)}}}
+                            onTouchEnd={()=>{if(wizLongPress.current)clearTimeout(wizLongPress.current);
+                              if(movingIdx>=0&&!isStep&&!isSel&&!isPastDay){wizMoveStep(movingIdx,ds);setMovingIdx(-1)}}}
+                            onTouchMove={()=>{if(wizLongPress.current)clearTimeout(wizLongPress.current)}}
+                            onClick={()=>{
+                              if(movingIdx>=0&&!isPastDay&&!isStep&&!isSel){wizMoveStep(movingIdx,ds);setMovingIdx(-1);return}
+                              if(movingIdx>=0&&isStep&&step.idx===movingIdx){setMovingIdx(-1);return}
+                              if(!isPastDay&&!isStep)setPDL(ds);
+                            }}
+                            style={{padding:"4px 1px",borderRadius:6,position:"relative",
+                              cursor:isStep&&!isPastDay?"grab":isPastDay?"default":"pointer",
+                              background:isBeingMoved?C.ac+"35":isDragTarget?C.ac+"25":isSel?(isPastDay?C.rd+"40":C.ac):stepInPast?"rgba(255,71,87,.1)":isStep?(wasCustomized?C.ac+"20":C.step+"30"):"transparent",
+                              border:isBeingMoved?`2px solid ${C.ac}`:isDragTarget?`2px dashed ${C.ac}`:"2px solid transparent",
+                              transition:"all .15s",userSelect:"none"}}>
+                            <div style={{fontSize:11,fontWeight:isSel||isStep||isDragTarget?700:400,
+                              color:isBeingMoved?C.ac:isDragTarget?C.ac:isSel?(isPastDay?C.rd:"#fff"):stepInPast?C.rd+"80":isStep?(wasCustomized?C.ac:C.step):isPastDay?C.t3+"40":isWknd?C.t3+"70":C.t1}}>
+                              {d}
+                            </div>
+                            {isStep&&<div style={{fontSize:6,fontWeight:700,color:wasCustomized?C.ac:C.step,lineHeight:1,marginTop:-1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:"100%",padding:"0 1px"}}>{step.name.split(" ")[0]}</div>}
+                          </div>
+                        );
+                      });
+                    })()}
+                  </div>
+                </div>
+              </div>
+              {/* Skip weekends — right-aligned under calendar */}
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:6}}>
+                {wizSteps&&wizSteps.length>0?<div style={{fontSize:9,color:C.t3,opacity:0.7}}>💡 {movingIdx>=0?"Tryck på en tom dag":"Dra orange steg till ny dag"}</div>:<div/>}
+                <div onClick={()=>setPSkipWknd(v=>!v)} style={{display:"flex",alignItems:"center",gap:5,cursor:"pointer"}}>
+                  <div style={{width:14,height:14,borderRadius:3,border:`2px solid ${pSkipWknd?C.gn:C.bd2}`,background:pSkipWknd?C.gn:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                    {pSkipWknd&&<span style={{color:"#fff",fontSize:8,fontWeight:700}}>✓</span>}
+                  </div>
+                  <span style={{fontSize:10,color:C.t3}}>Hoppa över helger</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. TEMPLATE — dropdown select */}
+            <div style={{marginBottom:8}}>
+              <div style={{fontSize:11,fontWeight:600,color:C.t3,marginBottom:4}}>Mall</div>
+              <div style={{position:"relative"}}>
+                <select value={pTpl} onChange={e=>setPTpl(e.target.value)}
+                  style={{width:"100%",padding:"10px 12px",paddingRight:32,background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:8,color:C.t1,fontFamily:"inherit",fontSize:14,outline:"none",appearance:"none",cursor:"pointer"}}>
+                  <option value="">Välj mall...</option>
+                  {(()=>{
+                    const placed=new Set();
+                    const groups=[];
+                    CATEGORIES.forEach(cat=>{
+                      const tpls=data.templates.filter(t=>cat.templates.some(ct=>ct.id===t.id));
+                      if(tpls.length){groups.push({label:`${cat.icon} ${cat.name}`,tpls});tpls.forEach(t=>placed.add(t.id))}
+                    });
+                    const custom=data.templates.filter(t=>!placed.has(t.id));
+                    if(custom.length)groups.push({label:"✏️ Egna mallar",tpls:custom});
+                    return groups.map(g=>(
+                      <optgroup key={g.label} label={g.label}>
+                        {g.tpls.map(t=><option key={t.id} value={t.id}>{t.icon} {t.name} ({t.steps.length} steg)</option>)}
+                      </optgroup>
+                    ));
+                  })()}
+                </select>
+                <div style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",pointerEvents:"none",fontSize:10,color:C.t3}}>▼</div>
+              </div>
+              <div onClick={()=>openTpl()} style={{fontSize:11,color:C.ac,fontWeight:600,cursor:"pointer",marginTop:4,paddingLeft:2}}>+ Skapa ny mall</div>
+            </div>
+
+            {/* 3. CLIENT — input with dropdown */}
+            <div style={{marginBottom:8}}>
+              <div style={{fontSize:11,fontWeight:600,color:C.t3,marginBottom:4}}>Kund</div>
+              <div style={{position:"relative"}}>
+                <div style={{display:"flex",gap:6,alignItems:"center"}}>
+                  <input value={pClient} onFocus={()=>setClientFocus(true)} onBlur={()=>setTimeout(()=>setClientFocus(false),150)}
+                    onChange={e=>{setPClient(e.target.value);setClientFocus(true);const ex=data.clients.find(c=>c.name.toLowerCase()===e.target.value.toLowerCase());if(ex)setPColor(ex.color)}} placeholder="Skriv eller välj kund..."
+                    style={{flex:1,padding:"10px 12px",background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:8,color:C.t1,fontFamily:"inherit",fontSize:14,outline:"none"}}/>
+                  <div onClick={()=>setShowColors(v=>!v)} style={{width:30,height:30,borderRadius:7,background:pColor,cursor:"pointer",flexShrink:0,border:"2px solid rgba(255,255,255,.12)"}}/>
+                </div>
+                {clientFocus&&data.clients.length>0&&(()=>{
+                  const matches=data.clients.filter(c=>!pClient||c.name.toLowerCase().includes(pClient.toLowerCase()));
+                  if(!matches.length||(matches.length===1&&matches[0].name.toLowerCase()===pClient.toLowerCase()))return null;
+                  return(
+                    <div style={{position:"absolute",left:0,right:38,top:"100%",marginTop:3,background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:8,overflow:"hidden",zIndex:10,boxShadow:"0 8px 24px rgba(0,0,0,.4)"}}>
+                      {matches.map(c=>(
+                        <div key={c.id} onMouseDown={()=>{setPClient(c.name);setPColor(c.color);setClientFocus(false)}}
+                          style={{padding:"8px 12px",cursor:"pointer",display:"flex",alignItems:"center",gap:8,borderBottom:`1px solid ${C.bd}`}}>
+                          <span style={{width:7,height:7,borderRadius:"50%",background:c.color,flexShrink:0}}/>
+                          <span style={{fontSize:13,color:C.t1}}>{c.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+            {showColors&&(
+              <div style={{display:"flex",gap:4,marginBottom:8,flexWrap:"wrap"}}>
+                {CLIENT_COLORS.map(c=>(
+                  <div key={c} onClick={()=>{setPColor(c);setShowColors(false)}} style={{width:22,height:22,borderRadius:5,background:c,cursor:"pointer",border:pColor===c?"2px solid #fff":"2px solid transparent"}}/>
+                ))}
+              </div>
+            )}
+
+            {/* 4. STEP LIST — with reminders */}
+            {wizSteps&&(
+              <div style={{background:C.bg2,border:`1px solid ${C.bd}`,borderRadius:10,padding:10}}>
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}}>
+                  <div style={{fontSize:9,fontWeight:700,color:C.t3,textTransform:"uppercase",letterSpacing:0.5}}>📅 {wizSteps.length} steg</div>
+                  {pCustomSteps&&pCustomSteps.some((s,i)=>livePreview&&s.date!==livePreview[i]?.date)&&(
+                    <div onClick={()=>setPCustomSteps(livePreview?livePreview.map(s=>({...s,reminders:["1d"]})):null)} style={{fontSize:9,color:C.ac,fontWeight:600,cursor:"pointer"}}>↺ Återställ</div>
+                  )}
+                </div>
+                {/* Moving indicator */}
+                {movingIdx>=0&&wizSteps[movingIdx]&&(
+                  <div style={{fontSize:10,color:C.ac,fontWeight:600,marginBottom:6,padding:"4px 8px",background:C.ac+"10",borderRadius:6}}>
+                    Tryck på ett datum för att flytta "{wizSteps[movingIdx].name}"
+                    <span onClick={()=>setMovingIdx(-1)} style={{marginLeft:8,cursor:"pointer",opacity:0.6}}>✕</span>
+                  </div>
+                )}
+                {(()=>{const todayStr=iso(new Date());const hasPast=wizSteps.some(s=>s.date<todayStr);return(<>
+                {hasPast&&<div style={{fontSize:10,color:C.rd,fontWeight:600,marginBottom:6,padding:"4px 8px",background:"rgba(255,71,87,.08)",borderRadius:6}}>⚠️ Steg i det förflutna</div>}
+                {wizSteps.map((s,i)=>{
+                  const inPast=s.date<todayStr;
+                  const isLast=i===wizSteps.length-1;
+                  const wasCustomized=livePreview&&livePreview[i]&&s.date!==livePreview[i].date;
+                  return(
+                  <div key={i} style={{padding:"5px 0",borderBottom:i<wizSteps.length-1?`1px solid ${C.bd}`:"none",opacity:inPast?0.4:1}}>
+                    <div style={{display:"flex",alignItems:"center",gap:6}}>
+                      <span style={{fontFamily:"monospace",fontSize:10,color:inPast?C.rd:isLast?C.rd:wasCustomized?C.ac:C.step,minWidth:62,fontWeight:600}}>{fmtDay(s.date)} {fmtShort(s.date)}</span>
+                      <span style={{fontSize:11,fontWeight:isLast?700:400,color:inPast?C.t3:C.t1,textDecoration:inPast?"line-through":"none",flex:1}}>{isLast?"🎯 ":""}{s.name}</span>
+                      {wasCustomized&&<span style={{fontSize:8,color:C.ac,fontWeight:700}}>✎</span>}
+                    </div>
+                    {!inPast&&(
+                      <div style={{display:"flex",alignItems:"center",gap:4,marginTop:4,marginLeft:62,flexWrap:"wrap"}}>
+                        {[{k:"same",l:"📧 Samma dag"},{k:"1d",l:"1 dag"},{k:"2d",l:"2 dagar"},{k:"3d",l:"3 dagar"},{k:"7d",l:"1 vecka"}].map(r=>{
+                          const rem=Array.isArray(s.reminders)?s.reminders:["1d"];
+                          const on=rem.includes(r.k);
+                          return(
+                            <div key={r.k} onClick={()=>wizToggleReminder(i,r.k)}
+                              style={{fontSize:10,padding:"4px 8px",borderRadius:6,cursor:"pointer",fontWeight:on?700:500,
+                                background:on?C.ac+"20":C.bg3,border:`1px solid ${on?C.ac+"50":C.bd}`,color:on?C.ac:C.t3,
+                                transition:"all .15s",lineHeight:1.2}}>{r.l}</div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )})}</>)})()}
+              </div>
+            )}
+          </div>
+
+          {/* Save button */}
+          <div style={{padding:"10px 16px",borderTop:`1px solid ${C.bd}`,flexShrink:0}}>
+            <button onClick={wizSave} disabled={!pClient.trim()||!pTpl||!pDL}
+              style={{width:"100%",padding:14,borderRadius:12,background:pClient.trim()&&pTpl&&pDL?C.ac:C.bd,border:"none",color:pClient.trim()&&pTpl&&pDL?"#fff":C.t3,fontSize:15,fontWeight:700,fontFamily:"inherit",cursor:pClient.trim()&&pTpl&&pDL?"pointer":"default",transition:"all .3s"}}>
+              Skapa projekt
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ===== PUSH POPUP ===== */}
+      {showPushPopup&&(
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:1500,display:"flex",alignItems:"center",justifyContent:"center",maxWidth:420,margin:"0 auto"}}>
+          <div style={{background:C.bg2,border:`1px solid ${C.bd}`,borderRadius:16,padding:"24px 20px",width:"85%",maxWidth:320,textAlign:"center",boxShadow:"0 12px 40px rgba(0,0,0,.5)"}}>
+            <div style={{fontSize:32,marginBottom:8}}>✅</div>
+            <div style={{fontSize:17,fontWeight:800,color:C.t1,marginBottom:4}}>Projekt skapat!</div>
+            <p style={{fontSize:12,color:C.t3,marginBottom:20}}>Vill du pusha stegen till Google Calendar direkt?</p>
+            <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              <button onClick={()=>{pushToGcal();setShowPushPopup(false);setTab("calendar");msg("☁️ Pushat till Google Calendar!")}}
+                style={{padding:14,borderRadius:10,background:C.ac,border:"none",color:"#fff",fontSize:14,fontWeight:700,fontFamily:"inherit",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
+                <span>📤</span> Pusha till Google Calendar
+              </button>
+              <button onClick={()=>{setShowPushPopup(false);setTab("week");msg("✅ Projekt skapat!")}}
+                style={{padding:12,borderRadius:10,background:C.bg3,border:`1px solid ${C.bd}`,color:C.t2,fontSize:13,fontWeight:600,fontFamily:"inherit",cursor:"pointer"}}>
+                Pusha senare
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===== TEMPLATE MODAL ===== */}
+      {tplOpen&&(
+        <div style={{position:"fixed",inset:0,background:C.bg,zIndex:1100,maxWidth:420,margin:"0 auto",display:"flex",flexDirection:"column"}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 20px",borderBottom:`1px solid ${C.bd}`,flexShrink:0}}>
+            <div style={{fontSize:17,fontWeight:700}}>{editTplId?"Redigera mall":"Ny mall"}</div>
+            <button onClick={()=>setTplOpen(false)} style={{width:32,height:32,borderRadius:8,background:C.bg3,border:`1px solid ${C.bd}`,color:C.t3,cursor:"pointer",fontSize:15,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+          </div>
+          <div style={{flex:1,overflowY:"auto",padding:20}}>
+            <div style={{fontSize:13,fontWeight:600,color:C.t2,marginBottom:8}}>Mallnamn</div>
+            <input value={tplName} onChange={e=>setTplName(e.target.value)} placeholder="T.ex. 'TikTok'"
+              style={{width:"100%",padding:"14px 16px",background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:10,color:C.t1,fontFamily:"inherit",fontSize:16,outline:"none",marginBottom:20}}/>
+            <div style={{fontSize:13,fontWeight:600,color:C.t2,marginBottom:8}}>Steg</div>
+            {tplSteps.map((s,i)=>(
+              <div key={i} style={{display:"grid",gridTemplateColumns:"24px 1fr 56px 28px",alignItems:"center",gap:6,padding:"10px 12px",background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:8,marginBottom:4}}>
+                <span style={{fontFamily:"monospace",fontSize:11,color:C.t3,textAlign:"center"}}>{i+1}</span>
+                <input value={s.name} onChange={e=>{const n=[...tplSteps];n[i]={...n[i],name:e.target.value};setTplSteps(n)}} placeholder="Stegnamn..."
+                  style={{background:"transparent",border:"none",color:C.t1,fontFamily:"inherit",fontSize:14,outline:"none"}}/>
+                <input type="number" min="0" value={s.days} onChange={e=>{const n=[...tplSteps];n[i]={...n[i],days:parseInt(e.target.value)||0};setTplSteps(n)}}
+                  style={{background:C.bg4,border:`1px solid ${C.bd}`,borderRadius:4,padding:4,textAlign:"center",fontFamily:"monospace",fontSize:12,color:C.t1,width:"100%"}}/>
+                <button onClick={()=>{const n=[...tplSteps];n.splice(i,1);setTplSteps(n)}} style={{background:"none",border:"none",color:C.t3,cursor:"pointer",fontSize:14}}>✕</button>
+              </div>
+            ))}
+            <button onClick={()=>setTplSteps([...tplSteps,{name:"",days:1}])} style={{width:"100%",padding:12,border:`1px dashed ${C.bd}`,borderRadius:8,background:"transparent",color:C.t3,cursor:"pointer",fontSize:13,fontFamily:"inherit",marginTop:6}}>+ Lägg till steg</button>
+          </div>
+          <div style={{padding:"14px 20px",borderTop:`1px solid ${C.bd}`,display:"flex",gap:8,flexShrink:0}}>
+            <button onClick={()=>setTplOpen(false)} style={{flex:1,padding:14,borderRadius:12,background:C.bg3,border:`1px solid ${C.bd}`,color:C.t1,fontSize:15,fontWeight:600,fontFamily:"inherit",cursor:"pointer"}}>Avbryt</button>
+            <button onClick={saveTpl} style={{flex:2,padding:14,borderRadius:12,background:C.ac,border:"none",color:"#fff",fontSize:15,fontWeight:600,fontFamily:"inherit",cursor:"pointer"}}>Spara mall</button>
+          </div>
+        </div>
+      )}
+
+      {/* TOAST */}
+      {toast&&<div style={{position:"fixed",bottom:90,left:"50%",transform:"translateX(-50%)",padding:"10px 20px",background:C.bg4,border:`1px solid ${C.gn}`,borderRadius:10,fontSize:13,fontWeight:500,zIndex:2000,color:C.t1,whiteSpace:"nowrap"}}>{toast}</div>}
+    </div>
+  );
+}
+
+    // ===== MOUNT =====
+    ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+  </script>
+</body>
+</html>
