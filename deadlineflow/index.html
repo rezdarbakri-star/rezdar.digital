@@ -45,6 +45,10 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
     const googleProvider = new firebase.auth.GoogleAuthProvider();
+    googleProvider.addScope("https://www.googleapis.com/auth/calendar.events");
+
+    // Store Google access token globally
+    let googleAccessToken = null;
 
     // Firestore helpers
     async function loadUserData(uid) {
@@ -58,6 +62,56 @@
       try {
         await db.collection("users").doc(uid).set(data);
       } catch(e) { console.error("Save error:", e); }
+    }
+
+    // Google Calendar API — push a single event
+    async function pushEventToGCal(token, summary, date, reminders) {
+      const reminderMinutes = [];
+      if(reminders && reminders.length) {
+        reminders.forEach(r => {
+          if(r === "same") reminderMinutes.push(0);
+          if(r === "1d") reminderMinutes.push(1440);
+          if(r === "2d") reminderMinutes.push(2880);
+          if(r === "3d") reminderMinutes.push(4320);
+          if(r === "7d") reminderMinutes.push(10080);
+        });
+      }
+      const event = {
+        summary: summary,
+        start: { date: date },
+        end: { date: date },
+        reminders: {
+          useDefault: false,
+          overrides: reminderMinutes.length
+            ? reminderMinutes.map(m => ({ method: "email", minutes: m }))
+            : [{ method: "email", minutes: 1440 }]
+        }
+      };
+      const res = await fetch("https://www.googleapis.com/calendar/v3/calendars/primary/events", {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + token,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(event)
+      });
+      if(!res.ok) {
+        const err = await res.json().catch(()=>({}));
+        throw new Error(err.error?.message || "Calendar API error");
+      }
+      return await res.json();
+    }
+
+    // Re-authenticate Google to get fresh token for Calendar
+    async function getGoogleCalendarToken() {
+      try {
+        const result = await auth.currentUser.reauthenticateWithPopup(googleProvider);
+        googleAccessToken = result.credential.accessToken;
+        return googleAccessToken;
+      } catch(e) {
+        console.error("Re-auth error:", e);
+        return null;
+      }
     }
   </script>
 
@@ -160,6 +214,7 @@ function LoginScreen({onLogin}){
     setLoading(true);setErr("");
     try{
       const cred=await auth.signInWithPopup(googleProvider);
+      googleAccessToken=cred.credential.accessToken;
       onLogin({type:"google",email:cred.user.email,uid:cred.user.uid});
     }catch(e){setErr(e.message)}
     setLoading(false);
@@ -814,6 +869,92 @@ function TemplatesView({data,onEdit,onDelete,onNew}){
   );
 }
 
+// ===== PROFILE VIEW =====
+function ProfileView({authState,data,onDeleteProject,onResetPush,onLogout}){
+  const [confirmDel,setConfirmDel]=useState(null);
+  return(
+    <div style={{paddingBottom:80}}>
+      {/* Account info */}
+      <div style={{background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:12,padding:16,marginBottom:16}}>
+        <div style={{display:"flex",alignItems:"center",gap:12}}>
+          <div style={{width:44,height:44,borderRadius:12,background:C.ac+"20",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20}}>{authState?.type==="google"?"G":"📧"}</div>
+          <div>
+            <div style={{fontSize:15,fontWeight:700,color:C.t1}}>{authState?.email||"Testkonto"}</div>
+            <div style={{fontSize:11,color:C.t3}}>{authState?.type==="google"?"Google-konto":authState?.type==="email"?"E-postkonto":"Testläge (ingen sync)"}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:16}}>
+        <div style={{background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:10,padding:12,textAlign:"center"}}>
+          <div style={{fontSize:20,fontWeight:800,color:C.t1}}>{data.projects.length}</div>
+          <div style={{fontSize:10,color:C.t3}}>Projekt</div>
+        </div>
+        <div style={{background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:10,padding:12,textAlign:"center"}}>
+          <div style={{fontSize:20,fontWeight:800,color:C.t1}}>{data.templates.length}</div>
+          <div style={{fontSize:10,color:C.t3}}>Mallar</div>
+        </div>
+        <div style={{background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:10,padding:12,textAlign:"center"}}>
+          <div style={{fontSize:20,fontWeight:800,color:C.t1}}>{data.clients.length}</div>
+          <div style={{fontSize:10,color:C.t3}}>Kunder</div>
+        </div>
+      </div>
+
+      {/* Projects — manage */}
+      <div style={{fontSize:13,fontWeight:700,color:C.t1,marginBottom:8}}>Projekt</div>
+      {data.projects.length===0&&<p style={{fontSize:12,color:C.t3,padding:"16px 0"}}>Inga projekt ännu.</p>}
+      {data.projects.map(p=>{
+        const cl=data.clients.find(c=>c.id===p.clientId);
+        const dn=p.steps.filter(s=>s.completed).length;
+        const pushed=p.steps.filter(s=>s.pushedToGcal).length;
+        const isConfirm=confirmDel===p.id;
+        return(
+          <div key={p.id} style={{background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:10,padding:12,marginBottom:6,borderLeft:`3px solid ${cl?cl.color:C.ac}`}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"start"}}>
+              <div>
+                <div style={{fontSize:14,fontWeight:600,color:C.t1}}>{p.name}</div>
+                <div style={{fontSize:11,color:C.t3,marginTop:2}}>{cl?cl.name:""} · {dn}/{p.steps.length} klara{pushed>0?` · ${pushed} pushade`:""}</div>
+              </div>
+            </div>
+            <div style={{display:"flex",gap:6,marginTop:8}}>
+              {pushed>0&&(
+                <button onClick={()=>onResetPush(p.id)}
+                  style={{fontSize:10,padding:"5px 10px",borderRadius:6,background:C.bg4,border:`1px solid ${C.bd}`,color:C.t2,cursor:"pointer",fontFamily:"inherit"}}>
+                  ↺ Återställ push
+                </button>
+              )}
+              {isConfirm?(
+                <div style={{display:"flex",gap:4}}>
+                  <button onClick={()=>{onDeleteProject(p.id);setConfirmDel(null)}}
+                    style={{fontSize:10,padding:"5px 10px",borderRadius:6,background:C.rd+"20",border:`1px solid ${C.rd}40`,color:C.rd,cursor:"pointer",fontFamily:"inherit",fontWeight:700}}>
+                    Ja, radera
+                  </button>
+                  <button onClick={()=>setConfirmDel(null)}
+                    style={{fontSize:10,padding:"5px 10px",borderRadius:6,background:C.bg4,border:`1px solid ${C.bd}`,color:C.t3,cursor:"pointer",fontFamily:"inherit"}}>
+                    Avbryt
+                  </button>
+                </div>
+              ):(
+                <button onClick={()=>setConfirmDel(p.id)}
+                  style={{fontSize:10,padding:"5px 10px",borderRadius:6,background:C.bg4,border:`1px solid ${C.bd}`,color:C.rd,cursor:"pointer",fontFamily:"inherit"}}>
+                  🗑 Radera
+                </button>
+              )}
+            </div>
+          </div>
+        );
+      })}
+
+      {/* Logout */}
+      <button onClick={onLogout}
+        style={{width:"100%",padding:14,borderRadius:10,background:C.rd+"10",border:`1px solid ${C.rd}30`,color:C.rd,fontSize:14,fontWeight:700,fontFamily:"inherit",cursor:"pointer",marginTop:20}}>
+        Logga ut
+      </button>
+    </div>
+  );
+}
+
 // ===== CALENDAR OVERVIEW =====
 function CalendarOverview({data,month,setMonth,onToggle,onPush}){
   const tasks=useMemo(()=>{
@@ -986,24 +1127,60 @@ function App(){
   const toggle=useCallback((pid,si)=>{upd(d=>{const p=d.projects.find(x=>x.id===pid);if(p)p.steps[si].completed=!p.steps[si].completed})},[upd]);
 
   // Push unpushed future steps to Google Calendar
-  const pushToGcal=useCallback(()=>{
+  const pushToGcal=useCallback(async()=>{
+    // Check if Google auth
+    if(!authState||authState.type==="test"){
+      msg("⚠️ Logga in för att pusha till kalender");return;
+    }
+
+    // Get token — may need re-auth
+    let token=googleAccessToken;
+    if(!token){
+      if(authState.type!=="google"){
+        msg("⚠️ Logga in med Google för att pusha till kalendern");return;
+      }
+      token=await getGoogleCalendarToken();
+      if(!token){msg("❌ Kunde inte ansluta till Google Calendar");return}
+    }
+
     const todayStr=iso(new Date());
-    // Count first
-    let count=0;
-    data.projects.forEach(p=>{p.steps.forEach(s=>{if(!s.pushedToGcal&&!s.completed&&s.date>=todayStr)count++})});
-    if(!count)return;
-    upd(d=>{
-      d.projects.forEach(p=>{
-        p.steps.forEach(s=>{
-          if(!s.pushedToGcal&&!s.completed&&s.date>=todayStr){
-            s.pushedToGcal=true;
-            // Production: google.calendar.events.insert({summary: s.name, start: {date: s.date}, ...})
-          }
-        });
+    const toPush=[];
+    data.projects.forEach(p=>{
+      const cl=data.clients.find(c=>c.id===p.clientId);
+      p.steps.forEach((s,si)=>{
+        if(!s.pushedToGcal&&!s.completed&&s.date>=todayStr){
+          toPush.push({pid:p.id,si,name:`${s.name} — ${cl?cl.name:""} (${p.name})`,date:s.date,reminders:s.reminders||["1d"]});
+        }
       });
     });
-    msg(`☁️ ${count} uppgifter pushade till Google Calendar`);
-  },[upd,data]);
+
+    if(!toPush.length){msg("✓ Allt är redan synkat!");return}
+
+    msg(`📤 Pushar ${toPush.length} events...`);
+    let ok=0,fail=0;
+
+    for(const item of toPush){
+      try{
+        await pushEventToGCal(token,item.name,item.date,item.reminders);
+        upd(d=>{const p=d.projects.find(x=>x.id===item.pid);if(p)p.steps[item.si].pushedToGcal=true});
+        ok++;
+      }catch(e){
+        console.error("GCal push error:",e);
+        if(e.message.includes("Invalid Credentials")||e.message.includes("401")){
+          token=await getGoogleCalendarToken();
+          if(token){
+            try{
+              await pushEventToGCal(token,item.name,item.date,item.reminders);
+              upd(d=>{const p=d.projects.find(x=>x.id===item.pid);if(p)p.steps[item.si].pushedToGcal=true});
+              ok++;continue;
+            }catch(e2){fail++}
+          }else{fail++}
+        }else{fail++}
+      }
+    }
+    if(fail)msg(`☁️ ${ok} pushade, ${fail} misslyckades`);
+    else msg(`☁️ ${ok} uppgifter pushade till Google Calendar!`);
+  },[upd,data,authState]);
 
   // Cloud sync — save to Firestore on every change
   const saveTimer=useRef(null);
@@ -1111,6 +1288,7 @@ function App(){
   };
 
   const delProject=id=>{upd(d=>{d.projects=d.projects.filter(x=>x.id!==id)});msg("🗑 Borttaget")};
+  const resetPush=id=>{upd(d=>{const p=d.projects.find(x=>x.id===id);if(p)p.steps.forEach(s=>{s.pushedToGcal=false})});msg("↺ Push återställd — kan pushas igen")};
 
   // === TEMPLATE ===
   const openTpl=(id=null)=>{
@@ -1164,6 +1342,7 @@ function App(){
         {tab==="week"&&<WeekView data={data} onToggle={toggle}/>}
         {tab==="calendar"&&<CalendarOverview data={data} month={calOverviewMonth} setMonth={setCalOverviewMonth} onToggle={toggle} onPush={pushToGcal}/>}
         {tab==="templates"&&<TemplatesView data={data} onEdit={id=>openTpl(id)} onDelete={delTpl} onNew={()=>openTpl()}/>}
+        {tab==="profile"&&<ProfileView authState={authState} data={data} onDeleteProject={delProject} onResetPush={resetPush} onLogout={handleLogout}/>}
       </div>
 
       {/* BOTTOM TAB BAR */}
@@ -1192,9 +1371,9 @@ function App(){
             <span style={{fontSize:9,fontWeight:600,color:tab==="calendar"?C.ac:C.t3}}>Kalender</span>
           </div>
 
-          <div onClick={handleLogout} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,padding:"6px 10px",cursor:"pointer",opacity:0.45}}>
+          <div onClick={()=>setTab("profile")} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,padding:"6px 10px",cursor:"pointer",opacity:tab==="profile"?1:0.45}}>
             <span style={{fontSize:18}}>👤</span>
-            <span style={{fontSize:9,fontWeight:600,color:C.t3}}>Konto</span>
+            <span style={{fontSize:9,fontWeight:600,color:tab==="profile"?C.ac:C.t3}}>Konto</span>
           </div>
         </div>
       )}
@@ -1249,22 +1428,22 @@ function App(){
                         const wasCustomized=isStep&&livePreview&&livePreview[step.idx]&&ds!==livePreview[step.idx].date;
                         return(
                           <div key={i}
-                            draggable={isStep&&!isPastDay}
+                            draggable={isStep}
                             onDragStart={e=>{if(step){e.dataTransfer.setData("text/plain",String(step.idx));e.dataTransfer.effectAllowed="move"}}}
                             onDragOver={e=>{e.preventDefault();setWizDragOver(ds)}}
                             onDragLeave={()=>setWizDragOver(null)}
-                            onDrop={e=>{e.preventDefault();setWizDragOver(null);try{const idx=parseInt(e.dataTransfer.getData("text/plain"));if(!isNaN(idx)&&!isPastDay)wizMoveStep(idx,ds)}catch(err){}}}
-                            onTouchStart={()=>{if(isStep&&!isPastDay){wizLongPress.current=setTimeout(()=>setMovingIdx(step.idx),400)}}}
+                            onDrop={e=>{e.preventDefault();setWizDragOver(null);try{const idx=parseInt(e.dataTransfer.getData("text/plain"));if(!isNaN(idx))wizMoveStep(idx,ds)}catch(err){}}}
+                            onTouchStart={()=>{if(isStep){wizLongPress.current=setTimeout(()=>setMovingIdx(step.idx),400)}}}
                             onTouchEnd={()=>{if(wizLongPress.current)clearTimeout(wizLongPress.current);
-                              if(movingIdx>=0&&!isStep&&!isSel&&!isPastDay){wizMoveStep(movingIdx,ds);setMovingIdx(-1)}}}
+                              if(movingIdx>=0&&!isStep&&!isSel){wizMoveStep(movingIdx,ds);setMovingIdx(-1)}}}
                             onTouchMove={()=>{if(wizLongPress.current)clearTimeout(wizLongPress.current)}}
                             onClick={()=>{
-                              if(movingIdx>=0&&!isPastDay&&!isStep&&!isSel){wizMoveStep(movingIdx,ds);setMovingIdx(-1);return}
+                              if(movingIdx>=0&&!isStep&&!isSel){wizMoveStep(movingIdx,ds);setMovingIdx(-1);return}
                               if(movingIdx>=0&&isStep&&step.idx===movingIdx){setMovingIdx(-1);return}
                               if(!isPastDay&&!isStep)setPDL(ds);
                             }}
                             style={{padding:"4px 1px",borderRadius:6,position:"relative",
-                              cursor:isStep&&!isPastDay?"grab":isPastDay?"default":"pointer",
+                              cursor:isStep?"grab":isPastDay?"default":"pointer",
                               background:isBeingMoved?C.ac+"35":isDragTarget?C.ac+"25":isSel?(isPastDay?C.rd+"40":C.ac):stepInPast?"rgba(255,71,87,.1)":isStep?(wasCustomized?C.ac+"20":C.step+"30"):"transparent",
                               border:isBeingMoved?`2px solid ${C.ac}`:isDragTarget?`2px dashed ${C.ac}`:"2px solid transparent",
                               transition:"all .15s",userSelect:"none"}}>
@@ -1422,7 +1601,7 @@ function App(){
             <div style={{fontSize:17,fontWeight:800,color:C.t1,marginBottom:4}}>Projekt skapat!</div>
             <p style={{fontSize:12,color:C.t3,marginBottom:20}}>Vill du pusha stegen till Google Calendar direkt?</p>
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
-              <button onClick={()=>{pushToGcal();setShowPushPopup(false);setTab("calendar");msg("☁️ Pushat till Google Calendar!")}}
+              <button onClick={async()=>{setShowPushPopup(false);setTab("calendar");await pushToGcal()}}
                 style={{padding:14,borderRadius:10,background:C.ac,border:"none",color:"#fff",fontSize:14,fontWeight:700,fontFamily:"inherit",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
                 <span>📤</span> Pusha till Google Calendar
               </button>
