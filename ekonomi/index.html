@@ -1,1 +1,521 @@
-1
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Räkningskollen</title>
+<meta name="theme-color" content="#0d0c1d"/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍃</text></svg>"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0c1d;font-family:'Outfit',sans-serif;color:#e2ddf0;min-height:100vh}
+button{cursor:pointer;font-family:inherit}
+button:active{transform:scale(.97)}
+input:focus,select:focus{outline:none;border-color:rgba(196,181,253,.5)!important;box-shadow:0 0 0 3px rgba(196,181,253,.1)}
+
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes bloom{0%{transform:scale(0);opacity:.7}50%{opacity:.3}100%{transform:scale(4);opacity:0}}
+@keyframes celIn{from{opacity:0}to{opacity:1}}
+
+.pu{animation:pulse 2s ease-in-out infinite}
+.pe{animation:fadeUp .4s ease-out}
+.ce{animation:fadeUp .45s ease-out both}
+
+.bg{position:fixed;inset:0;z-index:0;overflow:hidden;background:linear-gradient(160deg,#0d0c1d,#161328,#1a1030,#0f1923,#0d0c1d)}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.35;will-change:transform}
+.o1{width:400px;height:400px;background:radial-gradient(circle,rgba(196,181,253,.5),transparent 70%);top:-10%;left:-10%;animation:d1 25s ease-in-out infinite}
+.o2{width:350px;height:350px;background:radial-gradient(circle,rgba(168,230,207,.4),transparent 70%);top:30%;right:-15%;animation:d2 30s ease-in-out infinite}
+.o3{width:300px;height:300px;background:radial-gradient(circle,rgba(244,164,164,.25),transparent 70%);bottom:10%;left:20%;animation:d3 28s ease-in-out infinite}
+.o4{width:250px;height:250px;background:radial-gradient(circle,rgba(219,183,120,.2),transparent 70%);top:60%;left:-5%;animation:d4 32s ease-in-out infinite}
+.o5{width:200px;height:200px;background:radial-gradient(circle,rgba(232,200,255,.3),transparent 70%);top:10%;right:10%;animation:d5 22s ease-in-out infinite}
+
+@keyframes d1{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(60px,40px) scale(1.1)}66%{transform:translate(-30px,70px) scale(.95)}}
+@keyframes d2{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(-50px,-30px) scale(1.08)}66%{transform:translate(40px,-60px) scale(.92)}}
+@keyframes d3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(70px,-40px) scale(1.12)}}
+@keyframes d4{0%,100%{transform:translate(0,0)}50%{transform:translate(50px,30px)}}
+@keyframes d5{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-40px,50px) scale(1.15)}}
+
+.gl{background:rgba(255,255,255,.035);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.06);border-radius:18px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+
+<!-- React -->
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script type="text/babel" data-type="module">
+// ══════════════════════════════════════════════
+// 🔧 DIN FIREBASE CONFIG — FYLL I HÄR
+// ══════════════════════════════════════════════
+firebase.initializeApp({
+  apiKey: "AIzaSyAto5kEctThx-1RxgtjuP39LpZ3nMunV7k",
+  authDomain: "ekonomiappen-7b6e5.firebaseapp.com",
+  databaseURL: "https://ekonomiappen-7b6e5-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "ekonomiappen-7b6e5",
+  storageBucket: "ekonomiappen-7b6e5.firebasestorage.app",
+  messagingSenderId: "83223404365",
+  appId: "1:83223404365:web:ca2dfcf1b4b6f9d984a104",
+});
+
+const auth = firebase.auth();
+const db = firebase.database();
+const provider = new firebase.auth.GoogleAuthProvider();
+const { useState, useEffect, useCallback } = React;
+
+// ── Helpers ──
+const MO = ["Januari","Februari","Mars","April","Maj","Juni","Juli","Augusti","September","Oktober","November","December"];
+const gid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const gcode = () => Math.random().toString(36).slice(2,8).toUpperCase();
+const mkey = () => { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`; };
+const fmtM = k => { const[y,m]=k.split("-"); return `${MO[parseInt(m,10)-1]} ${y}`; };
+const fk = n => n.toLocaleString("sv-SE");
+
+// ── DB ──
+const ld = async (p,fb) => { try{const s=await db.ref(p).once("value");return s.exists()?s.val():fb;}catch{return fb;} };
+const sv = async (p,v) => { try{await db.ref(p).set(v);}catch(e){console.error(e);} };
+
+// ── Icons ──
+const Ic={
+Plus:()=><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+Check:()=><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
+Trash:()=><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>,
+Edit:()=><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>,
+Rocket:()=><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/></svg>,
+List:()=><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>,
+Clock:()=><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+Chev:()=><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="6 9 12 15 18 9"/></svg>,
+Auto:()=><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M21 12a9 9 0 1 1-6.22-8.56"/><polyline points="22 2 22 8 16 8"/></svg>,
+Var:()=><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/></svg>,
+Piggy:()=><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h2v-4h-2c0-1-.5-1.5-1-2"/><circle cx="15" cy="11" r="1"/></svg>,
+Wallet:()=><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>,
+X:()=><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+Home:()=><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+Heart:()=><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>,
+Copy:()=><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>,
+Users:()=><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+Out:()=><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
+};
+
+// ── Shared styles ──
+const g={background:"rgba(255,255,255,.035)",backdropFilter:"blur(12px)",border:"1px solid rgba(255,255,255,.06)",borderRadius:18};
+
+// ════════════════════════════════
+// AUTH GATE
+// ════════════════════════════════
+function AuthGate(){
+  const[user,setUser]=useState(null);
+  const[loading,setLoading]=useState(true);
+  const[err,setErr]=useState("");
+  const[mode,setMode]=useState("main"); // main | email
+  const[email,setEmail]=useState("");
+  const[pass,setPass]=useState("");
+  const[isReg,setIsReg]=useState(false);
+  useEffect(()=>auth.onAuthStateChanged(u=>{setUser(u);setLoading(false);}),[]);
+
+  async function googleLogin(){setErr("");try{await auth.signInWithPopup(provider);}catch(e){setErr(e.message);}}
+  async function anonLogin(){setErr("");try{await auth.signInAnonymously();}catch(e){setErr(e.message);}}
+  async function emailLogin(){
+    setErr("");if(!email||!pass){setErr("Fyll i båda fälten.");return;}
+    try{
+      if(isReg) await auth.createUserWithEmailAndPassword(email,pass);
+      else await auth.signInWithEmailAndPassword(email,pass);
+    }catch(e){
+      if(e.code==="auth/user-not-found"){setIsReg(true);setErr("Inget konto hittades — registrera istället?");}
+      else if(e.code==="auth/email-already-in-use") setErr("Kontot finns redan — prova logga in.");
+      else if(e.code==="auth/wrong-password"||e.code==="auth/invalid-credential") setErr("Fel lösenord.");
+      else if(e.code==="auth/weak-password") setErr("Lösenordet måste vara minst 6 tecken.");
+      else setErr(e.message);
+    }
+  }
+
+  if(loading) return <div style={{display:"flex",alignItems:"center",justifyContent:"center",minHeight:"100vh"}}><span className="pu">Laddar...</span></div>;
+  if(!user) return(
+    <div style={{display:"flex",alignItems:"center",justifyContent:"center",minHeight:"100vh"}}>
+      <div style={{...g,textAlign:"center",padding:"48px 36px",maxWidth:380,width:"90%",position:"relative"}}>
+        <div style={{position:"absolute",top:-40,left:"50%",marginLeft:-60,width:120,height:120,borderRadius:"50%",filter:"blur(40px)",opacity:.3,background:"radial-gradient(circle,rgba(196,181,253,.5),rgba(168,230,207,.3),transparent)"}}/>
+        <div style={{fontSize:40,marginBottom:16,animation:"float 3s ease-in-out infinite"}}>🍃</div>
+        <h1 style={{fontSize:28,fontWeight:300,color:"#e2ddf0",letterSpacing:".04em",marginBottom:12}}>räkningskollen</h1>
+        <p style={{fontSize:14,color:"#7c6f9b",lineHeight:1.7,marginBottom:28,fontWeight:300}}>Håll koll på dina räkningar, sparande och hushållets ekonomi.</p>
+
+        {mode==="main"&&<div style={{display:"flex",flexDirection:"column",gap:10,alignItems:"center"}}>
+          <button onClick={googleLogin} style={{display:"inline-flex",alignItems:"center",gap:10,padding:"12px 28px",border:"1px solid rgba(255,255,255,.1)",borderRadius:12,background:"rgba(255,255,255,.06)",color:"#e2ddf0",fontSize:15,fontWeight:500,width:"100%",justifyContent:"center"}}>
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            Logga in med Google
+          </button>
+          <button onClick={()=>{setMode("email");setErr("");}} style={{display:"inline-flex",alignItems:"center",gap:8,padding:"12px 28px",border:"1px solid rgba(255,255,255,.08)",borderRadius:12,background:"transparent",color:"#b0a8c8",fontSize:14,fontWeight:400,width:"100%",justifyContent:"center"}}>
+            ✉️ E-post & lösenord
+          </button>
+          <button onClick={anonLogin} style={{padding:"10px 20px",border:"none",borderRadius:10,background:"transparent",color:"#6b5f8a",fontSize:13}}>
+            Fortsätt utan konto →
+          </button>
+        </div>}
+
+        {mode==="email"&&<div style={{display:"flex",flexDirection:"column",gap:10,textAlign:"left"}}>
+          <div>
+            <label style={{display:"block",fontSize:10,color:"#7c6f9b",marginBottom:3,textTransform:"uppercase",letterSpacing:".05em",fontWeight:500}}>E-post</label>
+            <input style={{width:"100%",padding:"10px 12px",border:"1px solid rgba(255,255,255,.08)",borderRadius:9,background:"rgba(0,0,0,.2)",color:"#e2ddf0",fontSize:14,fontFamily:"inherit"}} type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="din@email.se" autoFocus/>
+          </div>
+          <div>
+            <label style={{display:"block",fontSize:10,color:"#7c6f9b",marginBottom:3,textTransform:"uppercase",letterSpacing:".05em",fontWeight:500}}>Lösenord</label>
+            <input style={{width:"100%",padding:"10px 12px",border:"1px solid rgba(255,255,255,.08)",borderRadius:9,background:"rgba(0,0,0,.2)",color:"#e2ddf0",fontSize:14,fontFamily:"inherit"}} type="password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="Minst 6 tecken" onKeyDown={e=>{if(e.key==="Enter")emailLogin();}}/>
+          </div>
+          <button onClick={emailLogin} style={{padding:"12px",border:"1px solid rgba(196,181,253,.2)",borderRadius:12,background:"rgba(196,181,253,.08)",color:"#c4b5fd",fontSize:14,fontWeight:500}}>{isReg?"Skapa konto":"Logga in"}</button>
+          <button onClick={()=>setIsReg(!isReg)} style={{border:"none",background:"transparent",color:"#7c6f9b",fontSize:12,padding:4}}>{isReg?"Har redan konto? Logga in":"Inget konto? Registrera"}</button>
+          <button onClick={()=>{setMode("main");setErr("");}} style={{border:"none",background:"transparent",color:"#6b5f8a",fontSize:12,padding:4}}>← Tillbaka</button>
+        </div>}
+
+        {err&&<p style={{color:"#f4a4a4",fontSize:13,marginTop:16}}>{err}</p>}
+      </div>
+    </div>
+  );
+  return <App user={user}/>;
+}
+
+// ════════════════════════════════
+// BILL FORM
+// ════════════════════════════════
+function BillForm({initial:ini,onSave,onCancel}){
+  const[n,sN]=useState(ini?.name||"");const[a,sA]=useState(ini?.amount?.toString()||"");
+  const[ag,sAg]=useState(ini?.autogiro||false);const[c,sC]=useState(ini?.category||"");
+  const[v,sV]=useState(ini?.variable||false);const[p,sP]=useState(ini?.platform||"");
+  const cats=["Boende","Försäkring","Prenumeration","Transport","Telefon/Internet","Övrigt"];
+  const pl=["Klarna","Billo","Kivra","Trafikstyrelsen","Swish","Bankgiro"];
+  const go=()=>{if(!n.trim())return;onSave(n.trim(),v?"0":a,ag,c,v,p);};
+  const inp={width:"100%",padding:"8px 11px",border:"1px solid rgba(255,255,255,.08)",borderRadius:9,background:"rgba(0,0,0,.2)",color:"#e2ddf0",fontSize:13,fontFamily:"inherit"};
+  const lb={display:"block",fontSize:10,color:"#7c6f9b",marginBottom:3,textTransform:"uppercase",letterSpacing:".05em",fontWeight:500};
+  return(
+    <div style={{...g,padding:14,marginBottom:12}}>
+      <div style={{display:"flex",gap:10,marginBottom:10,flexWrap:"wrap"}}>
+        <div style={{flex:1,minWidth:120}}><label style={lb}>Namn</label><input style={inp} value={n} onChange={e=>sN(e.target.value)} placeholder="t.ex. Hyra, Klarna..." autoFocus/></div>
+        {!v&&<div style={{flex:0,minWidth:100}}><label style={lb}>Belopp</label><input style={inp} type="number" value={a} onChange={e=>sA(e.target.value)} placeholder="0"/></div>}
+      </div>
+      <div style={{display:"flex",gap:10,marginBottom:10,flexWrap:"wrap"}}>
+        <div style={{flex:1}}><label style={lb}>Kategori</label><select style={inp} value={c} onChange={e=>sC(e.target.value)}><option value="">—</option>{cats.map(x=><option key={x}>{x}</option>)}</select></div>
+        <div style={{flex:1}}><label style={lb}>Plattform</label><select style={inp} value={p} onChange={e=>sP(e.target.value)}><option value="">—</option>{pl.map(x=><option key={x}>{x}</option>)}</select></div>
+      </div>
+      <div style={{display:"flex",gap:16,marginBottom:12,flexWrap:"wrap"}}>
+        <label style={{display:"flex",alignItems:"center",gap:6,cursor:"pointer",fontSize:13,color:"#8a80a8"}}><input type="checkbox" checked={v} onChange={e=>sV(e.target.checked)}/><span>Rörlig</span></label>
+        <label style={{display:"flex",alignItems:"center",gap:6,cursor:"pointer",fontSize:13,color:"#8a80a8"}}><input type="checkbox" checked={ag} onChange={e=>sAg(e.target.checked)}/><span>Autogiro</span></label>
+      </div>
+      <div style={{display:"flex",gap:8,justifyContent:"flex-end"}}>
+        <button onClick={onCancel} style={{padding:"8px 16px",border:"1px solid rgba(255,255,255,.06)",borderRadius:10,background:"transparent",color:"#7c6f9b",fontSize:13}}>Avbryt</button>
+        <button onClick={go} style={{display:"inline-flex",alignItems:"center",gap:5,padding:"7px 14px",border:"1px solid rgba(196,181,253,.15)",borderRadius:10,background:"rgba(196,181,253,.08)",color:"#c4b5fd",fontSize:12,fontWeight:500}}>{ini?"Spara":"Lägg till"}</button>
+      </div>
+    </div>
+  );
+}
+
+// ════════════════════════════════
+// PERSON CARD (household)
+// ════════════════════════════════
+function PC({l,d,me}){
+  return(<div className="ce" style={{...g,padding:"14px 12px",textAlign:"center"}}>
+    <div style={{width:32,height:32,borderRadius:"50%",margin:"0 auto 8px",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:600,background:me?"rgba(168,230,207,.12)":"rgba(196,181,253,.12)",color:me?"#a8e6cf":"#c4b5fd",border:`1px solid ${me?"rgba(168,230,207,.2)":"rgba(196,181,253,.2)"}`}}>{l?.[0]?.toUpperCase()||"?"}</div>
+    <span style={{fontSize:13,fontWeight:500,color:"#e2ddf0",display:"block",marginBottom:8}}>{l}</span>
+    {d?(<><div style={{fontSize:20,fontWeight:700,color:d.spendable>=0?"#a8e6cf":"#f4a4a4"}}>{d.spendable>=0?"":"−"}{fk(Math.abs(d.spendable))} kr</div>
+      <span style={{fontSize:10,color:"#6b5f8a",display:"block",marginTop:4}}>att förbruka</span>
+      <div style={{fontSize:10,color:"#6b5f8a",marginTop:6}}>{d.checked}/{d.total} avcheckade</div>
+    </>):(<span style={{fontSize:12,color:"#6b5f8a"}}>Ingen data ännu</span>)}
+  </div>);
+}
+
+function SC({l,v,c}){return<div style={{textAlign:"center",padding:"10px 4px",borderRadius:12,background:"rgba(255,255,255,.02)",border:"1px solid rgba(255,255,255,.03)"}}><span style={{display:"block",fontSize:10,color:"#6b5f8a",marginBottom:3,textTransform:"uppercase",letterSpacing:".06em",fontWeight:500}}>{l}</span><span style={{fontSize:13,fontWeight:600,color:c}}>{v}</span></div>}
+
+// ── Reusable mini-styles ──
+const S={
+  btnPri:{display:"inline-flex",alignItems:"center",gap:8,padding:"13px 28px",borderRadius:14,background:"linear-gradient(135deg,rgba(196,181,253,.25),rgba(168,230,207,.15))",color:"#e2ddf0",fontSize:14,fontWeight:500,backdropFilter:"blur(8px)",border:"1px solid rgba(196,181,253,.15)"},
+  btnSm:{display:"inline-flex",alignItems:"center",gap:5,padding:"7px 14px",border:"1px solid rgba(196,181,253,.15)",borderRadius:10,background:"rgba(196,181,253,.08)",color:"#c4b5fd",fontSize:12,fontWeight:500},
+  btnGh:{padding:"8px 16px",border:"1px solid rgba(255,255,255,.06)",borderRadius:10,background:"transparent",color:"#7c6f9b",fontSize:13},
+  btnT:{display:"flex",alignItems:"center",justifyContent:"center",width:28,height:28,border:"1px solid rgba(255,255,255,.06)",borderRadius:8,background:"transparent",color:"#7c6f9b"},
+  iBtn:{display:"flex",alignItems:"center",justifyContent:"center",width:30,height:30,border:"none",borderRadius:8,background:"rgba(255,255,255,.04)",color:"#7c6f9b"},
+  inl:{width:110,padding:"6px 10px",border:"1px solid rgba(196,181,253,.25)",borderRadius:8,background:"rgba(0,0,0,.2)",color:"#e2ddf0",fontSize:14,fontFamily:"inherit"},
+  incB:{border:"1px dashed rgba(196,181,253,.2)",borderRadius:10,background:"rgba(196,181,253,.04)",color:"#c4b5fd",fontSize:14,fontWeight:500,padding:"6px 14px",fontFamily:"inherit"},
+  varI:{width:72,padding:"5px 8px",border:"1px solid rgba(219,183,120,.3)",borderRadius:8,background:"rgba(0,0,0,.25)",color:"#dbb778",fontSize:13,fontWeight:500,textAlign:"right",fontFamily:"inherit"},
+  mOk:{width:26,height:26,border:"none",borderRadius:7,background:"rgba(168,230,207,.6)",color:"#0d0c1d",fontSize:13,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center"},
+  badge:(c,bg)=>({display:"inline-flex",alignItems:"center",gap:3,fontSize:10,color:c,background:bg,padding:"2px 7px",borderRadius:5}),
+  chip:{display:"inline-flex",alignItems:"center",gap:6,padding:"6px 12px",borderRadius:10,background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.06)",fontSize:13,color:"#b0a8c8"},
+};
+
+// ════════════════════════════════
+// MAIN APP
+// ════════════════════════════════
+function App({user}){
+  const uid=user.uid, dn=user.displayName||user.email?.split("@")[0]||(user.isAnonymous?"Gäst":"Du");
+  const[bills,setBills]=useState([]);const[months,setMonths]=useState({});const[savC,setSavC]=useState([]);
+  const[hhCode,setHhCode]=useState("");const[hh,setHh]=useState(null);const[pSum,setPSum]=useState(null);
+  const[view,setView]=useState("checklist");const[loading,setLoading]=useState(true);
+  const[eBill,setEBill]=useState(null);const[showAdd,setShowAdd]=useState(false);
+  const[expH,setExpH]=useState(null);const[cel,setCel]=useState(false);
+  const[eInc,setEInc]=useState(false);const[incI,setIncI]=useState("");
+  const[eAct,setEAct]=useState(null);const[actI,setActI]=useState("");
+  const[showAS,setShowAS]=useState(false);const[savNI,setSavNI]=useState("");
+  const[eSavA,setESavA]=useState(null);const[savAI,setSavAI]=useState("");
+  const[hhV,setHhV]=useState("main");const[joinI,setJoinI]=useState("");const[cp,setCp]=useState(false);
+
+  const ck=mkey(),cm=months[ck];
+
+  // Load
+  useEffect(()=>{(async()=>{
+    const[b,m,sc,hc]=await Promise.all([ld(`users/${uid}/bills`,[]),ld(`users/${uid}/months`,{}),ld(`users/${uid}/savingsCategories`,[]),ld(`users/${uid}/householdCode`,"")]);
+    setBills(b||[]);setMonths(m||{});setSavC(sc||[]);setHhCode(hc||"");
+    if(hc){const h=await ld(`households/${hc}/info`,null);if(h)setHh(h);}
+    setLoading(false);
+  })();},[uid]);
+
+  // Realtime partner
+  useEffect(()=>{
+    if(!hh||!hhCode)return;
+    const p=hh.members?.find(m=>m.uid!==uid);if(!p){setPSum(null);return;}
+    const r=db.ref(`households/${hhCode}/summaries/${ck}/${p.uid}`);
+    const cb=r.on("value",s=>setPSum(s.exists()?s.val():null));
+    return()=>r.off("value",cb);
+  },[hh,hhCode,uid,ck]);
+
+  const pB=useCallback(async b=>{setBills(b);await sv(`users/${uid}/bills`,b);},[uid]);
+  const pM=useCallback(async m=>{setMonths(m);await sv(`users/${uid}/months`,m);},[uid]);
+  const pS=useCallback(async s=>{setSavC(s);await sv(`users/${uid}/savingsCategories`,s);},[uid]);
+
+  // Publish summary
+  useEffect(()=>{
+    if(!hhCode||!cm||!cm.income)return;
+    const tE=cm.items.reduce((s,i)=>i.variable?s+(i.checked&&i.actualAmount!=null?i.actualAmount:0):s+(i.amount||0),0);
+    const tS=cm.savings?Object.values(cm.savings).reduce((s,v)=>s+v,0):0;
+    sv(`households/${hhCode}/summaries/${ck}/${uid}`,{uid,name:dn,income:cm.income||0,expenses:tE,savings:tS,spendable:(cm.income||0)-tE-tS,checked:cm.items.filter(i=>i.checked).length,total:cm.items.length});
+  },[months,hhCode,uid,dn,cm,ck]);
+
+  // HH actions
+  async function createHH(){const c=gcode();const h={code:c,members:[{uid,name:dn}]};await sv(`households/${c}/info`,h);await sv(`users/${uid}/householdCode`,c);setHhCode(c);setHh(h);setHhV("main");}
+  async function joinHH(){if(!joinI.trim())return;const c=joinI.trim().toUpperCase();const ex=await ld(`households/${c}/info`,null);if(!ex){alert("Hittades inte.");return;}if(ex.members?.length>=2&&!ex.members.some(m=>m.uid===uid)){alert("Fullt (max 2).");return;}let h=ex;if(!ex.members.some(m=>m.uid===uid)){h={...ex,members:[...ex.members,{uid,name:dn}]};await sv(`households/${c}/info`,h);}await sv(`users/${uid}/householdCode`,c);setHhCode(c);setHh(h);setHhV("main");setJoinI("");}
+  async function leaveHH(){if(!hh)return;await sv(`households/${hhCode}/info`,{...hh,members:hh.members.filter(m=>m.uid!==uid)});await sv(`users/${uid}/householdCode`,"");setHhCode("");setHh(null);setPSum(null);}
+
+  // CRUD
+  function addBill(n,a,ag,c,v,p){pB([...bills,{id:gid(),name:n,amount:parseFloat(a)||0,autogiro:ag,category:c,variable:!!v,platform:p||""}]);setShowAdd(false);}
+  function rmBill(id){pB(bills.filter(b=>b.id!==id));}
+  function upBill(id,d){pB(bills.map(b=>b.id===id?{...b,...d}:b));setEBill(null);}
+  function addSC(n){if(!n.trim())return;pS([...savC,{id:gid(),name:n.trim()}]);setShowAS(false);setSavNI("");}
+  function rmSC(id){pS(savC.filter(s=>s.id!==id));if(cm?.savings){const{[id]:_,...r}=cm.savings;pM({...months,[ck]:{...cm,savings:r}});}}
+  function setSA(cid,a){if(!cm)return;pM({...months,[ck]:{...cm,savings:{...(cm.savings||{}),[cid]:parseFloat(a)||0}}});setESavA(null);setSavAI("");}
+
+  function startM(){pM({...months,[ck]:{items:bills.map(b=>({...b,checked:false,checkedAt:null,actualAmount:b.variable?null:b.amount})),startedAt:new Date().toISOString(),income:0,savings:{}}});setView("checklist");}
+  function setInc(v){if(!cm)return;pM({...months,[ck]:{...cm,income:parseFloat(v)||0}});setEInc(false);setIncI("");}
+
+  function tog(bid){
+    if(!cm)return;const it=cm.items.find(i=>i.id===bid);if(!it)return;
+    if(it.variable&&!it.checked){setEAct(bid);setActI(it.actualAmount!=null?it.actualAmount.toString():"");return;}
+    const items=cm.items.map(i=>i.id===bid?{...i,checked:!i.checked,checkedAt:!i.checked?new Date().toISOString():null,actualAmount:!i.checked?(i.variable?i.actualAmount:i.amount):(i.variable?null:i.amount)}:i);
+    pM({...months,[ck]:{...cm,items}});
+    if(items.every(i=>i.checked)&&!cm.items.every(i=>i.checked)){setCel(true);setTimeout(()=>setCel(false),4000);}
+  }
+  function confV(bid){if(!cm)return;const a=parseFloat(actI)||0;const items=cm.items.map(i=>i.id===bid?{...i,checked:true,checkedAt:new Date().toISOString(),actualAmount:a}:i);pM({...months,[ck]:{...cm,items}});setEAct(null);setActI("");if(items.every(i=>i.checked)&&!cm.items.every(i=>i.checked)){setCel(true);setTimeout(()=>setCel(false),4000);}}
+  function unchV(bid){if(!cm)return;pM({...months,[ck]:{...cm,items:cm.items.map(i=>i.id===bid?{...i,checked:false,checkedAt:null,actualAmount:null}:i)}});}
+  function resetM(){const{[ck]:_,...r}=months;pM(r);}
+
+  // Derived
+  const chkC=cm?cm.items.filter(i=>i.checked).length:0;
+  const totC=cm?cm.items.length:0;
+  const prog=totC>0?(chkC/totC)*100:0;
+  const totE=cm?cm.items.reduce((s,i)=>i.variable?s+(i.checked&&i.actualAmount!=null?i.actualAmount:0):s+(i.amount||0),0):0;
+  const paidA=cm?cm.items.filter(i=>i.checked).reduce((s,i)=>s+(i.actualAmount!=null?i.actualAmount:i.amount||0),0):0;
+  const mI=cm?.income||0;
+  const tSv=cm?.savings?Object.values(cm.savings).reduce((s,v)=>s+v,0):0;
+  const aftB=mI-totE, spend=aftB-tSv;
+  const pastMs=Object.keys(months).filter(k=>k!==ck).sort().reverse();
+  const mySm=cm&&mI>0?{name:dn,income:mI,expenses:totE,savings:tSv,spendable:spend,checked:chkC,total:totC}:null;
+  const cSp=(mySm?.spendable||0)+(pSum?.spendable||0);
+  const cI=(mySm?.income||0)+(pSum?.income||0);
+  const cE=(mySm?.expenses||0)+(pSum?.expenses||0);
+  const cSv=(mySm?.savings||0)+(pSum?.savings||0);
+  const partner=hh?.members?.find(m=>m.uid!==uid);
+
+  if(loading)return<div style={{display:"flex",alignItems:"center",justifyContent:"center",minHeight:"100vh"}}><span className="pu">Laddar...</span></div>;
+
+  return(
+    <>
+    <div className="bg"><div className="orb o1"/><div className="orb o2"/><div className="orb o3"/><div className="orb o4"/><div className="orb o5"/></div>
+    <div style={{position:"relative",zIndex:1}}>
+
+    {/* Header */}
+    <header style={{padding:"24px 20px 14px",borderBottom:"1px solid rgba(255,255,255,.04)"}}>
+      <div style={{maxWidth:560,margin:"0 auto",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <div><div style={{display:"flex",alignItems:"center",gap:8,color:"#c4b5fd"}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.25 3.75 3.25 4.75"/></svg><h1 style={{fontSize:22,fontWeight:300,color:"#e2ddf0",letterSpacing:".04em",textTransform:"lowercase"}}>räkningskollen</h1></div><p style={{fontSize:12,color:"#7c6f9b",marginTop:6,letterSpacing:".06em",textTransform:"uppercase",fontWeight:500}}>{fmtM(ck)}</p></div>
+        <div style={{display:"flex",alignItems:"center",gap:8}}><span style={{fontSize:12,color:"#7c6f9b"}}>{dn}</span><button onClick={()=>auth.signOut()} style={S.btnT} title="Logga ut"><Ic.Out/></button></div>
+      </div>
+    </header>
+
+    {/* Nav */}
+    <nav style={{display:"flex",maxWidth:560,margin:"0 auto",padding:"8px 8px",gap:3,borderBottom:"1px solid rgba(255,255,255,.03)"}}>
+      {[{k:"checklist",l:"Månadskoll",i:<Ic.Rocket/>},{k:"master",l:"Utgifter",i:<Ic.List/>},{k:"household",l:"Hushåll",i:<Ic.Home/>},{k:"history",l:"Historik",i:<Ic.Clock/>}].map(t=>
+        <button key={t.k} onClick={()=>setView(t.k)} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:5,padding:"9px 4px",border:"none",borderRadius:12,background:view===t.k?"rgba(196,181,253,.08)":"transparent",color:view===t.k?"#c4b5fd":"#6b5f8a",fontSize:12,fontWeight:500,flexDirection:"column"}}>{t.i}<span style={{fontSize:11}}>{t.l}</span></button>
+      )}
+    </nav>
+
+    <main style={{maxWidth:560,margin:"0 auto",padding:"16px 16px 80px"}}>
+
+    {/* ═══ CHECKLIST ═══ */}
+    {view==="checklist"&&<div className="pe">
+      {!cm?<div style={{textAlign:"center",padding:"50px 20px"}}><div style={{width:80,height:80,borderRadius:"50%",margin:"0 auto 20px",background:"radial-gradient(circle,rgba(196,181,253,.15),rgba(168,230,207,.08),transparent 70%)"}}/>
+        {bills.length===0?<><h2 style={{fontSize:22,fontWeight:300,color:"#e2ddf0",marginBottom:8}}>Välkommen, {dn}</h2><p style={{fontSize:14,color:"#7c6f9b",maxWidth:320,margin:"0 auto 24px",lineHeight:1.7,fontWeight:300}}>Lägg till dina fasta utgifter först.</p><button style={S.btnPri} onClick={()=>setView("master")}><Ic.Plus/> Lägg till</button></>
+        :<><h2 style={{fontSize:22,fontWeight:300,color:"#e2ddf0",marginBottom:8}}>Ny månad väntar</h2><p style={{fontSize:14,color:"#7c6f9b",maxWidth:320,margin:"0 auto 24px",lineHeight:1.7,fontWeight:300}}>{bills.length} utgifter redo.</p><button style={S.btnPri} onClick={startM}><Ic.Rocket/> Starta {fmtM(ck)}</button></>}
+      </div>
+      :<>
+        {/* Income */}
+        <div style={{...g,padding:"16px 18px",marginBottom:10}} className="ce">
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8}}>
+            <div style={{display:"flex",alignItems:"center",gap:8}}><Ic.Wallet/><span style={{fontSize:14,fontWeight:500,color:"#b0a8c8"}}>Inkomst</span></div>
+            {eInc?<div style={{display:"flex",gap:6,alignItems:"center"}}><input style={S.inl} type="number" value={incI} onChange={e=>setIncI(e.target.value)} placeholder="Belopp" autoFocus onKeyDown={e=>{if(e.key==="Enter")setInc(incI);if(e.key==="Escape"){setEInc(false);setIncI("");}}}/><button style={S.btnSm} onClick={()=>setInc(incI)}>OK</button><button style={S.btnT} onClick={()=>{setEInc(false);setIncI("");}}><Ic.X/></button></div>
+            :<button style={S.incB} onClick={()=>{setEInc(true);setIncI(mI>0?mI.toString():"");}}>{mI>0?`${fk(mI)} kr`:"Ange →"}</button>}
+          </div>
+          {mI>0&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:6,marginTop:14}}>
+            <SC l="Inkomst" v={fk(mI)} c="#a8e6cf"/><SC l="Utgifter" v={`−${fk(totE)}`} c="#f4a4a4"/><SC l="Sparande" v={`−${fk(tSv)}`} c="#c4b5fd"/>
+            <div style={{textAlign:"center",padding:"10px 4px",borderRadius:12,background:spend>=0?"rgba(168,230,207,.04)":"rgba(244,164,164,.04)",border:`1px solid ${spend>=0?"rgba(168,230,207,.2)":"rgba(244,164,164,.2)"}`}}><span style={{display:"block",fontSize:10,color:"#6b5f8a",marginBottom:3,textTransform:"uppercase",letterSpacing:".06em",fontWeight:500}}>Förbruka</span><span style={{fontSize:14,fontWeight:700,color:spend>=0?"#a8e6cf":"#f4a4a4"}}>{spend>=0?"":"−"}{fk(Math.abs(spend))} kr</span></div>
+          </div>}
+        </div>
+
+        {/* Progress */}
+        <div style={{...g,padding:"16px 18px",marginBottom:10}} className="ce">
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}>
+            <span style={{fontSize:13,fontWeight:600,color:chkC===totC?"#a8e6cf":"#e2ddf0"}}>{chkC===totC?"✓ Klart":`${chkC} / ${totC}`}</span>
+            <span style={{fontSize:12,color:"#8a80a8"}}>{fk(paidA)} kr</span>
+          </div>
+          <div style={{height:6,borderRadius:3,background:"rgba(255,255,255,.06)",overflow:"hidden"}}><div style={{height:"100%",borderRadius:3,background:"linear-gradient(90deg,#c4b5fd,#a8e6cf)",transition:"width .6s cubic-bezier(.22,1,.36,1)",width:`${prog}%`}}/></div>
+        </div>
+
+        {/* Items */}
+        <div style={{display:"flex",flexDirection:"column",gap:5}}>
+          {cm.items.slice().sort((a,b)=>a.checked===b.checked?0:a.checked?1:-1).map((it,idx)=>
+            <div key={it.id} className="ce" style={{...g,display:"flex",alignItems:"center",gap:12,padding:"13px 16px",userSelect:"none",...(it.checked?{background:"rgba(168,230,207,.04)",borderColor:"rgba(168,230,207,.1)"}:{}),animationDelay:`${idx*35}ms`}}>
+              <div onClick={()=>it.checked&&it.variable?unchV(it.id):tog(it.id)} style={{cursor:"pointer",display:"flex",alignItems:"center"}}>
+                <div style={{width:22,height:22,borderRadius:7,border:"1.5px solid rgba(255,255,255,.12)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all .25s",...(it.checked?{background:"rgba(168,230,207,.7)",borderColor:"rgba(168,230,207,.8)",color:"#0d0c1d"}:{})}}>{it.checked&&<Ic.Check/>}</div>
+              </div>
+              <div style={{flex:1,minWidth:0,cursor:"pointer"}} onClick={()=>it.checked&&it.variable?unchV(it.id):tog(it.id)}>
+                <span style={{fontSize:14,color:"#e2ddf0",display:"block",...(it.checked?{textDecoration:"line-through",color:"#6b5f8a"}:{})}}>{it.name}</span>
+                <div style={{display:"flex",gap:5,marginTop:4,flexWrap:"wrap"}}>
+                  {it.autogiro&&<span style={S.badge("#c4b5fd","rgba(196,181,253,.08)")}><Ic.Auto/> Autogiro</span>}
+                  {it.variable&&<span style={S.badge("#dbb778","rgba(219,183,120,.08)")}><Ic.Var/> Rörlig</span>}
+                  {it.platform&&<span style={{fontSize:10,color:"#e8a4f0",background:"rgba(232,164,240,.08)",padding:"2px 7px",borderRadius:5,fontWeight:500}}>{it.platform}</span>}
+                  {it.category&&<span style={{fontSize:10,color:"#8a80a8",background:"rgba(255,255,255,.04)",padding:"2px 7px",borderRadius:5}}>{it.category}</span>}
+                </div>
+              </div>
+              {eAct===it.id?<div style={{display:"flex",gap:4,alignItems:"center"}} onClick={e=>e.stopPropagation()}><input style={S.varI} type="number" value={actI} onChange={e=>setActI(e.target.value)} placeholder="kr" autoFocus onKeyDown={e=>{if(e.key==="Enter")confV(it.id);if(e.key==="Escape"){setEAct(null);setActI("");}}}/><button style={S.mOk} onClick={()=>confV(it.id)}>✓</button></div>
+              :<span style={{fontSize:14,fontWeight:500,whiteSpace:"nowrap",...(it.checked?{color:"#5a7a6a"}:{color:"#c4b5fd"}),...(it.variable&&!it.checked?{color:"#dbb778",fontStyle:"italic"}:{})}}>{it.variable?(it.checked&&it.actualAmount!=null?`${fk(it.actualAmount)} kr`:"? kr"):(it.amount?`${fk(it.amount)} kr`:"–")}</span>}
+            </div>
+          )}
+        </div>
+
+        {/* Savings */}
+        {mI>0&&aftB>0&&<div style={{...g,padding:"16px 18px",marginTop:16}} className="ce">
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}><div style={{display:"flex",alignItems:"center",gap:8}}><Ic.Piggy/><span style={{fontSize:14,fontWeight:500,color:"#b0a8c8"}}>Sparande</span></div><button style={S.btnT} onClick={()=>setShowAS(true)}><Ic.Plus/></button></div>
+          {showAS&&<div style={{display:"flex",gap:6,marginBottom:12}}><input style={{...S.inl,flex:1}} value={savNI} onChange={e=>setSavNI(e.target.value)} placeholder="Ny sparkategori..." autoFocus onKeyDown={e=>{if(e.key==="Enter")addSC(savNI);if(e.key==="Escape"){setShowAS(false);setSavNI("");}}}/><button style={S.btnSm} onClick={()=>addSC(savNI)}>Lägg till</button><button style={S.btnT} onClick={()=>{setShowAS(false);setSavNI("");}}><Ic.X/></button></div>}
+          {savC.length===0&&!showAS?<p style={{fontSize:13,color:"#7c6f9b",lineHeight:1.6}}>Skapa kategorier — "Buffert", "Semester" — och fördela överskottet.</p>
+          :<div style={{display:"flex",flexDirection:"column",gap:6}}>
+            {savC.map(cat=>{const a=cm.savings?.[cat.id]||0;return<div key={cat.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 12px",borderRadius:12,background:"rgba(196,181,253,.03)",border:"1px solid rgba(196,181,253,.06)"}}>
+              <span style={{fontSize:13,fontWeight:500,color:"#b0a8c8"}}>{cat.name}</span>
+              {eSavA===cat.id?<div style={{display:"flex",gap:4,alignItems:"center"}}><input style={S.varI} type="number" value={savAI} onChange={e=>setSavAI(e.target.value)} placeholder="kr" autoFocus onKeyDown={e=>{if(e.key==="Enter")setSA(cat.id,savAI);if(e.key==="Escape"){setESavA(null);setSavAI("");}}}/><button style={S.mOk} onClick={()=>setSA(cat.id,savAI)}>✓</button></div>
+              :<div style={{display:"flex",alignItems:"center",gap:8}}><button style={{border:"1px dashed rgba(196,181,253,.15)",borderRadius:8,background:"rgba(196,181,253,.04)",color:"#c4b5fd",fontSize:13,fontWeight:500,padding:"4px 12px",fontFamily:"inherit"}} onClick={()=>{setESavA(cat.id);setSavAI(a>0?a.toString():"");}}>{a>0?`${fk(a)} kr`:"Ange →"}</button><button style={{...S.btnT,color:"#f4a4a4"}} onClick={()=>rmSC(cat.id)}><Ic.Trash/></button></div>}
+            </div>;})}
+            {tSv>0&&<div style={{textAlign:"right",padding:"10px 4px 0",fontSize:13,color:"#8a80a8",borderTop:"1px solid rgba(255,255,255,.04)",marginTop:6}}>Totalt: <strong>{fk(tSv)} kr</strong> <span style={{marginLeft:10,color:spend>=0?"#a8e6cf":"#f4a4a4"}}>→ {fk(Math.abs(spend))} kr {spend>=0?"kvar":"över"}</span></div>}
+          </div>}
+        </div>}
+        <div style={{textAlign:"center",marginTop:28}}><button style={S.btnGh} onClick={resetM}>Återställ månad</button></div>
+      </>}
+    </div>}
+
+    {/* ═══ MASTER ═══ */}
+    {view==="master"&&<div className="pe">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16,gap:12}}><div><h2 style={{fontSize:22,fontWeight:300,color:"#e2ddf0"}}>Fasta utgifter</h2><p style={{fontSize:12,color:"#7c6f9b",marginTop:4}}>Master-listan — kopieras varje månad.</p></div><button style={S.btnSm} onClick={()=>setShowAdd(true)}><Ic.Plus/> Ny</button></div>
+      {showAdd&&<BillForm onSave={addBill} onCancel={()=>setShowAdd(false)}/>}
+      {bills.length===0&&!showAdd?<div style={{textAlign:"center",padding:"50px 20px"}}><h2 style={{fontSize:22,fontWeight:300,color:"#e2ddf0",marginBottom:8}}>Tom lista</h2><p style={{fontSize:14,color:"#7c6f9b",maxWidth:320,margin:"0 auto",lineHeight:1.7}}>Lägg till hyra, el, försäkringar och ställen du måste checka.</p></div>
+      :<div style={{display:"flex",flexDirection:"column",gap:5}}>
+        {bills.map((b,i)=><div key={b.id} className="ce" style={{...g,display:"flex",alignItems:"center",gap:10,padding:"13px 16px",animationDelay:`${i*30}ms`}}>
+          {eBill===b.id?<BillForm initial={b} onSave={(n,a,ag,c,v,p)=>upBill(b.id,{name:n,amount:parseFloat(a)||0,autogiro:ag,category:c,variable:!!v,platform:p||""})} onCancel={()=>setEBill(null)}/>
+          :<><div style={{flex:1,minWidth:0}}><span style={{fontSize:14,color:"#e2ddf0",display:"block"}}>{b.name}</span><div style={{display:"flex",gap:5,marginTop:4,flexWrap:"wrap"}}>{b.autogiro&&<span style={S.badge("#c4b5fd","rgba(196,181,253,.08)")}><Ic.Auto/> Autogiro</span>}{b.variable&&<span style={S.badge("#dbb778","rgba(219,183,120,.08)")}><Ic.Var/> Rörlig</span>}{b.platform&&<span style={{fontSize:10,color:"#e8a4f0",background:"rgba(232,164,240,.08)",padding:"2px 7px",borderRadius:5,fontWeight:500}}>{b.platform}</span>}{b.category&&<span style={{fontSize:10,color:"#8a80a8",background:"rgba(255,255,255,.04)",padding:"2px 7px",borderRadius:5}}>{b.category}</span>}</div></div>
+            <span style={{fontSize:13,fontWeight:500,color:"#c4b5fd",whiteSpace:"nowrap",marginRight:6}}>{b.variable?"Rörligt":(b.amount?`${fk(b.amount)} kr`:"–")}</span>
+            <div style={{display:"flex",gap:4}}><button style={S.iBtn} onClick={()=>setEBill(b.id)}><Ic.Edit/></button><button style={{...S.iBtn,color:"#f4a4a4"}} onClick={()=>rmBill(b.id)}><Ic.Trash/></button></div></>}
+        </div>)}
+      </div>}
+      {bills.length>0&&<div style={{textAlign:"right",padding:"14px 4px",fontSize:13,color:"#7c6f9b",borderTop:"1px solid rgba(255,255,255,.04)",marginTop:14}}>Fasta: <strong>{fk(bills.filter(b=>!b.variable).reduce((s,b)=>s+(b.amount||0),0))} kr/mån</strong>{bills.some(b=>b.variable)&&<span style={{marginLeft:12,color:"#dbb778"}}>+ {bills.filter(b=>b.variable).length} rörliga</span>}</div>}
+    </div>}
+
+    {/* ═══ HOUSEHOLD ═══ */}
+    {view==="household"&&<div className="pe">
+      {!hh?<div style={{textAlign:"center",padding:"50px 20px"}}>
+        <div style={{width:80,height:80,borderRadius:"50%",margin:"0 auto 20px",background:"radial-gradient(circle,rgba(196,181,253,.15),rgba(168,230,207,.08),transparent 70%)"}}/>
+        <h2 style={{fontSize:22,fontWeight:300,color:"#e2ddf0",marginBottom:8}}>Hushåll</h2>
+        <p style={{fontSize:14,color:"#7c6f9b",maxWidth:320,margin:"0 auto 24px",lineHeight:1.7,fontWeight:300}}>Dela ekonomin med din partner. Se era gemensamma pengar kvar.</p>
+        {hhV==="main"&&<div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}><button style={S.btnPri} onClick={()=>setHhV("create")}><Ic.Plus/> Skapa</button><button style={{...S.btnGh,borderColor:"rgba(196,181,253,.15)"}} onClick={()=>setHhV("join")}><Ic.Users/> Gå med</button></div>}
+        {hhV==="create"&&<div style={{...g,maxWidth:340,margin:"20px auto",textAlign:"left",padding:16}}><p style={{fontSize:13,color:"#8a80a8",marginBottom:12}}>Ditt namn: <strong style={{color:"#e2ddf0"}}>{dn}</strong></p><div style={{display:"flex",gap:8,justifyContent:"flex-end"}}><button style={S.btnGh} onClick={()=>setHhV("main")}>Avbryt</button><button style={S.btnSm} onClick={createHH}>Skapa</button></div></div>}
+        {hhV==="join"&&<div style={{...g,maxWidth:340,margin:"20px auto",textAlign:"left",padding:16}}><label style={{display:"block",fontSize:10,color:"#7c6f9b",marginBottom:3,textTransform:"uppercase",letterSpacing:".05em",fontWeight:500}}>Hushållskod</label><input style={{width:"100%",padding:"8px 11px",border:"1px solid rgba(255,255,255,.08)",borderRadius:9,background:"rgba(0,0,0,.2)",color:"#e2ddf0",fontSize:13,fontFamily:"inherit"}} value={joinI} onChange={e=>setJoinI(e.target.value.toUpperCase())} placeholder="T.ex. A3X9K2" maxLength={6} autoFocus onKeyDown={e=>{if(e.key==="Enter")joinHH();}}/><div style={{display:"flex",gap:8,justifyContent:"flex-end",marginTop:12}}><button style={S.btnGh} onClick={()=>setHhV("main")}>Avbryt</button><button style={S.btnSm} onClick={joinHH}>Gå med</button></div></div>}
+      </div>
+      :<>
+        <div style={{...g,padding:"16px 18px",marginBottom:12}} className="ce">
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}><div style={{display:"flex",alignItems:"center",gap:8}}><Ic.Heart/><span style={{fontSize:16,fontWeight:500,color:"#b0a8c8"}}>Hushåll</span></div>
+            <div style={{display:"flex",alignItems:"center",gap:6}}><span style={{fontSize:12,color:"#7c6f9b",fontFamily:"monospace",letterSpacing:".1em",background:"rgba(255,255,255,.04)",padding:"4px 10px",borderRadius:8}}>{hh.code}</span><button style={S.btnT} onClick={async()=>{try{await navigator.clipboard.writeText(hh.code);setCp(true);setTimeout(()=>setCp(false),2000);}catch{}}}>{cp?<Ic.Check/>:<Ic.Copy/>}</button></div>
+          </div>
+          <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:14}}>{hh.members?.map(m=><div key={m.uid} style={S.chip}><div style={{width:8,height:8,borderRadius:"50%",background:m.uid===uid?"#a8e6cf":"#c4b5fd"}}/>{m.name}{m.uid===uid?" (du)":""}</div>)}{(!hh.members||hh.members.length<2)&&<div style={{...S.chip,borderStyle:"dashed",color:"#6b5f8a"}}>Väntar på partner...</div>}</div>
+          <button style={{...S.btnT,color:"#f4a4a4",fontSize:11,width:"auto",padding:"4px 10px"}} onClick={leaveHH}>Lämna</button>
+        </div>
+        {(mySm||pSum)?<>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}><PC l={dn} d={mySm} me/><PC l={partner?.name||"Partner"} d={pSum}/></div>
+          {mySm&&pSum&&<div className="ce" style={{...g,textAlign:"center",padding:"24px 20px"}}>
+            <span style={{fontSize:11,textTransform:"uppercase",letterSpacing:".08em",color:"#7c6f9b",fontWeight:500}}>Gemensam slutpeng</span>
+            <div style={{fontSize:32,fontWeight:700,color:cSp>=0?"#a8e6cf":"#f4a4a4",marginTop:8}}>{cSp>=0?"":"−"}{fk(Math.abs(cSp))} kr</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6,marginTop:16}}><SC l="Inkomst" v={fk(cI)} c="#a8e6cf"/><SC l="Utgifter" v={`−${fk(cE)}`} c="#f4a4a4"/><SC l="Sparande" v={`−${fk(cSv)}`} c="#c4b5fd"/></div>
+            <p style={{fontSize:12,color:"#6b5f8a",marginTop:14}}>Kombinerat — {fmtM(ck)}</p>
+          </div>}
+          {mySm&&!pSum&&partner&&<div style={{...g,textAlign:"center",padding:20}}><p style={{fontSize:13,color:"#7c6f9b"}}>Väntar på {partner.name}...</p></div>}
+        </>:<div style={{...g,textAlign:"center",padding:24}}><p style={{fontSize:13,color:"#7c6f9b",lineHeight:1.7}}>Ange inkomst och checka av räkningar under "Månadskoll" först.</p></div>}
+      </>}
+    </div>}
+
+    {/* ═══ HISTORY ═══ */}
+    {view==="history"&&<div className="pe">
+      <div style={{marginBottom:16}}><h2 style={{fontSize:22,fontWeight:300,color:"#e2ddf0"}}>Historik</h2><p style={{fontSize:12,color:"#7c6f9b",marginTop:4}}>Tidigare månader.</p></div>
+      {pastMs.length===0?<div style={{textAlign:"center",padding:"50px 20px"}}><h2 style={{fontSize:22,fontWeight:300,color:"#e2ddf0",marginBottom:8}}>Ingen historik</h2><p style={{fontSize:14,color:"#7c6f9b"}}>Slutförda månader visas här.</p></div>
+      :<div style={{display:"flex",flexDirection:"column",gap:8}}>
+        {pastMs.map(k=>{const m=months[k];const dn2=m.items.filter(i=>i.checked).length;const tt=m.items.length;const ok=dn2===tt;const ex=expH===k;
+          const hI=m.income||0;const hE=m.items.reduce((s,i)=>s+(i.checked&&i.actualAmount!=null?i.actualAmount:(!i.variable?(i.amount||0):0)),0);
+          const hSv=m.savings?Object.values(m.savings).reduce((s,v)=>s+v,0):0;const hSp=hI-hE-hSv;
+          return<div key={k} style={{...g,overflow:"hidden"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"13px 16px",cursor:"pointer",userSelect:"none"}} onClick={()=>setExpH(ex?null:k)}>
+              <div><span style={{fontSize:14,fontWeight:600,color:"#e2ddf0",marginRight:10}}>{fmtM(k)}</span><span style={{fontSize:12,fontWeight:600,color:ok?"#a8e6cf":"#dbb778"}}>{ok?"Komplett":`${dn2}/${tt}`}</span>{hI>0&&<span style={{fontSize:12,color:hSp>=0?"#a8e6cf":"#f4a4a4",marginLeft:8}}>Kvar: {hSp>=0?"":"−"}{fk(Math.abs(hSp))} kr</span>}</div>
+              <span style={{transition:"transform .2s",transform:ex?"rotate(180deg)":"rotate(0)",color:"#7c6f9b"}}><Ic.Chev/></span>
+            </div>
+            {ex&&<div style={{padding:"0 16px 14px",borderTop:"1px solid rgba(255,255,255,.04)"}}>
+              {hI>0&&<div style={{padding:"10px 0",fontSize:12,color:"#8a80a8",borderBottom:"1px solid rgba(255,255,255,.04)"}}>Inkomst: {fk(hI)} → Utgifter: {fk(hE)} → Sparande: {fk(hSv)} → <strong style={{color:hSp>=0?"#a8e6cf":"#f4a4a4"}}>Kvar: {hSp>=0?"":"−"}{fk(Math.abs(hSp))} kr</strong></div>}
+              {m.items.map(i=><div key={i.id} style={{display:"flex",alignItems:"center",gap:8,padding:"7px 0",borderBottom:"1px solid rgba(255,255,255,.02)"}}><span style={{width:7,height:7,borderRadius:"50%",background:i.checked?"#a8e6cf":"#f4a4a4",flexShrink:0}}/><span style={{flex:1,fontSize:13,color:"#b0a8c8"}}>{i.name}</span><span style={{fontSize:12,color:"#7c6f9b"}}>{i.checked&&i.actualAmount!=null?`${fk(i.actualAmount)} kr`:(i.variable?"–":(i.amount?`${fk(i.amount)} kr`:"–"))}</span></div>)}
+            </div>}
+          </div>;})}
+      </div>}
+    </div>}
+
+    </main></div>
+
+    {/* Celebrate */}
+    {cel&&<div style={{position:"fixed",inset:0,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(13,12,29,.8)",backdropFilter:"blur(16px)",zIndex:100,animation:"celIn .5s ease-out"}}>
+      <div style={{textAlign:"center",padding:40,position:"relative"}}><div style={{position:"absolute",width:120,height:120,borderRadius:"50%",background:"radial-gradient(circle,rgba(168,230,207,.4),rgba(196,181,253,.2),transparent)",animation:"bloom 2s ease-out infinite",top:"50%",left:"50%",marginLeft:-60,marginTop:-60}}/>
+        <span style={{fontSize:56,display:"block",marginBottom:12}}>✨</span>
+        <h2 style={{fontSize:28,fontWeight:300,color:"#e2ddf0",marginBottom:8}}>Allt avbockat</h2>
+        <p style={{fontSize:14,color:"#c4b5fd",fontWeight:300}}>Andas ut, {dn}</p>
+        {mI>0&&<p style={{fontSize:20,fontWeight:700,marginTop:8,color:spend>=0?"#a8e6cf":"#f4a4a4"}}>{spend>=0?`${fk(spend)} kr kvar`:`${fk(Math.abs(spend))} kr över`}</p>}
+      </div>
+    </div>}
+    </>
+  );
+}
+
+// ── Render ──
+ReactDOM.createRoot(document.getElementById("root")).render(<AuthGate/>);
+</script>
+</body>
+</html>
