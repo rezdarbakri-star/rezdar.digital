@@ -41,6 +41,8 @@ firebase.initializeApp({
 const db = firebase.database();
 const PLAYER_ID = "p_" + Math.random().toString(36).slice(2, 10);
 const IS_HOST = new URLSearchParams(window.location.search).has("host");
+const URL_JOIN_CODE = new URLSearchParams(window.location.search).get("join");
+const BASE_URL = window.location.origin + window.location.pathname.replace(/\/host\/?$/, "/").replace(/\?.*$/, "");
 
 const QUESTIONS = [
   { id:1, category:"ENERGY", question:"What percentage of the world's energy comes from fossil fuels?", type:"slider", min:0, max:100, unit:"%", correctAnswer:80, averageGuess:42, source:"IEA World Energy Outlook 2023", explanation:"Despite decades of investment in renewables, fossil fuels still provide about 80% of global energy. Solar and wind combined provide roughly 4-5%.", insight:"The gap between perception and reality on energy is one of the biggest misconceptions in the modern world.", icon:"⚡" },
@@ -215,7 +217,7 @@ function App(){
   const[roomCode,setRoomCode]=useState("");
   const[roomData,setRoomData]=useState(null);
   const[playerName,setPlayerName]=useState("");
-  const[joinCode,setJoinCode]=useState("");
+  const[joinCode,setJoinCode]=useState(URL_JOIN_CODE||"");
   const[playerAnswer,setPlayerAnswer]=useState(null);
   const[playerSlider,setPlayerSlider]=useState(50);
   const[playerSubmitted,setPlayerSubmitted]=useState(false);
@@ -421,7 +423,13 @@ function App(){
         <div style={{maxWidth:600,width:"100%",textAlign:"center",position:"relative",zIndex:1}}>
           <h2 style={{fontFamily:"'Playfair Display', Georgia, serif",fontSize:34,color:"#fff",margin:"0 0 32px"}}>Understand <em style={{color:T.primary}}>Energy</em></h2>
           <div style={{padding:32,borderRadius:20,background:T.cardBg,border:`1px solid ${T.cardBorder}`,marginBottom:32}}>
-            <div style={{fontSize:13,color:T.textDim,marginBottom:12,fontFamily:"'JetBrains Mono', monospace"}}>Share this code with your audience:</div>
+            <div style={{fontSize:13,color:T.textDim,marginBottom:16,fontFamily:"'JetBrains Mono', monospace"}}>Scan to join:</div>
+            <div style={{display:"inline-block",padding:12,background:"#fff",borderRadius:12,marginBottom:20}}>
+              <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(BASE_URL+"?join="+roomCode)}`} alt="QR Code" style={{display:"block",width:200,height:200}}/>
+            </div>
+            <div style={{fontSize:13,color:T.textFaint,fontFamily:"'JetBrains Mono', monospace",marginBottom:24,wordBreak:"break-all"}}>{BASE_URL.replace(/^https?:\/\//,"")}?join={roomCode}</div>
+            <div style={{width:60,height:1,margin:"0 auto 20px",background:"rgba(255,255,255,0.08)"}}/>
+            <div style={{fontSize:13,color:T.textDim,marginBottom:12,fontFamily:"'JetBrains Mono', monospace"}}>Or enter code manually:</div>
             <div style={{fontSize:72,fontWeight:800,fontFamily:"'JetBrains Mono', monospace",color:"#fff",letterSpacing:12,textShadow:"0 0 40px rgba(255,107,26,0.4)"}}>{roomCode}</div>
             <div style={{marginTop:20}}><PlayerCount count={pc}/></div>
             <div style={{marginTop:16,display:"flex",flexWrap:"wrap",gap:6,justifyContent:"center"}}>
