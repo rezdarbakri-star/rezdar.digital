@@ -2,301 +2,660 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Understand Energy — For Alex Epstein</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;0,800;1,400;1,700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<title>Understand Energy</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🔥</text></svg>" />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;0,800;1,400;1,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 <style>
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  :root{--bg:#0B1628;--primary:#FF6B1A;--amber:#FFAA00;--flame:#FF4500;--navy:#122240;--card:rgba(18,34,64,0.6);--border:rgba(255,107,26,0.12);--success:#22C55E;--error:#FF4444;--dim:rgba(255,255,255,0.5);--faint:rgba(255,255,255,0.25)}
-  html{scroll-behavior:smooth}
-  body{font-family:'Outfit',sans-serif;background:var(--bg);color:#fff;-webkit-font-smoothing:antialiased;overflow-x:hidden;background-image:radial-gradient(ellipse at 50% 100%,rgba(255,107,26,0.08) 0%,transparent 50%),radial-gradient(ellipse at 20% 80%,rgba(255,69,0,0.05) 0%,transparent 40%)}
-  .page{max-width:600px;margin:0 auto;padding:48px 20px 80px}
-
-  .header{text-align:center;margin-bottom:56px;opacity:0;animation:fadeUp .8s ease forwards .2s}
-  .for-badge{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--primary);margin-bottom:24px}
-  .header h1{font-family:'Playfair Display',serif;font-size:clamp(36px,8vw,56px);font-weight:800;line-height:1.05}
-  .header h1 em{background:linear-gradient(135deg,var(--primary),var(--amber),var(--flame));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-  .header p{font-size:16px;color:var(--dim);margin-top:16px;line-height:1.6;font-weight:300}
-
-  .label{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--faint);margin-bottom:20px;text-align:center}
-
-  /* PHONE — fixed height, no reflow */
-  .phone{width:100%;max-width:360px;margin:0 auto;border-radius:28px;border:2px solid rgba(255,255,255,0.06);background:var(--bg);position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.4),0 0 0 1px rgba(255,255,255,0.03)}
-  .phone-inner{padding:24px 20px 28px;position:relative;overflow:hidden}
-  .phone-notch{width:120px;height:5px;background:rgba(255,255,255,0.08);border-radius:3px;margin:0 auto 20px}
-  .phone.wide{max-width:440px}
-
-  /* Lock heights so page never shifts */
-  #solo-phone .phone-inner{min-height:880px}
-  #class-phone .phone-inner{min-height:900px}
-
-  .q-category{display:inline-block;padding:4px 12px;border-radius:16px;font-size:11px;font-family:'JetBrains Mono',monospace;font-weight:500;background:rgba(74,158,255,0.12);color:#4A9EFF;border:1px solid rgba(74,158,255,0.15)}
-  .q-counter{float:right;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--faint);line-height:26px}
-  .q-icon{font-size:28px;text-align:center;margin:16px 0 10px}
-  .q-text{font-family:'Playfair Display',serif;font-size:19px;font-weight:400;text-align:center;line-height:1.4;margin-bottom:20px}
-
-  .choice{display:flex;align-items:center;gap:10px;padding:13px 16px;border-radius:10px;background:var(--navy);margin-bottom:8px;border:1px solid rgba(255,255,255,0.04);font-size:14px;color:rgba(255,255,255,0.7);transition:all .5s ease}
-  .choice-letter{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;flex-shrink:0;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3);transition:all .5s ease}
-  .choice.selected{background:rgba(255,107,26,0.12);border-color:rgba(255,107,26,0.4);color:#fff}
-  .choice.selected .choice-letter{background:rgba(255,107,26,0.2);color:var(--primary)}
-  .choice.correct{background:rgba(34,197,94,0.15);border-color:rgba(34,197,94,0.5);color:var(--success)}
-  .choice.correct .choice-letter{background:rgba(34,197,94,0.2);color:var(--success)}
-  .choice.wrong{background:rgba(255,68,68,0.08);border-color:rgba(255,68,68,0.25);color:var(--error);opacity:.7}
-  .choice.wrong .choice-letter{background:rgba(255,68,68,0.15);color:var(--error)}
-  .choice.dimmed{opacity:.25}
-
-  .result-panel{margin-top:16px;padding:18px;border-radius:12px;background:var(--card);border:1px solid var(--border);opacity:0;transition:opacity .8s}
-  .result-panel.show{opacity:1}
-  .result-explanation{font-size:13px;color:rgba(255,255,255,0.55);line-height:1.7;font-weight:300;margin-bottom:12px}
-  .result-insight{padding:10px 14px;border-radius:8px;background:rgba(255,107,26,0.06);border-left:3px solid var(--primary);font-size:13px;color:#FF8C42;line-height:1.5;font-weight:500}
-  .result-source{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--faint);margin-top:10px}
-
-  .classroom-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-  .live-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:16px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2)}
-  .live-dot{width:7px;height:7px;border-radius:50%;background:var(--success);animation:pulse 1.5s ease infinite}
-  .live-text{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--success);font-weight:600}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-
-  .students{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:16px 0}
-  .student{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-family:'JetBrains Mono',monospace;font-weight:600;background:rgba(255,255,255,0.04);color:var(--faint);transition:all .4s ease;border:1px solid transparent}
-  .student.answered{background:rgba(34,197,94,0.12);color:var(--success);border-color:rgba(34,197,94,0.25)}
-  .student.wrong-a{background:rgba(255,107,26,0.15);color:var(--primary);border-color:rgba(255,107,26,0.3)}
-  .student.right-a{background:rgba(34,197,94,0.25);color:var(--success);border-color:rgba(34,197,94,0.5)}
-
-  .answer-counter{text-align:center;margin:12px 0;font-family:'JetBrains Mono',monospace}
-  .answer-counter .big{font-size:36px;font-weight:800;color:var(--primary);transition:color .5s}
-  .answer-counter .big.done{color:var(--success)}
-  .answer-counter .sub{font-size:12px;color:var(--dim)}
-
-  .dist-results-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--faint);text-transform:uppercase;margin-bottom:14px}
-  .dist-row{margin-bottom:12px;border-radius:12px;overflow:hidden;background:var(--navy);border:2px solid transparent;transition:border-color 1s ease}
-  .dist-row.is-correct{border-color:rgba(34,197,94,0.5)}
-  .dist-row-top{display:flex;justify-content:space-between;align-items:center;padding:10px 14px 6px}
-  .dist-row-top-left{display:flex;align-items:center;gap:8px}
-  .dist-letter{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3);transition:all .8s}
-  .dist-row.is-correct .dist-letter{background:rgba(34,197,94,0.2);color:var(--success)}
-  .dist-option{font-size:13px;color:rgba(255,255,255,0.5);transition:color .8s}
-  .dist-row.is-correct .dist-option{color:var(--success);font-weight:600}
-  .dist-pct-text{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;color:var(--primary);opacity:0;transition:opacity .8s}
-  .dist-row.is-correct .dist-pct-text{color:var(--success)}
-  .dist-count{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--faint);margin-left:6px;opacity:0;transition:opacity .8s}
-  .dist-bar-track{height:14px;margin:0 14px 10px;border-radius:7px;background:rgba(255,255,255,0.03);overflow:hidden}
-  .dist-bar-fill{height:100%;border-radius:7px;width:0;transition:width 1.8s cubic-bezier(0.16,1,0.3,1)}
-  .dist-row:not(.is-correct) .dist-bar-fill{background:linear-gradient(90deg,var(--primary),var(--amber));box-shadow:0 0 12px rgba(255,107,26,0.2)}
-  .dist-row.is-correct .dist-bar-fill{background:linear-gradient(90deg,var(--success),#4ADE80);box-shadow:0 0 16px rgba(34,197,94,0.3)}
-
-  /* Phases use opacity only — no height changes */
-  .phase{position:absolute;left:20px;right:20px;transition:opacity .5s}
-  .phase.hidden{opacity:0;pointer-events:none}
-  .phase.visible{opacity:1}
-
-  .step-label{text-align:center;padding:8px 0;margin:4px 0 10px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;opacity:0;transition:opacity .5s}
-  .step-label.show{opacity:1}
-  .step-label.orange{color:var(--primary)}
-  .step-label.green{color:var(--success)}
-
-  .cta{text-align:center;margin-top:56px;padding-top:40px;border-top:1px solid rgba(255,255,255,0.04)}
-  .cta h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:400;line-height:1.4;margin-bottom:8px}
-  .cta h2 strong{color:var(--primary);font-weight:700}
-  .cta p{font-size:14px;color:var(--dim);font-weight:300}
-  .cta .name{color:var(--primary);font-weight:600;margin-top:16px;font-size:15px}
-
-  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-  .fade-in{opacity:0;transform:translateY(20px);transition:opacity .6s,transform .6s}
-  .fade-in.visible{opacity:1;transform:translateY(0)}
-  .section-gap{margin-bottom:72px}
-
-  .cursor-dot{position:absolute;width:40px;height:40px;border-radius:50%;background:rgba(255,107,26,0.15);border:2px solid rgba(255,107,26,0.4);pointer-events:none;z-index:10;opacity:0;transition:top .6s cubic-bezier(.4,0,.2,1),left .6s cubic-bezier(.4,0,.2,1),opacity .3s}
-  .cursor-dot.show{opacity:1}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { height: 100%; overflow: hidden; }
+  body { font-family: 'Outfit', sans-serif; background: #0B1628; color: #fff; -webkit-font-smoothing: antialiased; height: 100%; overflow: hidden; position: fixed; width: 100%; }
+  #root { height: 100%; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: none; }
+  input[type=range] { -webkit-appearance: none; appearance: none; background: transparent; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; border-radius: 50%; background: #FF6B1A; cursor: grab; }
+  input[type=text] { font-family: 'JetBrains Mono', monospace; }
+  ::-webkit-scrollbar { width: 0; background: transparent; }
 </style>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
 </head>
 <body>
-<div class="page">
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
 
-  <div class="header">
-    <div class="for-badge">Built for Alex Epstein</div>
-    <h1>Understand<br><em>Energy</em></h1>
-    <p>Turn your lectures into interactive experiences.<br>Show students how wrong they are — using your data.</p>
-  </div>
+firebase.initializeApp({
+  apiKey: "AIzaSyBGdvZKFdelBMEjQ1YVVG00g9TC_pPGlHk",
+  authDomain: "energytalkingpoints.firebaseapp.com",
+  databaseURL: "https://energytalkingpoints-default-rtdb.firebaseio.com",
+  projectId: "energytalkingpoints",
+  storageBucket: "energytalkingpoints.firebasestorage.app",
+  messagingSenderId: "300789453794",
+  appId: "1:300789453794:web:b454bf042283a48e301fbb"
+});
+const db = firebase.database();
+const PLAYER_ID = "p_" + Math.random().toString(36).slice(2, 10);
+const IS_HOST = new URLSearchParams(window.location.search).has("host");
 
-  <!-- ═══ SOLO ═══ -->
-  <div class="demo-section section-gap fade-in" id="solo-demo">
-    <div class="label">Solo Play</div>
-    <div class="phone" id="solo-phone">
-      <div class="phone-inner">
-        <div class="phone-notch"></div>
-        <div><span class="q-category">Climate</span><span class="q-counter">5 / 10</span></div>
-        <div class="q-icon">🌡️</div>
-        <div class="q-text">Which kills more people globally each year: cold or heat?</div>
-        <div class="step-label orange" id="solo-step1">↓ Player answers</div>
-        <div id="solo-choices">
-          <div class="choice" data-i="0"><span class="choice-letter">A</span> Heat kills 5x more</div>
-          <div class="choice" data-i="1"><span class="choice-letter">B</span> Heat kills 2x more</div>
-          <div class="choice" data-i="2"><span class="choice-letter">C</span> About the same</div>
-          <div class="choice" data-i="3"><span class="choice-letter">D</span> Cold kills 10x more</div>
+const QUESTIONS = [
+  { id:1, category:"ENERGY", question:"What percentage of the world's energy comes from fossil fuels?", type:"slider", min:0, max:100, unit:"%", correctAnswer:80, averageGuess:42, source:"IEA World Energy Outlook 2023", explanation:"Despite decades of investment in renewables, fossil fuels still provide about 80% of global energy. Solar and wind combined provide roughly 4-5%.", insight:"The gap between perception and reality on energy is one of the biggest misconceptions in the modern world.", icon:"⚡" },
+  { id:2, category:"CLIMATE", question:"Since 1920, how much have climate-related disaster deaths declined?", type:"choice", options:["Increased 50%","Stayed about the same","Declined ~50%","Declined ~98%"], correctIndex:3, source:"EM-DAT International Disaster Database", explanation:"Climate-related deaths have plummeted by approximately 98% over the last century — from around 500,000 per year to under 15,000 — even as CO₂ levels rose.", insight:"More CO₂ in the atmosphere, yet 98% fewer climate deaths. Affordable energy is the ultimate climate protection.", icon:"🌍" },
+  { id:3, category:"POVERTY", question:"What percentage of the world lived in extreme poverty in 1800?", type:"slider", min:0, max:100, unit:"%", correctAnswer:90, averageGuess:50, source:"Our World in Data / World Bank", explanation:"In 1800, roughly 90% of humanity lived in extreme poverty. Today it's under 10%. This is the greatest improvement in human living standards in history.", insight:"The single greatest poverty reduction in human history happened during the era of fossil fuel use.", icon:"📊" },
+  { id:4, category:"ENERGY", question:"How many people in the world lack access to reliable electricity?", type:"choice", options:["About 100 million","About 750 million","About 2 billion","About 3.5 billion"], correctIndex:2, source:"IEA / UN", explanation:"Roughly 2 billion people still lack reliable electricity access, and billions more have only intermittent access.", insight:"Energy poverty kills. Access to affordable, reliable energy is the #1 factor in escaping poverty.", icon:"💡" },
+  { id:5, category:"CLIMATE", question:"Which kills more people globally each year: cold or heat?", type:"choice", options:["Heat kills 5x more","Heat kills 2x more","About the same","Cold kills 10x more"], correctIndex:3, source:"The Lancet, 2021 — 68 million deaths studied", explanation:"Cold kills roughly 10 times more people than heat globally.", insight:"The narrative focuses on heat waves, but cold is by far the bigger killer. Affordable heating saves millions of lives.", icon:"🌡️" },
+  { id:6, category:"ECONOMICS", question:"What would it cost to store just 3 days of global energy in batteries?", type:"choice", options:["$5 trillion","$50 trillion","$200 trillion","$500+ trillion"], correctIndex:3, source:"Energy Talking Points / EIA", explanation:"Storing just 3 days of global energy in batteries would cost over $500 trillion at current prices — roughly 5x global GDP.", insight:"The storage problem alone makes a rapid fossil fuel phase-out economically impossible with current technology.", icon:"🔋" },
+  { id:7, category:"ENERGY", question:"What percentage of global energy do solar and wind provide combined?", type:"slider", min:0, max:50, unit:"%", correctAnswer:5, averageGuess:25, source:"BP Statistical Review / IEA", explanation:"Despite massive investment and subsidies, solar and wind combined provide only about 4-5% of total global energy.", insight:"We hear about renewables constantly, yet they provide a tiny fraction of global energy.", icon:"☀️" },
+  { id:8, category:"GEOPOLITICS", question:"How much did Europe's electricity prices increase after expanding wind and solar?", type:"choice", options:["Decreased 20%","Stayed flat","Doubled","Tripled or more"], correctIndex:3, source:"Eurostat", explanation:"Countries that aggressively pursued solar and wind saw electricity prices rise to 2-3x those of countries with reliable energy.", insight:"The promise was cheaper energy. The result was some of the most expensive electricity in the world.", icon:"🇪🇺" },
+  { id:9, category:"CLIMATE", question:"Since 1980, has the area burned by wildfires globally increased or decreased?", type:"choice", options:["Increased dramatically","Increased slightly","Stayed the same","Decreased ~25%"], correctIndex:3, source:"NASA / Royal Society", explanation:"The total global area burned by wildfires has actually decreased by roughly 25% since the early 1980s.", insight:"Headlines show the worst fires. Data shows the global trend is improving.", icon:"🔥" },
+  { id:10, category:"ECONOMICS", question:"Per unit of energy produced, who gets more subsidies: fossil fuels or renewables?", type:"choice", options:["Fossil fuels get 10x more","About equal","Renewables get 10x more","Renewables get 50x+ more"], correctIndex:3, source:"EIA / Energy Talking Points", explanation:"Per unit of energy actually produced, renewable energy receives roughly 50x more in subsidies compared to fossil fuels.", insight:"The 'fossil fuel subsidies' talking point collapses when you look at subsidies per unit of energy delivered.", icon:"💰" },
+  { id:11, category:"CLIMATE", question:"As CO₂ levels have risen, has the Earth gotten greener or browner?", type:"choice", options:["Much browner — deserts are expanding","Slightly browner","No change","Significantly greener"], correctIndex:3, source:"NASA, 2019 — satellite imagery study", explanation:"NASA satellite data shows the Earth has gotten significantly greener over the past 35 years, with CO₂ fertilization being the primary driver.", insight:"More CO₂ has made the planet greener, not browner. This is one of the least-reported climate facts.", icon:"🌿" },
+  { id:12, category:"ENERGY", question:"What percentage of everyday products — plastics, fertilizers, medicines — depend on fossil fuels?", type:"slider", min:0, max:100, unit:"%", correctAnswer:90, averageGuess:45, source:"IEA / American Chemistry Council", explanation:"Over 90% of everyday products including plastics, synthetic fabrics, fertilizers, pharmaceuticals, and medical devices are derived from or manufactured using fossil fuels.", insight:"Fossil fuels don't just power civilization — they are the raw material civilization is made from.", icon:"🧪" },
+  { id:13, category:"POVERTY", question:"What was the average global life expectancy in 1900?", type:"slider", min:20, max:80, unit:" years", correctAnswer:32, averageGuess:55, source:"Our World in Data / Riley 2005", explanation:"In 1900, average global life expectancy was roughly 32 years. Today it exceeds 73 years.", insight:"We more than doubled human lifespan in a single century — powered by cheap, reliable energy.", icon:"❤️" },
+  { id:14, category:"ENERGY", question:"How long does it take to charge a commercial electric truck vs. refueling a diesel truck?", type:"choice", options:["About the same","2x longer for electric","5x longer for electric","Over 100x longer for electric"], correctIndex:3, source:"Energy Talking Points / DOE", explanation:"Refueling a diesel truck takes about 15 minutes. Fully charging a comparable electric truck takes over 10 hours with current infrastructure.", insight:"Electrifying heavy transport isn't just expensive — it's a fundamental energy density problem that batteries haven't solved.", icon:"🚛" },
+  { id:15, category:"CLIMATE", question:"Since 1990, what has happened to global crop yields?", type:"choice", options:["Declined significantly due to climate change","Declined slightly","Stayed about the same","Increased by over 50%"], correctIndex:3, source:"FAO / Our World in Data", explanation:"Global crop yields have increased by over 50% since 1990, driven by fossil-fuel-based fertilizers, mechanized farming, and higher CO₂ levels.", insight:"The world is producing more food than ever — during the very period we're told the climate is destroying agriculture.", icon:"🌾" },
+];
+
+const T={bg:"#0B1628",primary:"#FF6B1A",primaryLight:"#FF8C42",amber:"#FFAA00",flame:"#FF4500",navyLight:"#122240",navyMid:"#1A2D4D",textDim:"rgba(255,255,255,0.5)",textFaint:"rgba(255,255,255,0.25)",cardBg:"rgba(18,34,64,0.6)",cardBorder:"rgba(255,107,26,0.12)",success:"#22C55E",error:"#FF4444"};
+const CATS={ENERGY:{color:"#FF8C42",bg:"rgba(255,140,66,0.12)",label:"Energy"},CLIMATE:{color:"#4A9EFF",bg:"rgba(74,158,255,0.12)",label:"Climate"},POVERTY:{color:"#22C55E",bg:"rgba(34,197,94,0.12)",label:"Poverty"},ECONOMICS:{color:"#FFAA00",bg:"rgba(255,170,0,0.12)",label:"Economics"},GEOPOLITICS:{color:"#A78BFA",bg:"rgba(167,139,250,0.12)",label:"Geopolitics"}};
+const genCode=()=>{const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let r="";for(let i=0;i<5;i++)r+=c[Math.floor(Math.random()*c.length)];return r;};
+const total=QUESTIONS.length;
+
+const pageStyle={minHeight:"100%",background:T.bg,fontFamily:"'Outfit', sans-serif",position:"relative",overflow:"hidden",backgroundImage:"radial-gradient(ellipse at 50% 100%, rgba(255,107,26,0.08) 0%, transparent 50%), radial-gradient(ellipse at 20% 80%, rgba(255,69,0,0.05) 0%, transparent 40%), radial-gradient(ellipse at 80% 90%, rgba(255,170,0,0.04) 0%, transparent 40%)"};
+const flameSvg=<div style={{position:"absolute",bottom:0,left:0,right:0,height:300,pointerEvents:"none",zIndex:0}}><svg width="100%" height="300" viewBox="0 0 800 300" preserveAspectRatio="none" style={{opacity:0.07}}><ellipse cx="400" cy="280" rx="350" ry="120" fill="url(#f1)"/><ellipse cx="300" cy="260" rx="150" ry="100" fill="url(#f2)"/><ellipse cx="550" cy="250" rx="120" ry="90" fill="url(#f3)"/><defs><radialGradient id="f1"><stop stopColor="#FF6B1A"/><stop offset="1" stopColor="transparent"/></radialGradient><radialGradient id="f2"><stop stopColor="#FF4500"/><stop offset="1" stopColor="transparent"/></radialGradient><radialGradient id="f3"><stop stopColor="#FFAA00"/><stop offset="1" stopColor="transparent"/></radialGradient></defs></svg></div>;
+const inputStyle={width:"100%",padding:"16px 20px",borderRadius:12,border:"1px solid rgba(255,255,255,0.08)",background:T.navyLight,color:"#fff",fontSize:16,outline:"none",textAlign:"center"};
+
+function Btn({children,onClick,variant="primary",disabled,style:sx}){
+  const base={border:"none",borderRadius:12,padding:"14px 28px",fontSize:16,fontWeight:600,cursor:disabled?"default":"pointer",fontFamily:"'Outfit', sans-serif",transition:"all 0.3s",opacity:disabled?0.4:1};
+  const s=variant==="primary"?{...base,background:`linear-gradient(135deg, ${T.flame}, ${T.primary})`,color:"#fff",boxShadow:"0 4px 20px rgba(255,107,26,0.25)"}:{...base,background:T.navyLight,color:"rgba(255,255,255,0.6)",border:"1px solid rgba(255,255,255,0.08)"};
+  return <button onClick={onClick} disabled={disabled} style={{...s,...sx}}>{children}</button>;
+}
+
+function AnimBar({label,value,max,color,delay}){
+  const[w,setW]=useState(0);
+  useEffect(()=>{const t=setTimeout(()=>setW((value/max)*100),delay||100);return()=>clearTimeout(t);},[value,max,delay]);
+  return(<div style={{marginBottom:10}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:4,fontSize:13,fontFamily:"'JetBrains Mono', monospace"}}><span style={{color:T.textDim}}>{label}</span><span style={{color,fontWeight:700}}>{value}%</span></div><div style={{height:8,borderRadius:4,background:"rgba(255,255,255,0.05)",overflow:"hidden"}}><div style={{height:"100%",borderRadius:4,background:color,width:`${w}%`,transition:"width 1.2s cubic-bezier(0.16, 1, 0.3, 1)"}}/></div></div>);
+}
+
+function SliderInput({min,max,unit,value,onChange,disabled}){
+  const pct=((value-min)/(max-min))*100;
+  return(
+    <div style={{width:"100%",padding:"20px 0"}}>
+      <div style={{display:"flex",justifyContent:"center",marginBottom:16}}><div style={{fontSize:56,fontWeight:800,fontFamily:"'Playfair Display', Georgia, serif",color:"#fff",textShadow:"0 0 40px rgba(255,107,26,0.4)"}}>{value}{unit}</div></div>
+      <div style={{position:"relative",height:48,display:"flex",alignItems:"center"}}>
+        <div style={{position:"absolute",width:"100%",height:6,borderRadius:3,background:"rgba(255,255,255,0.06)"}}/>
+        <div style={{position:"absolute",width:`${pct}%`,height:6,borderRadius:3,background:`linear-gradient(90deg, ${T.primary}, ${T.amber})`,transition:"width 0.1s"}}/>
+        <input type="range" min={min} max={max} value={value} onChange={e=>onChange(+e.target.value)} disabled={disabled} style={{position:"absolute",width:"100%",height:48,opacity:0,cursor:disabled?"default":"grab",zIndex:2}}/>
+        <div style={{position:"absolute",left:`calc(${pct}% - 14px)`,width:28,height:28,borderRadius:"50%",background:T.primary,boxShadow:"0 0 20px rgba(255,107,26,0.6)",transition:"left 0.1s",pointerEvents:"none",border:"3px solid #fff"}}/>
+      </div>
+      <div style={{display:"flex",justifyContent:"space-between",marginTop:8,fontSize:13,color:T.textFaint,fontFamily:"'JetBrains Mono', monospace"}}><span>{min}{unit}</span><span>{max}{unit}</span></div>
+    </div>
+  );
+}
+
+function ChoiceInput({options,selected,onSelect,disabled,correctIndex,revealed}){
+  return(
+    <div style={{display:"grid",gap:12,width:"100%"}}>
+      {options.map((opt,i)=>{
+        const isSel=selected===i,isCor=i===correctIndex;
+        let bg=T.navyLight,border="1px solid rgba(255,255,255,0.06)",tc="rgba(255,255,255,0.7)";
+        if(revealed&&isCor){bg="rgba(34,197,94,0.15)";border="1px solid rgba(34,197,94,0.5)";tc=T.success;}
+        else if(revealed&&isSel&&!isCor){bg="rgba(255,68,68,0.1)";border="1px solid rgba(255,68,68,0.3)";tc=T.error;}
+        else if(isSel){bg="rgba(255,107,26,0.12)";border="1px solid rgba(255,107,26,0.4)";tc="#fff";}
+        return(
+          <button key={i} onClick={()=>!disabled&&onSelect(i)} disabled={disabled} style={{background:bg,border,borderRadius:12,padding:"16px 20px",color:tc,fontSize:16,fontFamily:"'Outfit', sans-serif",cursor:disabled?"default":"pointer",textAlign:"left",transition:"all 0.3s",display:"flex",alignItems:"center",gap:12}}>
+            <span style={{width:30,height:30,borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,flexShrink:0,fontFamily:"'JetBrains Mono', monospace",background:revealed&&isCor?"rgba(34,197,94,0.2)":revealed&&isSel?"rgba(255,68,68,0.2)":"rgba(255,255,255,0.05)",color:revealed&&isCor?T.success:revealed&&isSel?T.error:"rgba(255,255,255,0.35)"}}>
+              {revealed&&isCor?"✓":revealed&&isSel&&!isCor?"✗":String.fromCharCode(65+i)}
+            </span>{opt}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function ScoreRing({score,total}){
+  const pct=Math.round((score/total)*100),r=58,circ=2*Math.PI*r;
+  const[offset,setOffset]=useState(circ);
+  useEffect(()=>{setTimeout(()=>setOffset(circ-(pct/100)*circ),300);},[pct,circ]);
+  let grade,gc,gl;
+  if(pct>=80){grade="A";gc=T.success;gl="Exceptionally informed";}
+  else if(pct>=60){grade="B";gc="#4A9EFF";gl="Above average awareness";}
+  else if(pct>=40){grade="C";gc=T.amber;gl="Average — room to grow";}
+  else if(pct>=20){grade="D";gc=T.primary;gl="Below average — you're not alone";}
+  else{grade="F";gc=T.error;gl="Energy is very different from what you think";}
+  return(
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:16}}>
+      <div style={{position:"relative",width:140,height:140}}>
+        <svg width="140" height="140" style={{transform:"rotate(-90deg)"}}><circle cx="70" cy="70" r={r} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="8"/><circle cx="70" cy="70" r={r} fill="none" stroke={gc} strokeWidth="8" strokeDasharray={circ} strokeDashoffset={offset} strokeLinecap="round" style={{transition:"stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1)"}}/></svg>
+        <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}><div style={{fontSize:36,fontWeight:800,color:gc,fontFamily:"'Playfair Display', Georgia, serif"}}>{grade}</div><div style={{fontSize:14,color:T.textDim,fontFamily:"'JetBrains Mono', monospace"}}>{score}/{total}</div></div>
+      </div>
+      <div style={{fontSize:15,color:"rgba(255,255,255,0.55)",textAlign:"center"}}>{gl}</div>
+    </div>
+  );
+}
+
+function DistributionChart({answers,correctAnswer,type,options,unit}){
+  if(type==="slider"){
+    const buckets=Array(10).fill(0),vals=Object.values(answers||{});
+    vals.forEach(v=>{buckets[Math.min(Math.floor(v/10),9)]++;});
+    const maxB=Math.max(...buckets,1),cb=Math.min(Math.floor(correctAnswer/10),9);
+    return(
+      <div>
+        <div style={{fontSize:12,letterSpacing:3,color:T.textFaint,marginBottom:12,fontFamily:"'JetBrains Mono', monospace",textTransform:"uppercase"}}>Audience Distribution ({vals.length} responses)</div>
+        <div style={{display:"flex",alignItems:"flex-end",gap:4,height:140,marginBottom:4}}>
+          {buckets.map((b,i)=>(
+            <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",height:"100%",justifyContent:"flex-end"}}>
+              {b>0&&<div style={{fontSize:12,color:i===cb?T.success:T.primaryLight,fontFamily:"'JetBrains Mono', monospace",marginBottom:4,fontWeight:700}}>{b}</div>}
+              <div style={{width:"100%",borderRadius:"4px 4px 0 0",transition:"height 1s cubic-bezier(0.16,1,0.3,1)",height:`${(b/maxB)*90}%`,minHeight:b>0?4:0,background:i===cb?`linear-gradient(180deg, ${T.success}, rgba(34,197,94,0.4))`:`linear-gradient(180deg, ${T.primary}, rgba(255,107,26,0.3))`,boxShadow:i===cb?"0 0 15px rgba(34,197,94,0.3)":b>0?"0 0 10px rgba(255,107,26,0.15)":"none"}}/>
+            </div>
+          ))}
         </div>
-        <div class="step-label green" id="solo-step2">↓ Reality revealed</div>
-        <div class="result-panel" id="solo-result">
-          <div class="result-explanation">Cold kills roughly 10 times more people than heat globally. A Lancet study covering 68 million deaths found cold-related mortality vastly exceeds heat.</div>
-          <div class="result-insight">💡 The narrative focuses on heat waves, but cold is by far the bigger killer.</div>
-          <div class="result-source">Source: The Lancet, 2021</div>
-        </div>
-        <div class="cursor-dot" id="solo-cursor"></div>
+        <div style={{display:"flex",gap:4}}>{buckets.map((_,i)=><div key={i} style={{flex:1,textAlign:"center",fontSize:10,color:i===cb?T.success:T.textFaint,fontFamily:"'JetBrains Mono', monospace",fontWeight:i===cb?700:400}}>{i*10}</div>)}</div>
+        <div style={{textAlign:"center",marginTop:16}}><div style={{padding:"10px 16px",borderRadius:8,background:"rgba(34,197,94,0.08)",border:"1px solid rgba(34,197,94,0.2)",display:"inline-block"}}><span style={{fontSize:13,color:T.success,fontFamily:"'JetBrains Mono', monospace",fontWeight:700}}>✓ Correct answer: {correctAnswer}{unit}</span></div></div>
+        <div style={{display:"flex",justifyContent:"center",marginTop:8,gap:16,fontSize:12}}><span style={{color:T.primary}}>■ Audience guesses</span></div>
+      </div>
+    );
+  }
+  const counts=Array(options.length).fill(0),vals=Object.values(answers||{});
+  vals.forEach(v=>{if(v>=0&&v<options.length)counts[v]++;});
+  return(
+    <div>
+      <div style={{fontSize:12,letterSpacing:3,color:T.textFaint,marginBottom:12,fontFamily:"'JetBrains Mono', monospace",textTransform:"uppercase"}}>Audience Responses ({vals.length} players)</div>
+      <div style={{display:"grid",gap:8}}>
+        {options.map((opt,i)=>{
+          const isCor=i===correctAnswer,pct=vals.length>0?Math.round((counts[i]/vals.length)*100):0;
+          return(
+            <div key={i} style={{position:"relative",borderRadius:10,overflow:"hidden",background:isCor?"rgba(34,197,94,0.08)":T.navyLight,border:isCor?`2px solid ${T.success}`:"2px solid transparent",opacity:isCor?1:0.7}}>
+              <div style={{position:"absolute",top:0,left:0,bottom:0,borderRadius:8,width:`${pct}%`,transition:"width 1.2s cubic-bezier(0.16,1,0.3,1)",background:isCor?"rgba(34,197,94,0.2)":"rgba(255,107,26,0.08)"}}/>
+              <div style={{position:"relative",padding:"12px 16px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <div style={{display:"flex",alignItems:"center",gap:10}}>
+                  <span style={{width:isCor?30:26,height:isCor?30:26,borderRadius:6,display:"flex",alignItems:"center",justifyContent:"center",fontSize:isCor?16:12,fontWeight:700,fontFamily:"'JetBrains Mono', monospace",background:isCor?"rgba(34,197,94,0.3)":"rgba(255,255,255,0.05)",color:isCor?T.success:"rgba(255,255,255,0.35)"}}>{isCor?"✓":String.fromCharCode(65+i)}</span>
+                  <div>
+                    <span style={{fontSize:isCor?15:14,color:isCor?T.success:"rgba(255,255,255,0.5)",fontWeight:isCor?700:400}}>{opt}</span>
+                    {isCor&&<div style={{fontSize:10,letterSpacing:2,color:T.success,fontFamily:"'JetBrains Mono', monospace",fontWeight:700,marginTop:2}}>CORRECT ANSWER</div>}
+                  </div>
+                </div>
+                <div style={{display:"flex",alignItems:"center",gap:8}}>
+                  <span style={{fontSize:isCor?24:18,fontWeight:800,fontFamily:"'JetBrains Mono', monospace",color:isCor?T.success:T.primaryLight}}>{pct}%</span>
+                  <span style={{fontSize:11,color:T.textFaint,fontFamily:"'JetBrains Mono', monospace"}}>({counts[i]})</span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
-  </div>
+  );
+}
 
-  <!-- ═══ CLASSROOM ═══ -->
-  <div class="demo-section section-gap fade-in" id="classroom-demo">
-    <div class="label">Classroom Mode — Live on Stage</div>
-    <div class="phone wide" id="class-phone">
-      <div class="phone-inner">
-        <div class="phone-notch"></div>
-        <div class="classroom-header">
-          <div><span class="q-category">Climate</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--faint);margin-left:10px">Q2 / 10</span></div>
-          <div class="live-badge"><div class="live-dot"></div><span class="live-text">16 students</span></div>
-        </div>
-        <div class="q-icon">🌍</div>
-        <div class="q-text" style="font-size:17px">Since 1920, how much have climate-related disaster deaths changed?</div>
+function PlayerCount({count}){
+  return(
+    <div style={{display:"inline-flex",alignItems:"center",gap:8,padding:"6px 14px",borderRadius:20,background:"rgba(34,197,94,0.1)",border:"1px solid rgba(34,197,94,0.2)"}}>
+      <div style={{width:8,height:8,borderRadius:"50%",background:T.success,boxShadow:"0 0 8px rgba(34,197,94,0.5)",animation:"pulse 1.5s ease infinite"}}/>
+      <span style={{fontSize:13,color:T.success,fontFamily:"'JetBrains Mono', monospace",fontWeight:600}}>{count} player{count!==1?"s":""}</span>
+      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
+    </div>
+  );
+}
 
-        <!-- Wrapper to contain absolute phases -->
-        <div style="position:relative;min-height:600px">
-          <div class="phase visible" id="class-p1">
-            <div class="step-label orange show">Students answering on their phones...</div>
-            <div class="students" id="student-grid"></div>
-            <div class="answer-counter"><div class="big" id="class-counter">0/16</div><div class="sub">responses received</div></div>
+function App(){
+  const[screen,setScreen]=useState("home");
+  const[soloQ,setSoloQ]=useState(0);
+  const[soloAnswers,setSoloAnswers]=useState({});
+  const[soloScore,setSoloScore]=useState(0);
+  const[soloRevealed,setSoloRevealed]=useState(false);
+  const[soloAnim,setSoloAnim]=useState(true);
+  const[sliderVal,setSliderVal]=useState(50);
+  const[choiceVal,setChoiceVal]=useState(null);
+  const[roomCode,setRoomCode]=useState("");
+  const[roomData,setRoomData]=useState(null);
+  const[playerName,setPlayerName]=useState("");
+  const[joinCode,setJoinCode]=useState("");
+  const[playerAnswer,setPlayerAnswer]=useState(null);
+  const[playerSlider,setPlayerSlider]=useState(50);
+  const[playerSubmitted,setPlayerSubmitted]=useState(false);
+  const roomRef=useRef(null);
+  const listenerRef=useRef(null);
+  const prevQ=useRef(null);
+
+  const listenToRoom=useCallback((code)=>{
+    if(listenerRef.current)listenerRef.current();
+    const ref=db.ref("rooms/"+code);
+    roomRef.current=ref;
+    const cb=ref.on("value",snap=>{const d=snap.val();if(d)setRoomData(d);});
+    listenerRef.current=()=>ref.off("value",cb);
+  },[]);
+
+  useEffect(()=>{return()=>{if(listenerRef.current)listenerRef.current();};},[]);
+
+  useEffect(()=>{
+    if(roomData&&roomData.currentQ!==prevQ.current){
+      prevQ.current=roomData.currentQ;
+      setPlayerAnswer(null);
+      const q=QUESTIONS[roomData.currentQ];
+      setPlayerSlider(q?Math.round((q.min+q.max)/2):50);
+      setPlayerSubmitted(false);
+    }
+  },[roomData?.currentQ]);
+
+  const createRoom=()=>{
+    const code=genCode();
+    const ref=db.ref("rooms/"+code);
+    ref.set({phase:"lobby",currentQ:0,revealed:false,transition:null,players:{},answers:{}});
+    setRoomCode(code);
+    listenToRoom(code);
+    setScreen("host-lobby");
+  };
+  const hostStart=()=>{roomRef.current.update({phase:"question",currentQ:0,revealed:false,transition:null});setScreen("host-game");};
+  const hostReveal=()=>{
+    roomRef.current.update({transition:"revealing"});
+    setTimeout(()=>{roomRef.current.update({revealed:true,transition:null});},3000);
+  };
+  const hostNext=()=>{
+    const nextQ=(roomData?.currentQ||0)+1;
+    roomRef.current.update({transition:"nextQ"});
+    setTimeout(()=>{
+      if(nextQ<total)roomRef.current.update({currentQ:nextQ,revealed:false,transition:null});
+      else roomRef.current.update({phase:"finished",transition:null});
+    },2000);
+  };
+  const hostEnd=()=>{if(roomRef.current)roomRef.current.remove();if(listenerRef.current)listenerRef.current();setRoomData(null);setScreen("home");};
+
+  const joinRoom=()=>{
+    const code=joinCode.toUpperCase().trim();
+    if(!code||!playerName.trim())return;
+    const ref=db.ref("rooms/"+code);
+    ref.once("value").then(snap=>{
+      if(snap.exists()){
+        ref.child("players/"+PLAYER_ID).set({name:playerName.trim()});
+        setRoomCode(code);
+        listenToRoom(code);
+        setScreen("player-game");
+      }else{alert("Room not found.");}
+    });
+  };
+
+  const playerSubmitAnswer=()=>{
+    if(!roomData||playerSubmitted)return;
+    const q=QUESTIONS[roomData.currentQ];
+    const val=q.type==="slider"?playerSlider:playerAnswer;
+    if(val===null)return;
+    roomRef.current.child("answers/"+roomData.currentQ+"/"+PLAYER_ID).set(val);
+    setPlayerSubmitted(true);
+  };
+
+  const soloReset=(idx)=>{const nq=QUESTIONS[idx];setSoloAnim(false);setTimeout(()=>{setSoloQ(idx);setSoloRevealed(false);setChoiceVal(null);if(nq.type==="slider")setSliderVal(Math.round((nq.min+nq.max)/2));setSoloAnim(true);},300);};
+  const soloSubmit=()=>{setSoloRevealed(true);const q=QUESTIONS[soloQ];let pts=0;if(q.type==="slider"){const d=Math.abs(sliderVal-q.correctAnswer);if(d<=5)pts=3;else if(d<=15)pts=2;else if(d<=25)pts=1;}else if(choiceVal===q.correctIndex)pts=3;setSoloScore(s=>s+pts);setSoloAnswers(a=>({...a,[q.id]:pts}));};
+  const soloNext=()=>{if(soloQ<total-1)soloReset(soloQ+1);else setScreen("solo-results");};
+  const soloRestart=()=>{setSoloScore(0);setSoloAnswers({});soloReset(0);setScreen("solo");};
+
+  // ═══ HOME ═══
+  if(screen==="home"){
+    return(
+      <div style={{...pageStyle,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24}}>
+        {flameSvg}
+        <div style={{textAlign:"center",maxWidth:560,position:"relative",zIndex:1}}>
+          <div style={{fontSize:11,letterSpacing:6,color:T.primary,marginBottom:28,fontFamily:"'JetBrains Mono', monospace",textTransform:"uppercase",opacity:0.8}}>How well do you understand</div>
+          <h1 style={{fontSize:"clamp(44px, 9vw, 76px)",fontWeight:800,color:"#fff",fontFamily:"'Playfair Display', Georgia, serif",lineHeight:1.05,margin:"0 0 8px",textShadow:"0 2px 40px rgba(255,107,26,0.15)"}}>Understand</h1>
+          <h1 style={{fontSize:"clamp(44px, 9vw, 76px)",fontWeight:700,fontFamily:"'Playfair Display', Georgia, serif",lineHeight:1.05,margin:"0 0 12px",background:`linear-gradient(135deg, ${T.primary}, ${T.amber}, ${T.flame})`,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",filter:"drop-shadow(0 0 30px rgba(255,107,26,0.3))"}}><em>Energy</em></h1>
+          <div style={{width:60,height:3,margin:"24px auto",background:`linear-gradient(90deg, transparent, ${T.primary}, transparent)`,borderRadius:2}}/>
+          <p style={{fontSize:17,color:"rgba(255,255,255,0.4)",lineHeight:1.7,margin:"24px auto 20px",maxWidth:440,fontWeight:300}}>Most people score worse than random guessing on basic questions about energy, climate, poverty, and economics.</p>
+          <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap",marginBottom:40}}>
+            {Object.values(CATS).map(c=><span key={c.label} style={{padding:"6px 14px",borderRadius:20,fontSize:12,background:c.bg,color:c.color,border:`1px solid ${c.color}20`,fontFamily:"'JetBrains Mono', monospace",fontWeight:500}}>{c.label}</span>)}
           </div>
+          <button onClick={()=>{soloReset(0);setSoloScore(0);setSoloAnswers({});setScreen("solo");}} style={{background:`linear-gradient(135deg, ${T.flame}, ${T.primary}, ${T.amber})`,border:"none",borderRadius:14,padding:"20px 56px",color:"#fff",fontSize:19,fontWeight:700,cursor:"pointer",fontFamily:"'Outfit', sans-serif",boxShadow:"0 4px 30px rgba(255,107,26,0.3), 0 0 60px rgba(255,69,0,0.15)",display:"block",margin:"0 auto"}}>
+            Test Your Knowledge →
+          </button>
+          <div style={{marginTop:12,fontSize:13,color:T.textFaint,fontFamily:"'JetBrains Mono', monospace"}}>{total} questions · ~8 minutes</div>
+          {IS_HOST?(
+            <div style={{marginTop:16}}>
+              <button onClick={()=>setScreen("classroom-menu")} style={{background:"linear-gradient(135deg, #22C55E, #16A34A)",border:"none",borderRadius:14,padding:"20px 56px",color:"#fff",fontSize:19,fontWeight:700,cursor:"pointer",fontFamily:"'Outfit', sans-serif",boxShadow:"0 4px 30px rgba(34,197,94,0.25), 0 0 60px rgba(34,197,94,0.1)",display:"block",margin:"0 auto"}}>
+                Classroom Mode
+              </button>
+            </div>
+          ):(
+            <div style={{marginTop:40,maxWidth:360,margin:"40px auto 0"}}>
+              <div style={{padding:"24px",borderRadius:16,background:T.cardBg,border:`1px solid ${T.cardBorder}`}}>
+                <div style={{fontSize:15,fontWeight:600,color:"#fff",marginBottom:4}}>Join a live session</div>
+                <div style={{fontSize:13,color:T.textDim,marginBottom:16}}>Enter the code shown on screen</div>
+                <input type="text" placeholder="ROOM CODE" value={joinCode} onChange={e=>setJoinCode(e.target.value.toUpperCase())} maxLength={5} style={{...inputStyle,letterSpacing:6,fontSize:20,textTransform:"uppercase",marginBottom:10}}/>
+                <input type="text" placeholder="Your name" value={playerName} onChange={e=>setPlayerName(e.target.value)} maxLength={20} style={{...inputStyle,textAlign:"left",fontSize:15,marginBottom:12}}/>
+                <Btn onClick={joinRoom} disabled={!joinCode.trim()||!playerName.trim()} style={{width:"100%",padding:"14px"}}>Join →</Btn>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
-          <div class="phase hidden" id="class-p2">
-            <div class="step-label green show">Results revealed to the room</div>
-            <div class="students" id="student-grid-2"></div>
-            <div class="dist-results-label">Classroom responses — 16 students</div>
-            <div class="dist-row" id="d0"><div class="dist-row-top"><div class="dist-row-top-left"><span class="dist-letter">A</span><span class="dist-option">Increased 50%</span></div><div style="display:flex;align-items:baseline"><span class="dist-pct-text" id="d0p">38%</span><span class="dist-count" id="d0c">(6)</span></div></div><div class="dist-bar-track"><div class="dist-bar-fill" id="d0b"></div></div></div>
-            <div class="dist-row" id="d1"><div class="dist-row-top"><div class="dist-row-top-left"><span class="dist-letter">B</span><span class="dist-option">Stayed the same</span></div><div style="display:flex;align-items:baseline"><span class="dist-pct-text" id="d1p">31%</span><span class="dist-count" id="d1c">(5)</span></div></div><div class="dist-bar-track"><div class="dist-bar-fill" id="d1b"></div></div></div>
-            <div class="dist-row" id="d2"><div class="dist-row-top"><div class="dist-row-top-left"><span class="dist-letter">C</span><span class="dist-option">Declined ~50%</span></div><div style="display:flex;align-items:baseline"><span class="dist-pct-text" id="d2p">19%</span><span class="dist-count" id="d2c">(3)</span></div></div><div class="dist-bar-track"><div class="dist-bar-fill" id="d2b"></div></div></div>
-            <div class="dist-row is-correct" id="d3"><div class="dist-row-top"><div class="dist-row-top-left"><span class="dist-letter">✓</span><span class="dist-option">Declined ~98%</span></div><div style="display:flex;align-items:baseline"><span class="dist-pct-text" id="d3p">12%</span><span class="dist-count" id="d3c">(2)</span></div></div><div class="dist-bar-track"><div class="dist-bar-fill" id="d3b"></div></div></div>
-            <div id="class-insight" style="margin-top:16px;padding:12px 16px;border-radius:10px;background:rgba(255,107,26,0.06);border-left:3px solid var(--primary);opacity:0;transition:opacity .8s">
-              <div style="font-size:14px;color:#FF8C42;line-height:1.5;font-weight:500">💡 More CO₂, yet 98% fewer climate deaths. Energy is the ultimate climate protection.</div>
-              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--faint);margin-top:8px">Source: EM-DAT International Disaster Database</div>
+  // ═══ CLASSROOM MENU ═══
+  if(screen==="classroom-menu"){
+    return(
+      <div style={{...pageStyle,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24}}>
+        {flameSvg}
+        <div style={{maxWidth:440,width:"100%",position:"relative",zIndex:1,textAlign:"center"}}>
+          <button onClick={()=>setScreen("home")} style={{background:"none",border:"none",color:T.textFaint,cursor:"pointer",fontSize:14,padding:0,marginBottom:32,display:"block"}}>← Back</button>
+          <h2 style={{fontFamily:"'Playfair Display', Georgia, serif",fontSize:28,color:"#fff",margin:"0 0 8px"}}>Host a Session</h2>
+          <p style={{fontSize:15,color:T.textDim,margin:"0 0 40px",lineHeight:1.6,fontWeight:300}}>Create a room code for your audience to join on their phones.</p>
+          <Btn onClick={createRoom} style={{padding:"18px 56px",fontSize:18}}>Create Room</Btn>
+        </div>
+      </div>
+    );
+  }
+
+  // ═══ SOLO ═══
+  if(screen==="solo"){
+    const q=QUESTIONS[soloQ],cat=CATS[q.category],canSub=q.type==="choice"?choiceVal!==null:true;
+    return(
+      <div style={{...pageStyle,display:"flex",flexDirection:"column",alignItems:"center",padding:"32px 24px 48px"}}>
+        {flameSvg}
+        <div style={{maxWidth:520,width:"100%",marginBottom:32,position:"relative",zIndex:1}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+            <div style={{display:"flex",alignItems:"center",gap:12}}>
+              <button onClick={()=>setScreen("home")} style={{background:"none",border:"none",color:T.textFaint,cursor:"pointer",fontSize:14,padding:0}}>←</button>
+              <span style={{padding:"5px 14px",borderRadius:20,fontSize:12,background:cat.bg,color:cat.color,border:`1px solid ${cat.color}20`,fontFamily:"'JetBrains Mono', monospace"}}>{cat.label}</span>
+            </div>
+            <span style={{fontSize:13,color:T.textFaint,fontFamily:"'JetBrains Mono', monospace"}}>{soloQ+1} / {total}</span>
+          </div>
+          <div style={{height:3,borderRadius:2,background:"rgba(255,255,255,0.05)",overflow:"hidden"}}><div style={{height:"100%",background:`linear-gradient(90deg, ${T.flame}, ${T.primary}, ${T.amber})`,width:`${((soloQ+(soloRevealed?1:0))/total)*100}%`,transition:"width 0.6s"}}/></div>
+        </div>
+        <div style={{maxWidth:520,width:"100%",position:"relative",zIndex:1,opacity:soloAnim?1:0,transform:soloAnim?"translateY(0)":"translateY(20px)",transition:"opacity 0.4s, transform 0.4s"}}>
+          <div style={{fontSize:36,marginBottom:16,textAlign:"center"}}>{q.icon}</div>
+          <h2 style={{fontFamily:"'Playfair Display', Georgia, serif",fontSize:"clamp(22px, 4vw, 28px)",color:"#fff",fontWeight:400,textAlign:"center",lineHeight:1.4,margin:"0 0 32px"}}>{q.question}</h2>
+          {q.type==="slider"&&<SliderInput min={q.min} max={q.max} unit={q.unit} value={sliderVal} onChange={setSliderVal} disabled={soloRevealed}/>}
+          {q.type==="choice"&&<ChoiceInput options={q.options} selected={choiceVal} onSelect={setChoiceVal} disabled={soloRevealed} correctIndex={q.correctIndex} revealed={soloRevealed}/>}
+          {!soloRevealed?(
+            <Btn onClick={soloSubmit} disabled={!canSub} style={{width:"100%",marginTop:24,padding:"16px"}}>Lock In Answer</Btn>
+          ):(
+            <div style={{marginTop:32,padding:24,borderRadius:16,background:T.cardBg,border:`1px solid ${T.cardBorder}`}}>
+              {q.type==="slider"&&<div style={{marginBottom:20}}><AnimBar label="Your guess" value={sliderVal} max={q.max} color={T.error} delay={200}/><AnimBar label="Average guess" value={q.averageGuess} max={q.max} color="rgba(255,255,255,0.2)" delay={400}/><AnimBar label="Reality" value={q.correctAnswer} max={q.max} color={T.success} delay={600}/></div>}
+              <p style={{fontSize:15,color:"rgba(255,255,255,0.65)",lineHeight:1.7,margin:"0 0 16px",fontWeight:300}}>{q.explanation}</p>
+              <div style={{padding:"12px 16px",borderRadius:8,marginBottom:16,background:"rgba(255,107,26,0.06)",borderLeft:`3px solid ${T.primary}`}}><div style={{fontSize:14,color:T.primaryLight,lineHeight:1.6,fontWeight:500}}>💡 {q.insight}</div></div>
+              <div style={{fontSize:12,color:T.textFaint,fontFamily:"'JetBrains Mono', monospace"}}>Source: {q.source}</div>
+              <Btn onClick={soloNext} style={{width:"100%",marginTop:20,padding:"16px"}}>{soloQ<total-1?"Next Question →":"See Your Results →"}</Btn>
+            </div>
+          )}
+          <div style={{display:"flex",justifyContent:"center",marginTop:24,gap:6}}>
+            {QUESTIONS.map((_,i)=><div key={i} style={{width:i===soloQ?24:8,height:8,borderRadius:4,background:soloAnswers[QUESTIONS[i].id]!==undefined?soloAnswers[QUESTIONS[i].id]>=2?T.success:soloAnswers[QUESTIONS[i].id]>=1?T.amber:T.error:i===soloQ?T.primary:"rgba(255,255,255,0.06)",transition:"all 0.3s",boxShadow:i===soloQ?"0 0 8px rgba(255,107,26,0.4)":"none"}}/>)}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if(screen==="solo-results"){
+    const maxScore=total*3,cats={};
+    QUESTIONS.forEach(q=>{if(!cats[q.category])cats[q.category]={c:0,t:0};cats[q.category].t+=3;cats[q.category].c+=soloAnswers[q.id]||0;});
+    return(
+      <div style={{...pageStyle,display:"flex",flexDirection:"column",alignItems:"center",padding:"48px 24px"}}>
+        {flameSvg}
+        <div style={{maxWidth:480,width:"100%",textAlign:"center",position:"relative",zIndex:1}}>
+          <div style={{fontSize:11,letterSpacing:6,color:T.primary,marginBottom:12,fontFamily:"'JetBrains Mono', monospace",textTransform:"uppercase"}}>Your Results</div>
+          <h2 style={{fontFamily:"'Playfair Display', Georgia, serif",fontSize:34,color:"#fff",fontWeight:400,margin:"0 0 40px"}}>How well do you<br/><em style={{background:`linear-gradient(135deg, ${T.primary}, ${T.amber})`,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>understand energy?</em></h2>
+          <ScoreRing score={soloScore} total={maxScore}/>
+          <div style={{marginTop:40,textAlign:"left"}}>
+            <div style={{fontSize:11,letterSpacing:4,color:T.textFaint,marginBottom:16,fontFamily:"'JetBrains Mono', monospace",textTransform:"uppercase"}}>By Category</div>
+            {Object.entries(cats).map(([k,v])=><AnimBar key={k} label={CATS[k].label} value={Math.round((v.c/v.t)*100)} max={100} color={CATS[k].color} delay={300}/>)}
+          </div>
+          <div style={{marginTop:32,padding:20,borderRadius:12,background:"rgba(255,107,26,0.03)",border:"1px solid rgba(255,107,26,0.1)",textAlign:"left"}}>
+            <div style={{fontSize:14,color:"rgba(255,255,255,0.5)",lineHeight:1.7,fontWeight:300}}>Don't worry — most people score poorly. <strong style={{color:T.primary,fontWeight:600}}>Understanding energy starts with discovering what you got wrong.</strong></div>
+          </div>
+          <div style={{display:"flex",gap:12,marginTop:32,justifyContent:"center"}}><Btn onClick={soloRestart}>Play Again</Btn><Btn variant="secondary" onClick={()=>setScreen("home")}>Home</Btn></div>
+        </div>
+      </div>
+    );
+  }
+
+  // ═══ HOST LOBBY ═══
+  if(screen==="host-lobby"){
+    const players=roomData?.players||{};const pc=Object.keys(players).length;
+    return(
+      <div style={{...pageStyle,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24}}>
+        {flameSvg}
+        <div style={{maxWidth:600,width:"100%",textAlign:"center",position:"relative",zIndex:1}}>
+          <h2 style={{fontFamily:"'Playfair Display', Georgia, serif",fontSize:34,color:"#fff",margin:"0 0 32px"}}>Understand <em style={{color:T.primary}}>Energy</em></h2>
+          <div style={{padding:32,borderRadius:20,background:T.cardBg,border:`1px solid ${T.cardBorder}`,marginBottom:32}}>
+            <div style={{fontSize:13,color:T.textDim,marginBottom:12,fontFamily:"'JetBrains Mono', monospace"}}>Share this code with your audience:</div>
+            <div style={{fontSize:72,fontWeight:800,fontFamily:"'JetBrains Mono', monospace",color:"#fff",letterSpacing:12,textShadow:"0 0 40px rgba(255,107,26,0.4)"}}>{roomCode}</div>
+            <div style={{marginTop:20}}><PlayerCount count={pc}/></div>
+            <div style={{marginTop:16,display:"flex",flexWrap:"wrap",gap:6,justifyContent:"center"}}>
+              {Object.values(players).map((p,i)=><span key={i} style={{padding:"3px 10px",borderRadius:12,background:"rgba(255,255,255,0.05)",color:T.textDim,fontSize:12}}>{p.name}</span>)}
             </div>
           </div>
+          <Btn onClick={hostStart} disabled={pc<1} style={{padding:"18px 48px",fontSize:18}}>Start Quiz ({total} questions) →</Btn>
+          <div style={{marginTop:16}}><button onClick={hostEnd} style={{background:"none",border:"none",color:T.textDim,cursor:"pointer",fontSize:14}}>← Cancel</button></div>
         </div>
-
       </div>
-    </div>
-  </div>
+    );
+  }
 
-  <div class="cta fade-in">
-    <h2>Turn your Energy Talking Points into<br><strong>interactive proof your audience won't forget.</strong></h2>
-    <p>Working prototype ready. 10 questions. Solo + classroom mode.</p>
-    <div class="name">Rezdar — Rezdar Digital</div>
-  </div>
-</div>
+  // ═══ HOST GAME ═══
+  if(screen==="host-game"&&roomData){
+    if(roomData.phase==="finished"){
+      const players=roomData?.players||{};
+      return(
+        <div style={{...pageStyle,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24}}>
+          {flameSvg}
+          <div style={{maxWidth:560,width:"100%",textAlign:"center",position:"relative",zIndex:1}}>
+            <div style={{fontSize:64,marginBottom:16}}>🎓</div>
+            <h2 style={{fontFamily:"'Playfair Display', Georgia, serif",fontSize:38,color:"#fff",margin:"0 0 16px"}}>Session <em style={{color:T.primary}}>Complete</em></h2>
+            <p style={{color:T.textDim,fontSize:16,lineHeight:1.7,margin:"0 0 32px"}}>{Object.keys(players).length} participants completed {total} questions.</p>
+            <div style={{display:"flex",gap:12,justifyContent:"center"}}><Btn onClick={createRoom}>New Session</Btn><Btn variant="secondary" onClick={hostEnd}>Home</Btn></div>
+          </div>
+        </div>
+      );
+    }
+    const q=QUESTIONS[roomData.currentQ],cat=CATS[q.category];
+    const players=roomData?.players||{},pc=Object.keys(players).length;
+    const qa=roomData?.answers?.[roomData.currentQ]||{},ac=Object.keys(qa).length;
+    const allIn=ac>=pc&&pc>0;
+    return(
+      <div style={{...pageStyle,display:"flex",flexDirection:"column",alignItems:"center",padding:"32px 24px"}}>
+        {flameSvg}
+        <div style={{maxWidth:700,width:"100%",position:"relative",zIndex:1}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20,flexWrap:"wrap",gap:8}}>
+            <div style={{display:"flex",gap:12,alignItems:"center"}}>
+              <button onClick={hostEnd} style={{background:"none",border:"none",color:T.textFaint,cursor:"pointer",fontSize:14,padding:0}}>←</button>
+              <span style={{padding:"5px 14px",borderRadius:20,fontSize:12,background:cat.bg,color:cat.color,fontFamily:"'JetBrains Mono', monospace"}}>{cat.label}</span>
+              <span style={{fontSize:13,color:T.textFaint,fontFamily:"'JetBrains Mono', monospace"}}>Q{roomData.currentQ+1}/{total}</span>
+            </div>
+            <div style={{display:"flex",gap:12,alignItems:"center"}}>
+              <PlayerCount count={pc}/>
+              <div style={{padding:"6px 14px",borderRadius:20,background:allIn?"rgba(34,197,94,0.1)":"rgba(255,107,26,0.1)",border:allIn?"1px solid rgba(34,197,94,0.2)":"1px solid rgba(255,107,26,0.2)"}}>
+                <span style={{fontSize:13,color:allIn?T.success:T.primary,fontFamily:"'JetBrains Mono', monospace",fontWeight:600}}>{ac}/{pc} answered</span>
+              </div>
+            </div>
+          </div>
+          <div style={{height:4,borderRadius:2,background:"rgba(255,255,255,0.05)",overflow:"hidden",marginBottom:32}}><div style={{height:"100%",background:`linear-gradient(90deg, ${T.flame}, ${T.primary}, ${T.amber})`,width:`${((roomData.currentQ+(roomData.revealed?1:0))/total)*100}%`,transition:"width 0.6s"}}/></div>
+          <div style={{textAlign:"center",marginBottom:32}}>
+            <div style={{fontSize:48,marginBottom:16}}>{q.icon}</div>
+            <h2 style={{fontFamily:"'Playfair Display', Georgia, serif",fontSize:"clamp(26px, 4vw, 36px)",color:"#fff",fontWeight:400,lineHeight:1.35,margin:0}}>{q.question}</h2>
+          </div>
+          {roomData.transition==="revealing"?(
+            <div style={{textAlign:"center",padding:"60px 0"}}>
+              <style>{`
+                @keyframes revealRing{0%{stroke-dashoffset:283}100%{stroke-dashoffset:0}}
+                @keyframes revealFade{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}
+                @keyframes revealGlow{0%,100%{opacity:0.4}50%{opacity:1}}
+              `}</style>
+              <div style={{position:"relative",width:120,height:120,margin:"0 auto 32px"}}>
+                <svg width="120" height="120" style={{transform:"rotate(-90deg)"}}><circle cx="60" cy="60" r="45" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="6"/><circle cx="60" cy="60" r="45" fill="none" stroke={T.primary} strokeWidth="6" strokeLinecap="round" strokeDasharray="283" style={{animation:"revealRing 2.8s ease-in-out forwards"}}/></svg>
+                <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                  <div style={{width:12,height:12,borderRadius:"50%",background:T.primary,boxShadow:"0 0 20px rgba(255,107,26,0.6)",animation:"revealGlow 1s ease infinite"}}/>
+                </div>
+              </div>
+              <div style={{fontFamily:"'Playfair Display', Georgia, serif",fontSize:24,color:"#fff",marginBottom:8,animation:"revealFade 0.5s ease forwards"}}>Revealing results</div>
+              <div style={{fontSize:14,color:T.textDim,animation:"revealFade 0.5s ease 0.3s both"}}>How did the audience answer?</div>
+            </div>
+          ):roomData.transition==="nextQ"?(
+            <div style={{textAlign:"center",padding:"60px 0"}}>
+              <style>{`
+                @keyframes nextSlide{0%{opacity:0;transform:scale(0.8)}30%{opacity:1;transform:scale(1.05)}50%{transform:scale(1)}100%{opacity:0;transform:translateY(-20px)}}
+                @keyframes nextBar{0%{width:0}100%{width:100%}}
+              `}</style>
+              
+              <div style={{fontFamily:"'Playfair Display', Georgia, serif",fontSize:24,color:"#fff",marginBottom:24}}>Next question...</div>
+              <div style={{maxWidth:200,margin:"0 auto",height:4,borderRadius:2,background:"rgba(255,255,255,0.05)",overflow:"hidden"}}><div style={{height:"100%",borderRadius:2,background:`linear-gradient(90deg, ${T.primary}, ${T.amber})`,animation:"nextBar 1.8s ease forwards"}}/></div>
+            </div>
+          ):!roomData.revealed?(
+            <div style={{textAlign:"center"}}>
+              <div style={{padding:32,borderRadius:16,background:T.cardBg,border:`1px solid ${T.cardBorder}`,marginBottom:24}}>
+                <div style={{fontSize:14,letterSpacing:3,color:T.textFaint,fontFamily:"'JetBrains Mono', monospace",textTransform:"uppercase",marginBottom:16}}>Collecting answers...</div>
+                <div style={{fontSize:48,fontWeight:800,fontFamily:"'JetBrains Mono', monospace",color:allIn?T.success:T.primary,marginBottom:8,transition:"color 0.5s"}}>{ac}/{pc}</div>
+                <div style={{maxWidth:300,margin:"16px auto 0",height:8,borderRadius:4,background:"rgba(255,255,255,0.05)",overflow:"hidden"}}><div style={{height:"100%",borderRadius:4,background:allIn?`linear-gradient(90deg, ${T.success}, #4ADE80)`:`linear-gradient(90deg, ${T.primary}, ${T.amber})`,width:`${pc>0?(ac/pc)*100:0}%`,transition:"width 0.6s cubic-bezier(0.16,1,0.3,1)"}}/></div>
+                <div style={{color:T.textDim,fontSize:14,marginTop:12}}>{allIn?"Everyone's in!":"waiting for responses..."}</div>
+              </div>
+              <style>{`@keyframes btnPulse{0%,100%{box-shadow:0 4px 20px rgba(255,107,26,0.25)}50%{box-shadow:0 4px 40px rgba(255,107,26,0.5), 0 0 60px rgba(255,107,26,0.2)}}`}</style>
+              <Btn onClick={hostReveal} disabled={ac<1} style={{padding:"16px 48px",fontSize:18,animation:allIn?"btnPulse 1.5s ease infinite":"none"}}>Reveal Results</Btn>
+            </div>
+          ):(
+            <div>
+              <div style={{padding:28,borderRadius:16,background:T.cardBg,border:`1px solid ${T.cardBorder}`,marginBottom:24}}>
+                <DistributionChart answers={qa} correctAnswer={q.type==="slider"?q.correctAnswer:q.correctIndex} type={q.type} options={q.options} unit={q.unit}/>
+              </div>
+              <div style={{padding:24,borderRadius:16,background:T.cardBg,border:`1px solid ${T.cardBorder}`,marginBottom:24}}>
+                <p style={{fontSize:16,color:"rgba(255,255,255,0.65)",lineHeight:1.7,margin:"0 0 16px",fontWeight:300}}>{q.explanation}</p>
+                <div style={{padding:"12px 16px",borderRadius:8,background:"rgba(255,107,26,0.06)",borderLeft:`3px solid ${T.primary}`}}><div style={{fontSize:15,color:T.primaryLight,lineHeight:1.6,fontWeight:500}}>💡 {q.insight}</div></div>
+                <div style={{fontSize:12,color:T.textFaint,fontFamily:"'JetBrains Mono', monospace",marginTop:12}}>Source: {q.source}</div>
+              </div>
+              <div style={{textAlign:"center"}}><Btn onClick={hostNext} style={{padding:"16px 48px",fontSize:18}}>{roomData.currentQ<total-1?"Next Question →":"Finish Session →"}</Btn></div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
-<script>
-const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
-}, { threshold: 0.15 });
-document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+  // ═══ PLAYER GAME ═══
+  if(screen==="player-game"){
+    if(!roomData)return(<div style={{...pageStyle,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24}}>{flameSvg}<div style={{textAlign:"center",position:"relative",zIndex:1}}><div style={{fontSize:24,marginBottom:16}}>⏳</div><p style={{color:T.textDim}}>Connecting...</p></div></div>);
 
-// ═══ SOLO ═══
-const SOLO_CYCLE = 13000;
-let sT = [];
-function st(fn, ms) { sT.push(setTimeout(fn, ms)); }
+    if(roomData.phase==="lobby"){
+      const players=roomData?.players||{},pc=Object.keys(players).length;
+      return(<div style={{...pageStyle,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24}}>{flameSvg}<div style={{textAlign:"center",maxWidth:400,position:"relative",zIndex:1}}><div style={{fontSize:48,marginBottom:16}}>✅</div><h2 style={{fontFamily:"'Playfair Display', Georgia, serif",fontSize:28,color:"#fff",margin:"0 0 8px"}}>You're in!</h2><p style={{color:T.textDim,fontSize:16,margin:"0 0 24px"}}>Waiting for the host to start...</p><PlayerCount count={pc}/><div style={{marginTop:24,display:"flex",flexWrap:"wrap",gap:6,justifyContent:"center"}}>{Object.values(players).map((p,i)=><span key={i} style={{padding:"3px 10px",borderRadius:12,background:"rgba(255,255,255,0.05)",color:T.textDim,fontSize:12}}>{p.name}</span>)}</div></div></div>);
+    }
 
-function resetSolo() {
-  sT.forEach(clearTimeout); sT = [];
-  const cs = document.querySelectorAll('#solo-choices .choice');
-  ['A','B','C','D'].forEach((l,i) => { cs[i].className = 'choice'; cs[i].querySelector('.choice-letter').textContent = l; });
-  document.getElementById('solo-result').classList.remove('show');
-  const c = document.getElementById('solo-cursor'); c.classList.remove('show'); c.style.transform = '';
-  document.getElementById('solo-step1').classList.remove('show');
-  document.getElementById('solo-step2').classList.remove('show');
+    if(roomData.phase==="finished"){
+      return(<div style={{...pageStyle,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24}}>{flameSvg}<div style={{textAlign:"center",position:"relative",zIndex:1}}><div style={{fontSize:64,marginBottom:16}}>🎓</div><h2 style={{fontFamily:"'Playfair Display', Georgia, serif",fontSize:28,color:"#fff",margin:"0 0 16px"}}>Session Complete</h2><p style={{color:T.textDim,fontSize:16,margin:"0 0 32px"}}>Thanks for playing!</p><Btn onClick={()=>{if(listenerRef.current)listenerRef.current();setRoomData(null);setScreen("home");}}>Home</Btn></div></div>);
+    }
+
+    const q=QUESTIONS[roomData.currentQ],cat=CATS[q.category];
+    const myAnswer=roomData?.answers?.[roomData.currentQ]?.[PLAYER_ID];
+    const hasAnswered=myAnswer!==undefined||playerSubmitted;
+
+    // Player sees same transition animations as host
+    if(roomData.transition==="revealing"){
+      return(
+        <div style={{...pageStyle,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24}}>
+          {flameSvg}
+          <div style={{textAlign:"center",position:"relative",zIndex:1}}>
+            <style>{`
+              @keyframes revealRing{0%{stroke-dashoffset:283}100%{stroke-dashoffset:0}}
+              @keyframes revealFade{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}
+              @keyframes revealGlow{0%,100%{opacity:0.4}50%{opacity:1}}
+            `}</style>
+            <div style={{position:"relative",width:120,height:120,margin:"0 auto 32px"}}>
+              <svg width="120" height="120" style={{transform:"rotate(-90deg)"}}><circle cx="60" cy="60" r="45" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="6"/><circle cx="60" cy="60" r="45" fill="none" stroke={T.primary} strokeWidth="6" strokeLinecap="round" strokeDasharray="283" style={{animation:"revealRing 2.8s ease-in-out forwards"}}/></svg>
+              <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                <div style={{width:12,height:12,borderRadius:"50%",background:T.primary,boxShadow:"0 0 20px rgba(255,107,26,0.6)",animation:"revealGlow 1s ease infinite"}}/>
+              </div>
+            </div>
+            <div style={{fontFamily:"'Playfair Display', Georgia, serif",fontSize:24,color:"#fff",marginBottom:8,animation:"revealFade 0.5s ease forwards"}}>Revealing results</div>
+            <div style={{fontSize:14,color:T.textDim,animation:"revealFade 0.5s ease 0.3s both"}}>How did the audience answer?</div>
+          </div>
+        </div>
+      );
+    }
+
+    if(roomData.transition==="nextQ"){
+      return(
+        <div style={{...pageStyle,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24}}>
+          {flameSvg}
+          <div style={{textAlign:"center",position:"relative",zIndex:1}}>
+            <style>{`
+              @keyframes nextSlide{0%{opacity:0;transform:scale(0.8)}30%{opacity:1;transform:scale(1.05)}50%{transform:scale(1)}100%{opacity:0;transform:translateY(-20px)}}
+              @keyframes nextBar{0%{width:0}100%{width:100%}}
+            `}</style>
+            
+            <div style={{fontFamily:"'Playfair Display', Georgia, serif",fontSize:24,color:"#fff",marginBottom:24}}>Next question...</div>
+            <div style={{maxWidth:200,margin:"0 auto",height:4,borderRadius:2,background:"rgba(255,255,255,0.05)",overflow:"hidden"}}><div style={{height:"100%",borderRadius:2,background:`linear-gradient(90deg, ${T.primary}, ${T.amber})`,animation:"nextBar 1.8s ease forwards"}}/></div>
+          </div>
+        </div>
+      );
+    }
+
+    if(roomData.revealed){
+      const wasCorrect=q.type==="slider"?Math.abs((myAnswer||0)-q.correctAnswer)<=5:myAnswer===q.correctIndex;
+      return(
+        <div style={{...pageStyle,display:"flex",flexDirection:"column",alignItems:"center",padding:"32px 24px 48px"}}>
+          {flameSvg}
+          <div style={{maxWidth:520,width:"100%",position:"relative",zIndex:1}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+              <span style={{padding:"5px 14px",borderRadius:20,fontSize:12,background:cat.bg,color:cat.color,fontFamily:"'JetBrains Mono', monospace"}}>{cat.label}</span>
+              <span style={{fontSize:13,color:T.textFaint,fontFamily:"'JetBrains Mono', monospace"}}>Q{roomData.currentQ+1}/{total}</span>
+            </div>
+            <div style={{textAlign:"center",marginBottom:24}}>
+              <div style={{fontSize:48,marginBottom:12}}>{wasCorrect?"✅":"❌"}</div>
+              <h3 style={{fontFamily:"'Playfair Display', Georgia, serif",fontSize:22,color:wasCorrect?T.success:T.error,fontWeight:400}}>{wasCorrect?"Correct!":"Not quite"}</h3>
+            </div>
+            <div style={{padding:20,borderRadius:16,background:T.cardBg,border:`1px solid ${T.cardBorder}`,marginBottom:16}}>
+              <DistributionChart answers={roomData?.answers?.[roomData.currentQ]||{}} correctAnswer={q.type==="slider"?q.correctAnswer:q.correctIndex} type={q.type} options={q.options} unit={q.unit}/>
+            </div>
+            <div style={{padding:20,borderRadius:16,background:T.cardBg,border:`1px solid ${T.cardBorder}`}}>
+              <p style={{fontSize:15,color:"rgba(255,255,255,0.65)",lineHeight:1.7,margin:"0 0 16px",fontWeight:300}}>{q.explanation}</p>
+              <div style={{padding:"12px 16px",borderRadius:8,background:"rgba(255,107,26,0.06)",borderLeft:`3px solid ${T.primary}`}}><div style={{fontSize:14,color:T.primaryLight,lineHeight:1.6,fontWeight:500}}>💡 {q.insight}</div></div>
+              <div style={{fontSize:12,color:T.textFaint,fontFamily:"'JetBrains Mono', monospace",marginTop:12}}>Source: {q.source}</div>
+            </div>
+            <p style={{textAlign:"center",color:T.textFaint,fontSize:14,marginTop:24}}>Waiting for next question...</p>
+          </div>
+        </div>
+      );
+    }
+
+    if(hasAnswered){
+      return(<div style={{...pageStyle,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24}}>{flameSvg}<div style={{textAlign:"center",position:"relative",zIndex:1}}><div style={{width:48,height:48,borderRadius:"50%",background:"rgba(34,197,94,0.15)",border:"2px solid rgba(34,197,94,0.3)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px",fontSize:22,color:T.success}}>✓</div><h3 style={{fontFamily:"'Playfair Display', Georgia, serif",fontSize:24,color:"#fff",margin:"0 0 8px"}}>Answer submitted</h3><p style={{color:T.textDim,fontSize:16}}>Waiting for everyone else...</p></div></div>);
+    }
+
+    return(
+      <div style={{...pageStyle,display:"flex",flexDirection:"column",alignItems:"center",padding:"32px 24px 48px"}}>
+        {flameSvg}
+        <div style={{maxWidth:520,width:"100%",position:"relative",zIndex:1}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+            <span style={{padding:"5px 14px",borderRadius:20,fontSize:12,background:cat.bg,color:cat.color,fontFamily:"'JetBrains Mono', monospace"}}>{cat.label}</span>
+            <span style={{fontSize:13,color:T.textFaint,fontFamily:"'JetBrains Mono', monospace"}}>Q{roomData.currentQ+1}/{total}</span>
+          </div>
+          <div style={{height:3,borderRadius:2,background:"rgba(255,255,255,0.05)",overflow:"hidden",marginBottom:24}}><div style={{height:"100%",background:`linear-gradient(90deg, ${T.flame}, ${T.primary}, ${T.amber})`,width:`${(roomData.currentQ/total)*100}%`,transition:"width 0.6s"}}/></div>
+          <div style={{fontSize:36,marginBottom:16,textAlign:"center"}}>{q.icon}</div>
+          <h2 style={{fontFamily:"'Playfair Display', Georgia, serif",fontSize:"clamp(20px, 4vw, 26px)",color:"#fff",fontWeight:400,textAlign:"center",lineHeight:1.4,margin:"0 0 28px"}}>{q.question}</h2>
+          {q.type==="slider"&&<SliderInput min={q.min} max={q.max} unit={q.unit} value={playerSlider} onChange={setPlayerSlider} disabled={false}/>}
+          {q.type==="choice"&&(
+            <div style={{display:"grid",gap:12,width:"100%"}}>
+              {q.options.map((opt,i)=>{
+                const isSel=playerAnswer===i;
+                return(
+                  <button key={i} onClick={()=>setPlayerAnswer(i)} style={{background:isSel?"rgba(255,107,26,0.12)":T.navyLight,border:isSel?"1px solid rgba(255,107,26,0.4)":"1px solid rgba(255,255,255,0.06)",borderRadius:12,padding:"16px 20px",color:isSel?"#fff":"rgba(255,255,255,0.7)",fontSize:16,fontFamily:"'Outfit', sans-serif",cursor:"pointer",textAlign:"left",transition:"all 0.3s",display:"flex",alignItems:"center",gap:12}}>
+                    <span style={{width:30,height:30,borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,flexShrink:0,fontFamily:"'JetBrains Mono', monospace",background:isSel?"rgba(255,107,26,0.2)":"rgba(255,255,255,0.05)",color:isSel?T.primary:"rgba(255,255,255,0.35)"}}>{String.fromCharCode(65+i)}</span>{opt}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          <Btn onClick={playerSubmitAnswer} disabled={q.type==="choice"&&playerAnswer===null} style={{width:"100%",marginTop:24,padding:"16px"}}>Lock In Answer</Btn>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
 }
 
-function runSolo() {
-  resetSolo();
-  const cur = document.getElementById('solo-cursor');
-  const cs = document.querySelectorAll('#solo-choices .choice');
-  const phone = document.getElementById('solo-phone');
-
-  st(() => document.getElementById('solo-step1').classList.add('show'), 3000);
-
-  st(() => {
-    const r = cs[1].getBoundingClientRect(), pr = phone.getBoundingClientRect();
-    cur.style.top = (r.top - pr.top + r.height/2 - 20) + 'px';
-    cur.style.left = (r.left - pr.left + r.width/2 - 20) + 'px';
-    cur.classList.add('show');
-  }, 3800);
-
-  st(() => { cs[1].classList.add('selected'); cur.style.transform = 'scale(0.8)'; st(() => cur.style.transform = 'scale(1)', 200); }, 4600);
-  st(() => cur.classList.remove('show'), 5200);
-  st(() => document.getElementById('solo-step1').classList.remove('show'), 6500);
-  st(() => document.getElementById('solo-step2').classList.add('show'), 7000);
-  st(() => {
-    cs[1].classList.remove('selected'); cs[1].classList.add('wrong'); cs[1].querySelector('.choice-letter').textContent = '✗';
-    cs[3].classList.add('correct'); cs[3].querySelector('.choice-letter').textContent = '✓';
-    cs[0].classList.add('dimmed'); cs[2].classList.add('dimmed');
-  }, 7500);
-  st(() => document.getElementById('solo-result').classList.add('show'), 8500);
-}
-
-const soloObs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) { runSolo(); setInterval(runSolo, SOLO_CYCLE); soloObs.unobserve(e.target); } });
-}, { threshold: 0.3 });
-soloObs.observe(document.getElementById('solo-demo'));
-
-// ═══ CLASSROOM ═══
-const NAMES = ['Em','Li','So','No','Ol','Lu','Mi','Et','Av','Ja','Is','Al','Ch','Wi','Am','Be'];
-const CLASS_CYCLE = 16000;
-let cT = [];
-function ct(fn, ms) { cT.push(setTimeout(fn, ms)); }
-
-function resetClassroom() {
-  cT.forEach(clearTimeout); cT = [];
-  ['student-grid','student-grid-2'].forEach(id => {
-    const g = document.getElementById(id); g.innerHTML = '';
-    NAMES.forEach(n => { const d = document.createElement('div'); d.className = 'student'; d.textContent = n; g.appendChild(d); });
-  });
-  document.getElementById('class-counter').textContent = '0/16';
-  document.getElementById('class-counter').classList.remove('done');
-  document.getElementById('class-p1').className = 'phase visible';
-  document.getElementById('class-p2').className = 'phase hidden';
-  ['d0b','d1b','d2b','d3b'].forEach(id => { const e = document.getElementById(id); e.style.transition = 'none'; e.style.width = '0'; requestAnimationFrame(() => e.style.transition = 'width 1.8s cubic-bezier(0.16,1,0.3,1)'); });
-  ['d0p','d1p','d2p','d3p','d0c','d1c','d2c','d3c'].forEach(id => document.getElementById(id).style.opacity = '0');
-  document.getElementById('class-insight').style.opacity = '0';
-}
-
-function runClassroom() {
-  resetClassroom();
-  const s1 = document.querySelectorAll('#student-grid .student');
-  const s2 = document.querySelectorAll('#student-grid-2 .student');
-  const counter = document.getElementById('class-counter');
-  const order = [...Array(16).keys()].sort(() => Math.random() - 0.5);
-  let ans = 0;
-
-  order.forEach((idx, i) => {
-    ct(() => { s1[idx].classList.add('answered'); ans++; counter.textContent = ans+'/16'; if(ans>=16) counter.classList.add('done'); }, 3000 + i*200);
-  });
-
-  const sw = 3000 + 16*200 + 1500;
-
-  ct(() => {
-    document.getElementById('class-p1').className = 'phase hidden';
-    document.getElementById('class-p2').className = 'phase visible';
-    order.slice(0,14).forEach(i => s2[i].classList.add('wrong-a'));
-    order.slice(14).forEach(i => s2[i].classList.add('right-a'));
-  }, sw);
-
-  const bars = [{b:'d0b',w:'38%',p:'d0p',c:'d0c'},{b:'d1b',w:'31%',p:'d1p',c:'d1c'},{b:'d2b',w:'19%',p:'d2p',c:'d2c'},{b:'d3b',w:'12%',p:'d3p',c:'d3c'}];
-  ct(() => { bars.forEach((b,i) => { ct(() => { document.getElementById(b.b).style.width=b.w; document.getElementById(b.p).style.opacity='1'; document.getElementById(b.c).style.opacity='1'; }, i*300); }); }, sw+500);
-  ct(() => document.getElementById('class-insight').style.opacity='1', sw+500+4*300+600);
-}
-
-const classObs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) { runClassroom(); setInterval(runClassroom, CLASS_CYCLE); classObs.unobserve(e.target); } });
-}, { threshold: 0.2 });
-classObs.observe(document.getElementById('classroom-demo'));
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>
 </html>
