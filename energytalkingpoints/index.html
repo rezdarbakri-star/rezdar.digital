@@ -602,7 +602,10 @@ function App(){
               <span style={{padding:"5px 14px",borderRadius:20,fontSize:12,background:cat.bg,color:cat.color,fontFamily:"'JetBrains Mono', monospace"}}>{cat.label}</span>
               <span style={{fontSize:13,color:T.textFaint,fontFamily:"'JetBrains Mono', monospace"}}>Q{roomData.currentQ+1}/{total}</span>
             </div>
-            <div style={{display:"flex",gap:12,marginBottom:24}}>
+            <div style={{padding:20,borderRadius:16,background:T.cardBg,border:`1px solid ${T.cardBorder}`,marginBottom:16}}>
+              <DistributionChart answers={roomData?.answers?.[roomData.currentQ]||{}} correctAnswer={q.type==="slider"?q.correctAnswer:q.correctIndex} type={q.type} options={q.options} unit={q.unit}/>
+            </div>
+            <div style={{display:"flex",gap:12,marginBottom:16}}>
               <div style={{flex:1,padding:"16px 20px",borderRadius:14,background:wasCorrect?"rgba(34,197,94,0.08)":"rgba(239,68,68,0.08)",border:`1px solid ${wasCorrect?"rgba(34,197,94,0.25)":"rgba(239,68,68,0.25)"}`}}>
                 <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:2,color:T.textFaint,marginBottom:8,fontFamily:"'JetBrains Mono', monospace"}}>You answered</div>
                 <div style={{fontSize:22,fontWeight:700,color:wasCorrect?T.success:T.error,fontFamily:"'JetBrains Mono', monospace"}}>{yourAnswerText}</div>
@@ -611,9 +614,6 @@ function App(){
                 <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:2,color:T.textFaint,marginBottom:8,fontFamily:"'JetBrains Mono', monospace"}}>Correct answer</div>
                 <div style={{fontSize:22,fontWeight:700,color:T.success,fontFamily:"'JetBrains Mono', monospace"}}>{correctText}</div>
               </div>
-            </div>
-            <div style={{padding:20,borderRadius:16,background:T.cardBg,border:`1px solid ${T.cardBorder}`,marginBottom:16}}>
-              <DistributionChart answers={roomData?.answers?.[roomData.currentQ]||{}} correctAnswer={q.type==="slider"?q.correctAnswer:q.correctIndex} type={q.type} options={q.options} unit={q.unit}/>
             </div>
             <div style={{padding:20,borderRadius:16,background:T.cardBg,border:`1px solid ${T.cardBorder}`}}>
               <p style={{fontSize:15,color:"rgba(255,255,255,0.65)",lineHeight:1.7,margin:"0 0 16px",fontWeight:300}}>{q.explanation}</p>
