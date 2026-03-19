@@ -179,33 +179,26 @@
       );
       z-index: 1;
     }
-    .hero-video-wrap iframe {
+    .hero-video-wrap video {
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 100vw;
-      height: 100vh;
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
       transform: translate(-50%, -50%);
-      pointer-events: none;
-    }
-    /* Mobile: vertical video needs different scaling */
-    @media (max-width: 768px) {
-      .hero-video-wrap iframe {
-        width: 100vw;
-        height: 180vw;
-      }
-    }
-    @media (min-width: 769px) {
-      .hero-video-wrap iframe {
-        width: 177.78vh; /* 16:9 */
-        height: 100vh;
-        min-width: 100vw;
-        min-height: 56.25vw;
-      }
+      object-fit: cover;
     }
     .hero-video-mobile, .hero-video-desktop { display: none; }
-    @media (max-width: 768px) { .hero-video-mobile { display: block; } }
-    @media (min-width: 769px) { .hero-video-desktop { display: block; } }
+    @media (max-width: 768px) { .hero-video-mobile { display: block; width: 100%; height: 100%; } }
+    @media (min-width: 769px) { .hero-video-desktop { display: block; width: 100%; height: 100%; } }
+    .hero-video-mobile video,
+    .hero-video-desktop video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
     .hero-content {
       position: relative;
@@ -420,6 +413,50 @@
       font-size: 14px;
       line-height: 1.7;
       color: var(--white-soft);
+    }
+
+    /* ===== AMENITIES STRIP ===== */
+    .amenities {
+      background: var(--black);
+      padding: 64px 24px;
+    }
+    .amenities-scroll {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 32px;
+      max-width: 1200px;
+    }
+    @media (min-width: 769px) {
+      .amenities-scroll { grid-template-columns: repeat(4, 1fr); }
+    }
+    .amenity-card {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      aspect-ratio: 4/5;
+      background: var(--dark-card);
+    }
+    .amenity-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s;
+    }
+    .amenity-card:hover img { transform: scale(1.05); }
+    .amenity-card .amenity-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(10,10,10,0.85) 0%, transparent 50%);
+      display: flex;
+      align-items: flex-end;
+      padding: 20px 16px;
+    }
+    .amenity-card .amenity-label {
+      font-family: var(--font-display);
+      font-size: 22px;
+      letter-spacing: 1px;
+      color: var(--white);
     }
 
     /* ===== PT SECTION ===== */
@@ -901,25 +938,27 @@
   <!-- ===== HERO ===== -->
   <section class="hero">
     <div class="hero-video-wrap">
-      <!-- Mobile video (vertical/short format) -->
+      <!-- 
+        HERO VIDEO INSTRUKTIONER:
+        Lägg dina MP4-filer i /images-mappen:
+        - hero-mobile.mp4  (vertikal, från: https://youtu.be/2_bnGMDLrc0)
+        - hero-desktop.mp4 (vertikal/short, från: https://youtube.com/shorts/uBgvM7FGC0Y)
+        
+        Tips: Ladda ner via yt-dlp eller liknande verktyg.
+        Kör: yt-dlp -f mp4 https://youtu.be/2_bnGMDLrc0 -o hero-mobile.mp4
+        Kör: yt-dlp -f mp4 https://youtube.com/shorts/uBgvM7FGC0Y -o hero-desktop.mp4
+      -->
+      <!-- Mobile video (vertical) -->
       <div class="hero-video-mobile">
-        <iframe
-          src="https://www.youtube.com/embed/2_bnGMDLrc0?autoplay=1&mute=1&loop=1&playlist=2_bnGMDLrc0&controls=0&showinfo=0&modestbranding=1&rel=0&playsinline=1&disablekb=1&fs=0&iv_load_policy=3&cc_load_policy=0"
-          frameborder="0"
-          allow="autoplay; encrypted-media"
-          allowfullscreen
-          title="Stolt Gym"
-        ></iframe>
+        <video autoplay muted loop playsinline preload="auto" poster="images/hero-poster-mobile.jpg">
+          <source src="images/hero-mobile.mp4" type="video/mp4">
+        </video>
       </div>
       <!-- Desktop video -->
       <div class="hero-video-desktop">
-        <iframe
-          src="https://www.youtube.com/embed/uBgvM7FGC0Y?autoplay=1&mute=1&loop=1&playlist=uBgvM7FGC0Y&controls=0&showinfo=0&modestbranding=1&rel=0&playsinline=1&disablekb=1&fs=0&iv_load_policy=3&cc_load_policy=0"
-          frameborder="0"
-          allow="autoplay; encrypted-media"
-          allowfullscreen
-          title="Stolt Gym"
-        ></iframe>
+        <video autoplay muted loop playsinline preload="auto" poster="images/hero-poster-desktop.jpg">
+          <source src="images/hero-desktop.mp4" type="video/mp4">
+        </video>
       </div>
     </div>
 
@@ -963,27 +1002,49 @@
     <div class="features-grid">
       <div class="feature-card reveal">
         <div class="feature-img">
-          <!-- IMAGE ID: img-feature-utrustning -->
-          <span class="img-placeholder-label">img-feature-utrustning</span>
+          <img src="images/gym8.webp" alt="Modern träningsutrustning på Stolt Gym">
         </div>
         <h3>Modern Utrustning</h3>
         <p>Vår utrustning är noggrant utvald och uppdateras regelbundet för att möta de senaste standarderna inom fitness och styrketräning.</p>
       </div>
       <div class="feature-card reveal">
         <div class="feature-img">
-          <!-- IMAGE ID: img-feature-gemenskap -->
-          <span class="img-placeholder-label">img-feature-gemenskap</span>
+          <img src="images/tra_ningsgrupp3.webp" alt="Gemenskap på Stolt Gym">
         </div>
         <h3>Härlig Gemenskap</h3>
         <p>Oavsett om du är nybörjare eller erfaren, är du en del av en inkluderande och vänlig atmosfär där alla jobbar tillsammans för att nå sina mål.</p>
       </div>
       <div class="feature-card reveal">
         <div class="feature-img">
-          <!-- IMAGE ID: img-feature-pt -->
-          <span class="img-placeholder-label">img-feature-pt</span>
+          <img src="images/latpulldowns.webp" alt="Träning på Stolt Gym">
         </div>
         <h3>Kvalificerade PTs</h3>
         <p>Våra PTs har omfattande erfarenhet och expertis inom fitness och hälsa, och de anpassar varje träningsprogram efter dina unika behov och förutsättningar.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== AMENITIES ===== -->
+  <section class="amenities">
+    <span class="section-tag reveal">Allt Under Ett Tak</span>
+    <h2 class="section-title reveal">VI HAR ALLT<br>DU BEHÖVER.</h2>
+
+    <div class="amenities-scroll">
+      <div class="amenity-card reveal">
+        <img src="images/gym7.webp" alt="Cardio-avdelning">
+        <div class="amenity-overlay"><span class="amenity-label">Cardio</span></div>
+      </div>
+      <div class="amenity-card reveal">
+        <img src="images/barnrummet.webp" alt="Barnrummet">
+        <div class="amenity-overlay"><span class="amenity-label">Barnrum</span></div>
+      </div>
+      <div class="amenity-card reveal">
+        <img src="images/solarie.webp" alt="Solarium">
+        <div class="amenity-overlay"><span class="amenity-label">Solarium</span></div>
+      </div>
+      <div class="amenity-card reveal">
+        <img src="images/shoppen.webp" alt="Kosttillskottbutik">
+        <div class="amenity-overlay"><span class="amenity-label">Shop</span></div>
       </div>
     </div>
   </section>
@@ -997,8 +1058,7 @@
     <div class="pt-grid">
       <div class="pt-card reveal">
         <div class="pt-photo">
-          <!-- IMAGE ID: img-pt-alexander -->
-          <span class="img-placeholder-label">img-pt-alexander</span>
+          <img src="images/PT2.webp" alt="Alexander Annelin - Personlig Tränare">
         </div>
         <div class="pt-info">
           <h3>Alexander Annelin</h3>
@@ -1012,8 +1072,7 @@
 
       <div class="pt-card reveal">
         <div class="pt-photo">
-          <!-- IMAGE ID: img-pt-jonnie -->
-          <span class="img-placeholder-label">img-pt-jonnie</span>
+          <img src="images/PT1.webp" alt="Jonnie Danielsson - Personlig Tränare">
         </div>
         <div class="pt-info">
           <h3>Jonnie Danielsson</h3>
@@ -1133,20 +1192,28 @@
   <!-- ===== GALLERY STRIP ===== -->
   <div class="gallery-strip">
     <div class="gallery-item">
-      <!-- IMAGE ID: img-gallery-1 -->
-      <span class="img-placeholder-label">img-gallery-1</span>
+      <img src="images/gym6.webp" alt="Fria vikter">
     </div>
     <div class="gallery-item">
-      <!-- IMAGE ID: img-gallery-2 -->
-      <span class="img-placeholder-label">img-gallery-2</span>
+      <img src="images/tra_ningsgrupp4.webp" alt="Gruppträning">
     </div>
     <div class="gallery-item">
-      <!-- IMAGE ID: img-gallery-3 -->
-      <span class="img-placeholder-label">img-gallery-3</span>
+      <img src="images/gym4.webp" alt="Lounge">
     </div>
     <div class="gallery-item">
-      <!-- IMAGE ID: img-gallery-4 -->
-      <span class="img-placeholder-label">img-gallery-4</span>
+      <img src="images/shoppen.webp" alt="Kosttillskottbutik">
+    </div>
+    <div class="gallery-item">
+      <img src="images/gym7.webp" alt="Cardio-avdelning">
+    </div>
+    <div class="gallery-item">
+      <img src="images/gym3.webp" alt="Boxning och funktionell träning">
+    </div>
+    <div class="gallery-item">
+      <img src="images/gym2.webp" alt="Entré och korridor">
+    </div>
+    <div class="gallery-item">
+      <img src="images/solarie.webp" alt="Solarium">
     </div>
   </div>
 
