@@ -232,6 +232,20 @@
       animation: fadeUp 0.8s ease both 0.4s;
     }
     .hero h1 .accent { color: var(--accent); }
+    .hero-logo-crop {
+      display: inline-block;
+      height: clamp(52px, 14vw, 120px);
+      overflow: hidden;
+      vertical-align: bottom;
+      line-height: 0;
+    }
+    .hero-logo-crop img {
+      height: 175%;
+      width: auto;
+      filter: invert(1);
+      object-fit: cover;
+      object-position: top;
+    }
     .hero-sub {
       font-size: 16px;
       line-height: 1.6;
@@ -957,7 +971,7 @@
 
     <div class="hero-content">
       <div class="hero-tag">Skogås &bull; Trångsund</div>
-      <h1>TRÄNA<br><span class="accent">STOLT.</span></h1>
+      <h1>TRÄNA<br><span class="hero-logo-crop"><img src="images/stoltgym.png" alt="STOLT"></span></h1>
       <p class="hero-sub">Fräscht gym med modern utrustning, meriterade PTs, gruppträning, solarium, kosttillskottbutik och mycket mer.</p>
       <div class="hero-btns">
         <a href="https://www.gymcontrol.se/global/webshop/index.php?uid=9254&sid=RP97tqyshEB8hJsVqP6lWxxaJ&action=membership&valdanlaggning=1" class="btn-primary">Bli Medlem</a>
@@ -1002,7 +1016,7 @@
       </div>
       <div class="feature-card reveal">
         <div class="feature-img">
-          <img src="images/grupptraning1.webp" alt="Gemenskap på Stolt Gym">
+          <img src="images/traningsgrupp3.webp" alt="Gemenskap på Stolt Gym">
         </div>
         <h3>Härlig Gemenskap</h3>
         <p>Oavsett om du är nybörjare eller erfaren, är du en del av en inkluderande och vänlig atmosfär där alla jobbar tillsammans för att nå sina mål.</p>
@@ -1188,7 +1202,7 @@
       <img src="images/gym6.webp" alt="Fria vikter">
     </div>
     <div class="gallery-item">
-      <img src="images/grupptraning2.webp" alt="Gruppträning">
+      <img src="images/traningsgrupp4.webp" alt="Gruppträning">
     </div>
     <div class="gallery-item">
       <img src="images/gym4.webp" alt="Lounge">
