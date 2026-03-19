@@ -234,16 +234,13 @@
     .hero h1 .accent { color: var(--accent); }
     .hero-logo-crop {
       display: block;
-      height: clamp(58px, 15vw, 130px);
-      overflow: hidden;
       line-height: 0;
+      margin-top: 4px;
     }
     .hero-logo-crop img {
-      height: 155%;
+      height: clamp(42px, 11vw, 96px);
       width: auto;
       filter: invert(1);
-      object-fit: cover;
-      object-position: top left;
       display: block;
     }
     .hero-sub {
@@ -971,7 +968,7 @@
 
     <div class="hero-content">
       <div class="hero-tag">Skogås &bull; Trångsund</div>
-      <h1>TRÄNA<br><span class="hero-logo-crop"><img src="images/stoltgym.png" alt="STOLT"></span></h1>
+      <h1>TRÄNA<br><span class="hero-logo-crop"><img src="images/stolt-cropped.png" alt="STOLT"></span></h1>
       <p class="hero-sub">Fräscht gym med modern utrustning, meriterade PTs, gruppträning, solarium, kosttillskottbutik och mycket mer.</p>
       <div class="hero-btns">
         <a href="https://www.gymcontrol.se/global/webshop/index.php?uid=9254&sid=RP97tqyshEB8hJsVqP6lWxxaJ&action=membership&valdanlaggning=1" class="btn-primary">Bli Medlem</a>
@@ -1263,13 +1260,13 @@
         <p><strong>Skogås:</strong> Skogås Torgväg 3, Skogås Centrum</p>
         <p><strong>Trångsund:</strong> Trångsund Centrum</p>
         <p style="margin-top: 8px;">Telefon: <a href="tel:0841400035">08-414 000 35</a></p>
-        <p>Mail: <a href="mailto:info@stoltgym.se">info@stoltgym.se</a></p>
+        <p>Mail: <a href="/cdn-cgi/l/email-protection#355c5b535a7546415a5941524c581b4650"><span class="__cf_email__" data-cfemail="264f484049665552494a52415f4b085543">[email&#160;protected]</span></a></p>
       </div>
     </div>
     <div class="footer-bottom">Stolt Gym &copy; 2025. Alla rättigheter förbehållna.</div>
   </footer>
 
-  <script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     // ===== NAV SCROLL =====
     const nav = document.getElementById('nav');
     window.addEventListener('scroll', () => {
@@ -1308,13 +1305,4 @@
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry, i) => {
         if (entry.isIntersecting) {
-          setTimeout(() => entry.target.classList.add('visible'), i * 60);
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-    reveals.forEach(el => observer.observe(el));
-  </script>
-
-</body>
-</html>
+          setTimeout(() => entry.target.c
