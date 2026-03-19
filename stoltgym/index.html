@@ -18,9 +18,9 @@
       --dark-border: #222222;
       --white: #f5f5f5;
       --white-soft: #b0b0b0;
-      --accent: #c8ff2e;
-      --accent-dim: rgba(200, 255, 46, 0.12);
-      --accent-glow: rgba(200, 255, 46, 0.25);
+      --accent: #00d4ff;
+      --accent-dim: rgba(0, 212, 255, 0.12);
+      --accent-glow: rgba(0, 212, 255, 0.25);
       --orange: #ff6b35;
       --font-display: 'Bebas Neue', sans-serif;
       --font-body: 'DM Sans', sans-serif;
@@ -61,6 +61,7 @@
     .nav-logo {
       height: 36px;
       width: auto;
+      filter: invert(1);
     }
     /* Placeholder for logo */
     .nav-logo-placeholder {
@@ -211,7 +212,7 @@
       display: inline-block;
       padding: 6px 16px;
       background: var(--accent-dim);
-      border: 1px solid rgba(200, 255, 46, 0.3);
+      border: 1px solid rgba(0, 212, 255, 0.3);
       border-radius: 100px;
       font-size: 11px;
       font-weight: 600;
@@ -360,7 +361,7 @@
       overflow: hidden;
     }
     .feature-card:hover {
-      border-color: rgba(200, 255, 46, 0.2);
+      border-color: rgba(0, 212, 255, 0.2);
       transform: translateY(-4px);
     }
     .feature-card::before {
@@ -481,7 +482,7 @@
       transition: border-color 0.3s, transform 0.3s;
     }
     .pt-card:hover {
-      border-color: rgba(200, 255, 46, 0.2);
+      border-color: rgba(0, 212, 255, 0.2);
       transform: translateY(-4px);
     }
     .pt-photo {
@@ -687,7 +688,7 @@
       padding: 4px 16px;
       border-radius: 100px;
     }
-    .price-card:hover { border-color: rgba(200, 255, 46, 0.3); }
+    .price-card:hover { border-color: rgba(0, 212, 255, 0.3); }
     .price-label {
       font-size: 13px;
       font-weight: 600;
@@ -907,7 +908,7 @@
   <nav class="nav" id="nav">
     <!-- PLACEHOLDER: Replace with actual logo image -->
     <!-- Image ID: logo -->
-    <a href="#" class="nav-logo-placeholder">STOLT GYM</a>
+    <a href="#"><img src="images/stoltgym.png" alt="Stolt Gym" class="nav-logo"></a>
 
     <ul class="nav-links">
       <li><a href="#features">Gymmet</a></li>
@@ -941,7 +942,7 @@
       <!-- Mobile video (vertical) -->
       <div class="hero-video-mobile">
         <video autoplay muted loop playsinline preload="auto"
-          src="https://storage.googleapis.com/msgsndr/ovECHuIkoLGWYsBGqPPZ/media/69244843a6fefe8177366858.mp4"
+          src="images/69244aa7e4747c1885c266f8.mov"
           poster="images/gym5.webp">
         </video>
       </div>
@@ -1221,8 +1222,7 @@
   <footer id="contact">
     <div class="footer-inner">
       <div class="footer-brand">
-        <!-- IMAGE ID: logo-footer (same logo, white version) -->
-        <h4>STOLT GYM</h4>
+        <img src="images/stoltgym.png" alt="Stolt Gym" style="height: 40px; width: auto; margin-bottom: 16px; filter: invert(1);">
         <p>Din lokala träningsdestination i Skogås centrum och Trångsund. Mer än bara ett gym.</p>
         <div class="footer-socials">
           <a href="https://www.facebook.com/profile.php?id=61563815025839" aria-label="Facebook">
