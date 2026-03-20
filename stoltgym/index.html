@@ -187,9 +187,9 @@
       height: 100%;
       object-fit: cover;
     }
-    .hero-video-mobile, .hero-video-desktop { display: none; }
-    @media (max-width: 768px) { .hero-video-mobile { display: block; width: 100%; height: 100%; } }
-    @media (min-width: 769px) { .hero-video-desktop { display: block; width: 100%; height: 100%; } }
+    .hero-video-mobile, .hero-video-desktop { display: none; position: absolute; inset: 0; }
+    @media (max-width: 768px) { .hero-video-mobile { display: block; } }
+    @media (min-width: 769px) { .hero-video-desktop { display: block; } }
 
     .hero-content {
       position: relative;
