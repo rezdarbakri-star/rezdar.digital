@@ -173,9 +173,9 @@
       inset: 0;
       background: linear-gradient(
         to bottom,
-        rgba(10,10,10,0.2) 0%,
-        rgba(10,10,10,0.1) 40%,
-        rgba(10,10,10,0.6) 70%,
+        rgba(10,10,10,0.1) 0%,
+        rgba(10,10,10,0.0) 30%,
+        rgba(10,10,10,0.5) 65%,
         rgba(10,10,10,0.95) 100%
       );
       z-index: 1;
@@ -187,9 +187,6 @@
       height: 100%;
       object-fit: cover;
     }
-    .hero-video-mobile, .hero-video-desktop { display: none; position: absolute; inset: 0; }
-    @media (max-width: 768px) { .hero-video-mobile { display: block; } }
-    @media (min-width: 769px) { .hero-video-desktop { display: block; } }
 
     .hero-content {
       position: relative;
@@ -224,11 +221,13 @@
     .hero h1 .accent { color: var(--accent); }
     .hero-logo-crop {
       display: block;
+      height: clamp(48px, 12vw, 110px);
+      overflow: hidden;
       line-height: 0;
       margin-top: 4px;
     }
     .hero-logo-crop img {
-      height: clamp(42px, 11vw, 96px);
+      height: 160%;
       width: auto;
       filter: invert(1);
       display: block;
@@ -940,25 +939,15 @@
   <!-- ===== HERO ===== -->
   <section class="hero">
     <div class="hero-video-wrap">
-      <!-- Mobile video (vertical) -->
-      <div class="hero-video-mobile">
-        <video autoplay muted loop playsinline preload="auto"
-          src="images/69244aa7e4747c1885c266f8.mov"
-          poster="images/gym5.webp">
-        </video>
-      </div>
-      <!-- Desktop video -->
-      <div class="hero-video-desktop">
-        <video autoplay muted loop playsinline preload="auto"
-          src="https://storage.googleapis.com/msgsndr/ovECHuIkoLGWYsBGqPPZ/media/69244843a6fefe8177366858.mp4"
-          poster="images/gym5.webp">
-        </video>
-      </div>
+      <video autoplay muted loop playsinline preload="auto"
+        src="https://storage.googleapis.com/msgsndr/ovECHuIkoLGWYsBGqPPZ/media/69244843a6fefe8177366858.mp4"
+        poster="images/gym5.webp">
+      </video>
     </div>
 
     <div class="hero-content">
       <div class="hero-tag">Skogås &bull; Trångsund</div>
-      <h1>TRÄNA<br><span class="accent">STOLT.</span></h1>
+      <h1>TRÄNA<br><span class="hero-logo-crop"><img src="images/stoltgym.png" alt="STOLT"></span></h1>
       <p class="hero-sub">Fräscht gym med modern utrustning, meriterade PTs, gruppträning, solarium, kosttillskottbutik och mycket mer.</p>
       <div class="hero-btns">
         <a href="#pricing" class="btn-primary">Bli Medlem</a>
