@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>100 WILD — Rezdar × Red Bull × Revolution Race</title>
+<title>100 WILD — Rezdar × Red Bull × RevolutionRace</title>
 <meta name="description" content="100 WILD — En expeditionsserie genom världens mest extrema miljöer. Pokémon möter Bear Grylls.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>">
 <style>body{margin:0;background:#0a0a0a}</style>
@@ -14,7 +14,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
 <script type="text/babel">
-const { useState, useEffect, useRef } = React;
+const { useState, useEffect, useRef, createContext, useContext } = React;
+
+/* ═══════════════════════════════════════════════════════════════
+   LANGUAGE CONTEXT
+   ═══════════════════════════════════════════════════════════════ */
+const LangContext = createContext("sv");
+function useLang() { return useContext(LangContext); }
+function T({ sv, en }) {
+  const lang = useLang();
+  return lang === "en" ? en : sv;
+}
 
 /* ═══════════════════════════════════════════════════════════════
    DATA
@@ -33,11 +43,12 @@ const BIOME_THEMES = {
   species: { bg: "#0a0a0a", accent: "#f59e0b", particle: "#fbbf24", glow: "rgba(245,158,11,0.05)" },
   anim:    { bg: "#0a0a0a", accent: "#8b5cf6", particle: "#a78bfa", glow: "rgba(139,92,246,0.05)" },
   stats:   { bg: "#0a0a0a", accent: RED, particle: RED, glow: "rgba(227,0,15,0.06)" },
+  sponsor: { bg: "#0a0a0a", accent: "#fbbf24", particle: "#f59e0b", glow: "rgba(251,191,36,0.05)" },
   brand:   { bg: "#0a0a0a", accent: RED, particle: "#ff4444", glow: "rgba(227,0,15,0.05)" },
   cta:     { bg: "#0a0a0a", accent: RED, particle: "#ff4444", glow: "rgba(227,0,15,0.08)" },
 };
 
-const BIOMES_SHOWCASE = [
+const BIOMES_SHOWCASE_SV = [
   { name: "ARKTIS", icon: "❄️", color: "#7ec8e3", themeId: "arctic",
     photo: "images/arctic.jpg", grad: "linear-gradient(135deg, #0d1b2a, #1b3a5c)",
     tagline: "–40°C. Isbjörnsterritorium.",
@@ -72,7 +83,42 @@ const BIOMES_SHOWCASE = [
     ]},
 ];
 
-const SKILL_CATEGORIES = [
+const BIOMES_SHOWCASE_EN = [
+  { name: "ARCTIC", icon: "❄️", color: "#7ec8e3", themeId: "arctic",
+    photo: "images/arctic.jpg", grad: "linear-gradient(135deg, #0d1b2a, #1b3a5c)",
+    tagline: "–40°C. Polar bear territory.",
+    desc: "Svalbard, Norwegian Arctic. Tracking polar bears and arctic foxes across glaciers and pack ice. Minimal gear, maximum focus.",
+    dangers: ["Polar Bear", "Hypothermic Cold", "Ice Break", "Polar Darkness"],
+    terrain: "Glaciers · Pack Ice · Tundra",
+    creatures: [
+      { name: "Polar Bear", icon: "🐻‍❄️", caught: true }, { name: "Arctic Fox", icon: "🦊", caught: true },
+      { name: "Narwhal", icon: "🦄", caught: false }, { name: "Walrus", icon: "🦭", caught: false },
+      { name: "Snow Leopard", icon: "🐆", caught: false }, { name: "???", icon: "❓", mystery: true },
+    ]},
+  { name: "AMAZON", icon: "🌿", color: "#4caf50", themeId: "amazon",
+    photo: "images/amazon.jpg", grad: "linear-gradient(135deg, #0a1e0a, #2e5e2e)",
+    tagline: "50 hours. No way out.",
+    desc: "The Brazilian jungle. The world's most biodiverse ecosystem — caimans, jaguars, poison dart frogs. Navigation without trails, sleeping in hammocks above the water.",
+    dangers: ["Jaguars", "Anacondas", "Venomous Species", "Navigation"],
+    terrain: "Rainforest · Rivers · Mangrove",
+    creatures: [
+      { name: "Caiman", icon: "🐊", caught: true }, { name: "Jaguar", icon: "🐆", caught: false },
+      { name: "Anaconda", icon: "🐍", caught: false }, { name: "Poison Frog", icon: "🐸", caught: false },
+      { name: "Macaw", icon: "🦜", caught: false }, { name: "???", icon: "❓", mystery: true },
+    ]},
+  { name: "SAHARA", icon: "🏜️", color: "#f97316", themeId: "savanna",
+    photo: "images/desert.jpg", grad: "linear-gradient(135deg, #2e1a00, #5c3a00)",
+    tagline: "The world's largest desert. No water. No shade.",
+    desc: "Morocco to Mauritania. 50°C, limited water, zero infrastructure. Desert foxes, scorpions and a silence that tests mental endurance.",
+    dangers: ["Dehydration", "Sandstorm", "Scorpions", "Night Cold"],
+    terrain: "Sand Dunes · Rocky Desert · Oases",
+    creatures: [
+      { name: "Desert Fox", icon: "🦊", caught: false }, { name: "Scorpion", icon: "🦂", caught: false },
+      { name: "Dromedary", icon: "🐪", caught: false }, { name: "???", icon: "❓", mystery: true },
+    ]},
+];
+
+const SKILL_CATEGORIES_SV = [
   { name: "VATTEN", icon: "🌊", color: "#039be5", skills: [
     { name: "Dykning", icon: "🤿", active: true }, { name: "Kajak", icon: "🛶", active: true },
     { name: "Klippdykning", icon: "🏊", active: false }, { name: "???", icon: "❓", mystery: true },
@@ -89,28 +135,32 @@ const SKILL_CATEGORIES = [
   ]},
 ];
 
-const BIOMES_CREATURES = [
-  { name: "ARKTIS", icon: "❄️", color: "#7ec8e3", themeId: "arctic", creatures: [
-    { name: "Isbjörn", icon: "🐻‍❄️", caught: true }, { name: "Arctic Fox", icon: "🦊", caught: true },
-    { name: "Narval", icon: "🦄", caught: false }, { name: "Valross", icon: "🦭", caught: false },
-    { name: "Snöleopard", icon: "🐆", caught: false }, { name: "???", icon: "❓", mystery: true },
+const SKILL_CATEGORIES_EN = [
+  { name: "WATER", icon: "🌊", color: "#039be5", skills: [
+    { name: "Diving", icon: "🤿", active: true }, { name: "Kayak", icon: "🛶", active: true },
+    { name: "Cliff Diving", icon: "🏊", active: false }, { name: "???", icon: "❓", mystery: true },
   ]},
-  { name: "AMAZONAS", icon: "🌿", color: "#4caf50", themeId: "amazon", creatures: [
-    { name: "Caiman", icon: "🐊", caught: true }, { name: "Jaguar", icon: "🐆", caught: false },
-    { name: "Anakonda", icon: "🐍", caught: false }, { name: "Giftgroda", icon: "🐸", caught: false },
-    { name: "Ara", icon: "🦜", caught: false }, { name: "???", icon: "❓", mystery: true },
+  { name: "TERRA", icon: "⛰️", color: "#ff9800", skills: [
+    { name: "Trekking", icon: "🥾", active: true }, { name: "Climbing", icon: "🧗", active: true },
+    { name: "Camping", icon: "🏕️", active: true }, { name: "Tracking", icon: "🐾", active: true },
+    { name: "Bikepacking", icon: "🚴", active: false }, { name: "???", icon: "❓", mystery: true },
   ]},
-  { name: "SAVANN", icon: "🌅", color: "#ff9800", themeId: "savanna", creatures: [
-    { name: "Lejon", icon: "🦁", caught: true }, { name: "Elefant", icon: "🐘", caught: true },
-    { name: "Giraff", icon: "🦒", caught: true }, { name: "Gorilla", icon: "🦍", caught: true },
-    { name: "Schimpans", icon: "🐒", caught: true }, { name: "Gepard", icon: "🐆", caught: false },
+  { name: "EXTREME", icon: "⚡", color: RED, skills: [
+    { name: "Skydiving", icon: "🪂", active: true }, { name: "Expedition", icon: "🗺️", active: true },
+    { name: "Survival", icon: "🔥", active: false }, { name: "Wingsuit", icon: "🦅", active: false },
     { name: "???", icon: "❓", mystery: true },
   ]},
 ];
 
-const CATCH_DEMO = [
+const CATCH_DEMO_SV = [
   { name: "Jaguar", icon: "🐆", rarity: "LEGENDARY", location: "Amazonas, Brazil", ep: "EP 04" },
   { name: "Isbjörn", icon: "🐻‍❄️", rarity: "EPIC", location: "Svalbard, Norway", ep: "EP 23" },
+  { name: "Gorilla", icon: "🦍", rarity: "LEGENDARY", location: "Bwindi, Uganda", ep: "EP 19" },
+];
+
+const CATCH_DEMO_EN = [
+  { name: "Jaguar", icon: "🐆", rarity: "LEGENDARY", location: "Amazon, Brazil", ep: "EP 04" },
+  { name: "Polar Bear", icon: "🐻‍❄️", rarity: "EPIC", location: "Svalbard, Norway", ep: "EP 23" },
   { name: "Gorilla", icon: "🦍", rarity: "LEGENDARY", location: "Bwindi, Uganda", ep: "EP 19" },
 ];
 
@@ -120,14 +170,14 @@ const RARITY = {
   LEGENDARY: { color: "#ef4444", accent: "#f87171", glow: "rgba(239,68,68,0.4)", label: "LEGENDARY SIGHTING" },
 };
 
-const BRANDS = [
-  { name: "RED BULL", color: "#e3000f", tagline: "GIVES YOU WINGS",
+const BRANDS_SV = [
+  { name: "RED BULL", color: "#e3000f", tagline: "GIVES YOU WINGS", status: "locked",
     points: [
       "Varje avsnitt är en fysisk och mental utmaning — en naturlig matchning",
       "Integration i camp-setups, expeditionsstarter och recovery-moment",
       "Multi-platform: YouTube-avsnitt, TikTok-klipp, Instagram behind-the-scenes",
     ]},
-  { name: "REVOLUTION RACE", color: "#4caf50", tagline: "GEAR THAT SURVIVES THE WILD",
+  { name: "REVOLUTIONRACE", color: "#4caf50", tagline: "GEAR THAT SURVIVES THE WILD", status: "locked",
     points: [
       "Produkten syns i varje bildruta — inte som reklam, utan som utrustning som används",
       "Arktis, Amazonas, Sahara — kläder som testas i verkliga förhållanden",
@@ -135,7 +185,22 @@ const BRANDS = [
     ]},
 ];
 
-const EXPEDITION_PHOTOS = [
+const BRANDS_EN = [
+  { name: "RED BULL", color: "#e3000f", tagline: "GIVES YOU WINGS", status: "locked",
+    points: [
+      "Every episode is a physical and mental challenge — a natural match",
+      "Integration in camp setups, expedition starts and recovery moments",
+      "Multi-platform: YouTube episodes, TikTok clips, Instagram behind-the-scenes",
+    ]},
+  { name: "REVOLUTIONRACE", color: "#4caf50", tagline: "GEAR THAT SURVIVES THE WILD", status: "locked",
+    points: [
+      "The product is visible in every frame — not as advertising, but as gear being used",
+      "Arctic, Amazon, Sahara — clothing tested in real conditions",
+      "\"What was Rezdar wearing?\" content that drives purchase intent",
+    ]},
+];
+
+const EXPEDITION_PHOTOS_SV = [
   { src: "images/arctic.jpg", label: "ARKTIS", icon: "❄️", color: "#7ec8e3", grad: "linear-gradient(135deg, #0d1b2a, #1b3a5c)" },
   { src: "images/amazon.jpg", label: "AMAZONAS", icon: "🌿", color: "#81c784", grad: "linear-gradient(135deg, #0a1e0a, #2e5e2e)" },
   { src: "images/ocean.jpg", label: "HAVET", icon: "🌊", color: "#039be5", grad: "linear-gradient(135deg, #0a1628, #1a3a5c)" },
@@ -143,8 +208,13 @@ const EXPEDITION_PHOTOS = [
   { src: "images/savanna.jpg", label: "AFRIKA", icon: "🌅", color: "#ff9800", grad: "linear-gradient(135deg, #1a0e04, #3d2410)" },
 ];
 
-const caughtTotal = BIOMES_SHOWCASE.reduce((a, b) => a + b.creatures.filter(c => c.caught).length, 0);
-const totalActive = SKILL_CATEGORIES.reduce((a, b) => a + b.skills.filter(s => s.active).length, 0);
+const EXPEDITION_PHOTOS_EN = [
+  { src: "images/arctic.jpg", label: "ARCTIC", icon: "❄️", color: "#7ec8e3", grad: "linear-gradient(135deg, #0d1b2a, #1b3a5c)" },
+  { src: "images/amazon.jpg", label: "AMAZON", icon: "🌿", color: "#81c784", grad: "linear-gradient(135deg, #0a1e0a, #2e5e2e)" },
+  { src: "images/ocean.jpg", label: "OCEAN", icon: "🌊", color: "#039be5", grad: "linear-gradient(135deg, #0a1628, #1a3a5c)" },
+  { src: "images/desert.jpg", label: "SAHARA", icon: "🏜️", color: "#ffc107", grad: "linear-gradient(135deg, #2e1a00, #5c3a00)" },
+  { src: "images/savanna.jpg", label: "AFRICA", icon: "🌅", color: "#ff9800", grad: "linear-gradient(135deg, #1a0e04, #3d2410)" },
+];
 
 /* ═══════════════════════════════════════════════════════════════
    STYLES
@@ -168,11 +238,47 @@ const styles = `
   @keyframes iconPulse{0%,100%{opacity:0;transform:scale(1)}50%{opacity:.2;transform:scale(1.2)}}
   @keyframes scanAnim{0%{opacity:.9;top:0}100%{opacity:0;top:100%}}
   @keyframes barFill{from{width:0}to{width:var(--fill)}}
+  @keyframes badgePulse{0%,100%{opacity:.85}50%{opacity:1}}
 
   .glitch{display:block;position:relative;transition:text-shadow .3s}
   .glitch:hover{animation:glitchShake .3s;text-shadow:3px 0 ${RED},-3px 0 rgba(0,255,255,.4)!important}
   .cc{transition:transform .3s}.cc:hover{transform:scale(1.04)}
   .exp-card{transition:transform .3s}.exp-card:hover{transform:translateY(-4px)}
+
+  .lang-toggle{
+    position:fixed;top:16px;right:16px;z-index:10000;
+    display:flex;border-radius:8px;overflow:hidden;
+    border:1px solid rgba(255,255,255,0.12);
+    backdrop-filter:blur(16px);
+    background:rgba(10,10,10,0.7);
+  }
+  .lang-btn{
+    padding:8px 14px;
+    font-family:'Space Mono',monospace;
+    font-size:11px;letter-spacing:2px;
+    color:rgba(255,255,255,0.35);
+    background:transparent;border:none;cursor:pointer;
+    transition:all 0.3s;
+  }
+  .lang-btn.active{
+    color:white;background:${RED};
+  }
+  .lang-btn:hover:not(.active){
+    color:rgba(255,255,255,0.7);
+  }
+
+  .official-badge{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:4px 12px 4px 8px;
+    border-radius:6px;
+    background:rgba(251,191,36,0.08);
+    border:1px solid rgba(251,191,36,0.25);
+    font-family:'Space Mono',monospace;
+    font-size:8px;letter-spacing:3px;
+    color:#fbbf24;
+    animation:badgePulse 3s ease infinite;
+  }
+  .official-badge svg{width:12px;height:12px;fill:#fbbf24}
 
   @media(max-width:768px){
     .biome-layout{grid-template-columns:1fr!important}
@@ -181,6 +287,12 @@ const styles = `
     .catch-row{grid-template-columns:1fr!important}
     .skill-grid{grid-template-columns:1fr!important}
     .stats-row{flex-wrap:wrap!important;gap:30px!important}
+    .sponsor-grid{grid-template-columns:1fr!important}
+    .hero-collab{letter-spacing:2px!important;font-size:9px!important}
+    .hero-desc br,.cta-desc br{display:none}
+    .hero-desc,.cta-desc{text-wrap:balance}
+    section p{text-wrap:balance;overflow-wrap:break-word;word-break:break-word}
+    .glitch{word-break:break-word;overflow-wrap:break-word}
   }
 `;
 
@@ -309,7 +421,6 @@ function ExpCard({ photo, idx }) {
     }}>
       <div style={{ width: "100%", aspectRatio: "3/4", position: "relative", transformStyle: "preserve-3d",
         transition: "transform 0.6s cubic-bezier(0.4,0,0.2,1)", transform: flipped ? "rotateY(180deg)" : "none" }}>
-        {/* Front — photo (gradient fallback) */}
         <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", borderRadius: 8, overflow: "hidden",
           border: "1px solid rgba(255,255,255,0.08)", background: photo.grad }}>
           <img src={photo.src} alt={photo.label} style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }}
@@ -321,7 +432,6 @@ function ExpCard({ photo, idx }) {
           <div style={{ position: "absolute", top: 8, right: 8, width: 5, height: 5, borderRadius: "50%", background: RED, boxShadow: `0 0 6px ${RED}` }} />
           <div style={{ position: "absolute", bottom: 8, left: 8, fontFamily: "'Bebas Neue',sans-serif", fontSize: 11, letterSpacing: 2, color: "rgba(255,255,255,0.7)", textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}>{photo.label}</div>
         </div>
-        {/* Back */}
         <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", transform: "rotateY(180deg)", borderRadius: 8,
           background: photo.grad, border: `1px solid ${photo.color}40`,
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6 }}>
@@ -394,11 +504,33 @@ function CatchCard({ animal, index }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   LANGUAGE TOGGLE
+   ═══════════════════════════════════════════════════════════════ */
+function LangToggle({ lang, setLang }) {
+  return (
+    <div className="lang-toggle">
+      <button className={`lang-btn ${lang === "sv" ? "active" : ""}`} onClick={() => setLang("sv")}>SWE</button>
+      <button className={`lang-btn ${lang === "en" ? "active" : ""}`} onClick={() => setLang("en")}>ENG</button>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
    MAIN APP
    ═══════════════════════════════════════════════════════════════ */
 function App() {
   const [scrollY, setScrollY] = useState(0);
   const [currentTheme, setCurrentTheme] = useState("hero");
+  const [lang, setLang] = useState("sv");
+
+  const BIOMES_SHOWCASE = lang === "en" ? BIOMES_SHOWCASE_EN : BIOMES_SHOWCASE_SV;
+  const SKILL_CATEGORIES = lang === "en" ? SKILL_CATEGORIES_EN : SKILL_CATEGORIES_SV;
+  const CATCH_DEMO = lang === "en" ? CATCH_DEMO_EN : CATCH_DEMO_SV;
+  const BRANDS = lang === "en" ? BRANDS_EN : BRANDS_SV;
+  const EXPEDITION_PHOTOS = lang === "en" ? EXPEDITION_PHOTOS_EN : EXPEDITION_PHOTOS_SV;
+
+  const caughtTotal = BIOMES_SHOWCASE.reduce((a, b) => a + b.creatures.filter(c => c.caught).length, 0);
+  const totalActive = SKILL_CATEGORIES.reduce((a, b) => a + b.skills.filter(s => s.active).length, 0);
 
   useEffect(() => {
     const fn = () => setScrollY(window.scrollY);
@@ -410,16 +542,20 @@ function App() {
     const obs = new IntersectionObserver(e => {
       e.forEach(en => { if (en.isIntersecting && en.target.dataset.theme) setCurrentTheme(en.target.dataset.theme); });
     }, { threshold: 0.3 });
-    const t = setTimeout(() => document.querySelectorAll("[data-theme]").forEach(el => obs.observe(el)), 200);
-    return () => { clearTimeout(t); obs.disconnect(); };
+    const tt = setTimeout(() => document.querySelectorAll("[data-theme]").forEach(el => obs.observe(el)), 200);
+    return () => { clearTimeout(tt); obs.disconnect(); };
   }, []);
 
   const progress = Math.min((scrollY / Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)) * 100, 100) || 0;
   const aT = BIOME_THEMES[currentTheme] || BIOME_THEMES.hero;
 
   return (
+    <LangContext.Provider value={lang}>
     <div style={{ background: DARK, minHeight: "100vh", color: "white", fontFamily: "'DM Sans',sans-serif" }}>
       <style>{styles}</style>
+
+      {/* Language toggle */}
+      <LangToggle lang={lang} setLang={setLang} />
 
       {/* Progress bar */}
       <div style={{ position: "fixed", top: 0, left: 0, height: 3, zIndex: 9999, width: `${progress}%`,
@@ -431,24 +567,26 @@ function App() {
         position: "relative", overflow: "hidden", background: `radial-gradient(ellipse at 30% 40%, rgba(227,0,15,0.06), ${DARK})` }}>
         <Atmosphere themeId="hero" />
         <div style={{ textAlign: "center", position: "relative", zIndex: 2, padding: "40px 24px", maxWidth: 900 }}>
-          <div style={{ fontFamily: "'Space Mono',monospace", fontSize: "clamp(9px,1.1vw,12px)", letterSpacing: 7, color: RED, marginBottom: 24, opacity: 0, animation: "fadeUp .8s ease .3s forwards" }}>
-            RED BULL × REVOLUTION RACE × REZDAR
+          <div className="hero-collab" style={{ fontFamily: "'Space Mono',monospace", fontSize: "clamp(9px,1.1vw,12px)", letterSpacing: 7, color: RED, marginBottom: 24, opacity: 0, animation: "fadeUp .8s ease .3s forwards" }}>
+            RED BULL × REVOLUTIONRACE × REZDAR
             <div style={{ width: 40, height: 2, background: RED, margin: "14px auto 0" }} />
           </div>
           <div style={{ fontFamily: "'Bebas Neue',sans-serif", lineHeight: .85, opacity: 0, animation: "fadeUp 1s ease .6s forwards" }}>
             <div className="glitch" style={{ fontSize: "clamp(100px,20vw,280px)", color: "white", letterSpacing: -5 }}>100</div>
             <div className="glitch" style={{ fontSize: "clamp(90px,18vw,260px)", color: RED, letterSpacing: 8, marginTop: -15, textShadow: "0 0 80px rgba(227,0,15,.15)" }}>WILD</div>
           </div>
-          {/* THE ONE-LINER */}
-          <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "clamp(15px,1.6vw,20px)", color: "rgba(255,255,255,.65)", marginTop: 35, lineHeight: 1.7, fontWeight: 300, opacity: 0, animation: "fadeUp .8s ease 1s forwards", maxWidth: 600, margin: "35px auto 0" }}>
-            En expeditionsserie genom världens mest extrema miljöer.<br/>
-            <strong style={{ color: "white", fontWeight: 600 }}>Målet: dokumentera 100 vilda arter.</strong>
+          <p className="hero-desc" style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "clamp(15px,1.6vw,20px)", color: "rgba(255,255,255,.65)", marginTop: 35, lineHeight: 1.7, fontWeight: 300, opacity: 0, animation: "fadeUp .8s ease 1s forwards", maxWidth: 600, margin: "35px auto 0" }}>
+            <T sv={<>En expeditionsserie genom världens mest extrema miljöer.<br/><strong style={{ color: "white", fontWeight: 600 }}>Målet: dokumentera 100 vilda arter.</strong></>}
+               en={<>An expedition series through the world's most extreme environments.<br/><strong style={{ color: "white", fontWeight: 600 }}>The goal: document 100 wild species.</strong></>} />
           </p>
           <p style={{ fontFamily: "'Space Mono',monospace", fontSize: "clamp(10px,1vw,13px)", color: "rgba(255,255,255,.3)", marginTop: 16, letterSpacing: 1, opacity: 0, animation: "fadeUp .8s ease 1.2s forwards" }}>
-            Pokémon möter Bear Grylls. Byggt som ett spel. Filmat på riktigt.
+            <T sv="Pokémon möter Bear Grylls. Byggt som ett spel. Filmat på riktigt."
+               en="Pokémon meets Bear Grylls. Built like a game. Filmed for real." />
           </p>
           <div style={{ marginTop: 50, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, opacity: 0, animation: "fadeUp .6s ease 1.5s forwards" }}>
-            <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: 3, color: "#555" }}>SCROLLA</span>
+            <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: 3, color: "#555" }}>
+              <T sv="SCROLLA" en="SCROLL" />
+            </span>
             <div style={{ width: 1, height: 35, background: `linear-gradient(to bottom, ${RED}, transparent)`, animation: "pulse 2s ease infinite" }} />
           </div>
         </div>
@@ -458,10 +596,9 @@ function App() {
       {BIOMES_SHOWCASE.map((biome, i) => {
         const caught = biome.creatures.filter(c => c.caught).length;
         return (
-        <Section key={biome.name} themeId={biome.themeId}>
+        <Section key={biome.name + lang} themeId={biome.themeId}>
           <div style={{ maxWidth: 1000, margin: "0 auto" }}>
             <div style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: "clamp(20px,4vw,40px)", alignItems: "start" }} className="biome-layout">
-              {/* Photo */}
               <Reveal>
                 <div style={{ borderRadius: 12, overflow: "hidden", border: `1px solid ${biome.color}20`, aspectRatio: "3/4", position: "relative", background: biome.grad }}>
                   <img src={biome.photo} alt={biome.name} style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }}
@@ -474,13 +611,14 @@ function App() {
                   <div style={{ position: "absolute", top: 10, right: 10, width: 6, height: 6, borderRadius: "50%", background: RED, boxShadow: `0 0 8px ${RED}` }} />
                 </div>
               </Reveal>
-              {/* Info */}
               <div>
                 <Reveal>
                   <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6 }}>
                     <span style={{ fontSize: 28 }}>{biome.icon}</span>
                     <div>
-                      <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: 3, color: `${biome.color}80` }}>BIOM {String(i + 1).padStart(2, "0")} · LEVEL {i + 1}</div>
+                      <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: 3, color: `${biome.color}80` }}>
+                        {lang === "en" ? `BIOME ${String(i + 1).padStart(2, "0")} · LEVEL ${i + 1}` : `BIOM ${String(i + 1).padStart(2, "0")} · LEVEL ${i + 1}`}
+                      </div>
                       <div className="glitch" style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: "clamp(40px,7vw,72px)", color: "white", letterSpacing: 4, lineHeight: 1 }}>{biome.name}</div>
                     </div>
                   </div>
@@ -493,7 +631,9 @@ function App() {
                 </Reveal>
                 <Reveal delay={0.2}>
                   <div style={{ marginBottom: 20 }}>
-                    <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: 3, color: "rgba(255,255,255,.2)", marginBottom: 8 }}>FAROR</div>
+                    <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: 3, color: "rgba(255,255,255,.2)", marginBottom: 8 }}>
+                      {lang === "en" ? "DANGERS" : "FAROR"}
+                    </div>
                     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                       {biome.dangers.map(d => (
                         <span key={d} style={{ padding: "4px 10px", borderRadius: 6, background: `${biome.color}10`, border: `1px solid ${biome.color}20`,
@@ -502,11 +642,12 @@ function App() {
                     </div>
                   </div>
                 </Reveal>
-                {/* Creature cards inline */}
                 <Reveal delay={0.25}>
                   <div style={{ marginTop: 4 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                      <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: 3, color: "rgba(255,255,255,.2)" }}>ARTER</div>
+                      <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: 3, color: "rgba(255,255,255,.2)" }}>
+                        {lang === "en" ? "SPECIES" : "ARTER"}
+                      </div>
                       <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,.06)" }} />
                       <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 10, color: biome.color }}>{caught}<span style={{ color: "rgba(255,255,255,.15)" }}>/{biome.creatures.length}</span></span>
                     </div>
@@ -539,7 +680,8 @@ function App() {
           <div style={{ textAlign: "center", marginBottom: 50 }}>
             <div className="glitch" style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: "clamp(48px,9vw,100px)", color: "white", letterSpacing: 3, lineHeight: 0.9 }}>SKILL TREE</div>
             <p style={{ fontSize: "clamp(13px,1.2vw,16px)", color: "rgba(255,255,255,.35)", marginTop: 16, maxWidth: 480, margin: "16px auto 0", lineHeight: 1.7 }}>
-              Varje expedition kräver nya färdigheter. Rezdar bygger sin arsenal — från dykning till wingsuit. Nya skills låser upp nya expeditioner.
+              <T sv="Varje expedition kräver nya färdigheter. Rezdar bygger sin arsenal — från dykning till wingsuit. Nya skills låser upp nya expeditioner."
+                 en="Every expedition requires new skills. Rezdar builds his arsenal — from diving to wingsuit. New skills unlock new expeditions." />
             </p>
             <div style={{ display: "flex", justifyContent: "center", gap: 40, marginTop: 30 }}>
               <Ring pct={totalActive / 15} color={RED} size={60}><span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, color: RED }}>{totalActive}</span></Ring>
@@ -586,7 +728,6 @@ function App() {
         </div>
       </Section>
 
-
       {/* ═══ 4. ANIMATION SYSTEM ═══ */}
       <Section themeId="anim">
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
@@ -594,11 +735,12 @@ function App() {
           <div style={{ textAlign: "center", marginBottom: 40 }}>
             <div className="glitch" style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: "clamp(40px,8vw,80px)", color: "white", letterSpacing: 3, lineHeight: 0.9 }}>ENCOUNTER<br/>ANIMATION</div>
             <p style={{ fontSize: "clamp(13px,1.2vw,16px)", color: "rgba(255,255,255,.35)", marginTop: 16, maxWidth: 500, margin: "16px auto 0", lineHeight: 1.7 }}>
-              Varje ny art triggar en animerad pop-up i realtid. Rarity-tiers skapar tittarengagemang — alla väntar på nästa Legendary.
+              <T sv="Varje ny art triggar en animerad pop-up i realtid. Rarity-tiers skapar tittarengagemang — alla väntar på nästa Legendary."
+                 en="Every new species triggers an animated pop-up in real time. Rarity tiers create viewer engagement — everyone waits for the next Legendary." />
             </p>
           </div>
           <div className="catch-row" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
-            {CATCH_DEMO.map((a, i) => <CatchCard key={i} animal={a} index={i} />)}
+            {CATCH_DEMO.map((a, i) => <CatchCard key={a.name + lang} animal={a} index={i} />)}
           </div>
         </div>
       </Section>
@@ -627,12 +769,34 @@ function App() {
           <div style={{ textAlign: "center", marginBottom: 50 }}>
             <div className="glitch" style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: "clamp(40px,8vw,90px)", color: "white", letterSpacing: 3, lineHeight: 0.9 }}>BRAND FIT</div>
             <p style={{ fontSize: "clamp(13px,1.2vw,16px)", color: "rgba(255,255,255,.35)", marginTop: 16, maxWidth: 500, margin: "16px auto 0", lineHeight: 1.7 }}>
-              Det är en äventyrsserie där varumärken syns i rätt kontext — naturligt, trovärdigt, i verkligheten.
+              <T sv="Det är en äventyrsserie där varumärken syns i rätt kontext — naturligt, trovärdigt, i verkligheten."
+                 en="An adventure series where brands appear in the right context — naturally, credibly, in the real world." />
             </p>
           </div>
-          <div className="brand-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-            {BRANDS.map((b, bi) => (
-              <Reveal key={b.name} delay={bi * 0.12} style={{ background: "#0c0c12", border: `1px solid ${b.color}18`, borderRadius: 14, padding: "28px 24px" }}>
+
+          {/* Locked-in brands */}
+          <div className="brand-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
+            {BRANDS.filter(b => b.status === "locked").map((b, bi) => (
+              <Reveal key={b.name} delay={bi * 0.12} style={{
+                background: "#0c0c12", borderRadius: 14, padding: "28px 24px", position: "relative", overflow: "hidden",
+                border: `1.5px solid ${b.color}30`,
+                boxShadow: `0 0 30px ${b.color}08, inset 0 1px 0 ${b.color}15`,
+              }}>
+                {/* Glowing top accent line */}
+                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3,
+                  background: `linear-gradient(90deg, transparent, ${b.color}, transparent)` }} />
+
+                {/* LOCKED IN badge */}
+                <div style={{ position: "absolute", top: 16, right: 16, display: "flex", alignItems: "center", gap: 5,
+                  padding: "5px 10px", borderRadius: 6,
+                  background: `${b.color}12`, border: `1px solid ${b.color}35`,
+                  animation: "badgePulse 3s ease infinite",
+                  boxShadow: `0 0 12px ${b.color}20`,
+                }}>
+                  <svg viewBox="0 0 24 24" width="10" height="10" fill={b.color}><path d="M12 1l3.09 6.26L22 8.27l-5 4.87 1.18 6.88L12 16.77l-6.18 3.25L7 13.14 2 8.27l6.91-1.01L12 1z"/></svg>
+                  <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: 2, color: b.color, fontWeight: 700 }}>LOCKED IN</span>
+                </div>
+
                 <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: "clamp(32px,5vw,48px)", color: b.color, letterSpacing: 3 }}>{b.name}</div>
                 <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: 3, color: "rgba(255,255,255,.2)", marginBottom: 20 }}>{b.tagline}</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -646,6 +810,7 @@ function App() {
               </Reveal>
             ))}
           </div>
+
         </div>
       </Section>
 
@@ -657,8 +822,9 @@ function App() {
             <div className="glitch" style={{ fontSize: "clamp(70px,14vw,200px)", color: RED, letterSpacing: 3 }}>START.</div>
           </div>
           <div style={{ width: 40, height: 3, background: RED, margin: "20px auto 0" }} />
-          <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "clamp(13px,1.3vw,17px)", color: "rgba(232,228,223,.45)", marginTop: 28, lineHeight: 1.7, maxWidth: 420, margin: "28px auto 0" }}>
-            Expeditionen är planerad. Publiken finns.<br/>Det enda som saknas är rätt partner.
+          <p className="cta-desc" style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "clamp(13px,1.3vw,17px)", color: "rgba(232,228,223,.45)", marginTop: 28, lineHeight: 1.7, maxWidth: 420, margin: "28px auto 0" }}>
+            <T sv={<>Expeditionen är planerad. Publiken finns.<br/>Det enda som saknas är rätt partner.</>}
+               en={<>The expedition is planned. The audience is there.<br/>The only thing missing is the right partner.</>} />
           </p>
         </div>
       </Section>
@@ -669,6 +835,7 @@ function App() {
         <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: 2, color: "rgba(255,255,255,.15)" }}>100 WILD · 2026</span>
       </div>
     </div>
+    </LangContext.Provider>
   );
 }
 
