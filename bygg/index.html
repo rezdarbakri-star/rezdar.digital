@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REZDAR'S DRÖMBYGGE — Samarbetsförslag</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #f5f0e8;
+  --bg-card: #ede7db;
+  --bg-elevated: #e5ddd0;
+  --text: #2a2520;
+  --text-dim: #7a7064;
+  --accent: #d4882b;
+  --accent-warm: #c46a1a;
+  --yellow: #e8b931;
+  --yellow-soft: rgba(232, 185, 49, 0.15);
+  --wood: #8b6914;
+  --serif: 'Instrument Serif', Georgia, serif;
+  --sans: 'DM Sans', system-ui, sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Blueprint grid */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.035;
+  background-image:
+    linear-gradient(var(--text) 1px, transparent 1px),
+    linear-gradient(90deg, var(--text) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* Floating construction particles */
+.particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  animation: floatUp linear infinite;
+}
+
+.particle--nail {
+  width: 3px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 1px;
+  opacity: 0.1;
+}
+
+.particle--dot {
+  width: 6px;
+  height: 6px;
+  background: var(--yellow);
+  border-radius: 50%;
+  opacity: 0.08;
+}
+
+.particle--square {
+  width: 8px;
+  height: 8px;
+  background: var(--wood);
+  border-radius: 2px;
+  opacity: 0.05;
+  transform: rotate(45deg);
+}
+
+@keyframes floatUp {
+  0% { opacity: 0; transform: translateY(100vh) rotate(0deg); }
+  10% { opacity: var(--p-opacity, 0.08); }
+  90% { opacity: var(--p-opacity, 0.08); }
+  100% { opacity: 0; transform: translateY(-10vh) rotate(var(--p-rot, 180deg)); }
+}
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Layout */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1;
+}
+
+section { padding: 100px 0; position: relative; }
+
+@media (max-width: 640px) {
+  section { padding: 64px 0; }
+}
+
+/* Section divider */
+.section-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), var(--yellow), var(--accent), transparent);
+  opacity: 0.2;
+}
+
+/* ===== HERO ===== */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 24px;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 40%, rgba(212, 136, 43, 0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(232, 185, 49, 0.05) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* Tape measure line */
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--yellow), var(--accent), var(--yellow), transparent);
+  animation: measureExtend 2s ease 1.5s forwards;
+  border-radius: 2px;
+}
+
+@keyframes measureExtend { to { width: min(400px, 60vw); } }
+
+.hero-inner { position: relative; z-index: 1; }
+
+.hero-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 32px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.3s forwards;
+}
+
+.hero-title {
+  font-family: var(--serif);
+  font-size: clamp(48px, 10vw, 100px);
+  line-height: 1.0;
+  font-weight: 400;
+  margin-bottom: 24px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.5s forwards;
+}
+
+.hero-title em {
+  font-style: italic;
+  color: var(--accent-warm);
+  position: relative;
+  display: inline-block;
+}
+
+.hero-title em::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 0;
+  width: 0;
+  height: 4px;
+  background: var(--yellow);
+  border-radius: 2px;
+  animation: underlineDraw 0.8s ease 1.2s forwards;
+}
+
+@keyframes underlineDraw { to { width: 100%; } }
+
+.hero-sub {
+  font-size: 18px;
+  color: var(--text-dim);
+  max-width: 480px;
+  margin: 0 auto;
+  font-weight: 300;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.7s forwards;
+}
+
+.scroll-cue {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  animation: fadeUp 0.8s ease 1.8s forwards;
+}
+
+.scroll-cue span {
+  display: block;
+  width: 2px;
+  height: 48px;
+  background: linear-gradient(to bottom, var(--accent), transparent);
+  margin: 0 auto;
+  animation: pulse 2s ease-in-out infinite;
+  border-radius: 2px;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* Section headers */
+.section-num {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-family: var(--serif);
+  font-size: clamp(32px, 6vw, 56px);
+  line-height: 1.1;
+  margin-bottom: 24px;
+}
+
+.section-body {
+  font-size: 17px;
+  color: var(--text-dim);
+  max-width: 600px;
+  font-weight: 300;
+  line-height: 1.8;
+}
+
+/* ===== IDEEN ===== */
+.idea-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  margin-top: 56px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.idea-card {
+  background: var(--bg-card);
+  padding: 36px 24px;
+  text-align: center;
+  transition: background 0.3s ease;
+  position: relative;
+}
+
+.idea-card:hover { background: var(--bg-elevated); }
+
+.idea-card::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 2px dashed transparent;
+  border-radius: 8px;
+  transition: border-color 0.4s ease;
+}
+
+.idea-card:hover::before {
+  border-color: rgba(212, 136, 43, 0.2);
+}
+
+.idea-card-icon { font-size: 32px; margin-bottom: 16px; }
+
+.idea-card-title {
+  font-family: var(--serif);
+  font-size: 21px;
+  margin-bottom: 8px;
+}
+
+.idea-card-desc {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-weight: 300;
+}
+
+@media (max-width: 640px) {
+  .idea-grid { grid-template-columns: 1fr; }
+}
+
+/* ===== EPISODES ===== */
+.del-group { margin-top: 64px; }
+.del-group + .del-group { margin-top: 80px; }
+
+.del-group-header {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--bg-elevated);
+  position: relative;
+}
+
+.del-group-header::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  height: 2px;
+  width: 0;
+  background: linear-gradient(90deg, var(--accent), var(--yellow));
+  border-radius: 2px;
+  transition: width 1.2s ease;
+}
+
+.del-group.visible .del-group-header::after {
+  width: var(--progress, 50%);
+}
+
+.del-group-num {
+  font-family: var(--serif);
+  font-size: 14px;
+  color: var(--accent-warm);
+  font-style: italic;
+}
+
+.del-group-title {
+  font-family: var(--serif);
+  font-size: 24px;
+}
+
+.del-group-views {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--text-dim);
+  font-weight: 300;
+}
+
+.episode {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 24px;
+  align-items: center;
+  padding: 16px 0;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.3s ease;
+}
+
+.episode:hover { transform: translateX(4px); }
+.episode + .episode { border-top: 1px solid var(--bg-elevated); }
+
+.episode-thumb {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 16/9;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  transition: box-shadow 0.3s ease;
+}
+
+.episode:hover .episode-thumb {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+}
+
+.episode-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.episode:hover .episode-thumb img { transform: scale(1.04); }
+
+.episode-thumb-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.episode:hover .episode-thumb-overlay { opacity: 1; }
+
+.play-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.play-icon::after {
+  content: '';
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 8px 0 8px 14px;
+  border-color: transparent transparent transparent var(--text);
+  margin-left: 3px;
+}
+
+.episode-duration {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.75);
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.episode-info h3 {
+  font-family: var(--serif);
+  font-size: 20px;
+  line-height: 1.3;
+  margin-bottom: 8px;
+  font-weight: 400;
+}
+
+.episode-views {
+  font-size: 14px;
+  color: var(--accent-warm);
+  font-weight: 600;
+}
+
+.episode-views span {
+  color: var(--text-dim);
+  font-weight: 300;
+  margin-left: 4px;
+}
+
+@media (max-width: 640px) {
+  .episode { grid-template-columns: 1fr; gap: 12px; }
+  .del-group-header { flex-direction: column; gap: 4px; }
+  .del-group-views { margin-left: 0; }
+}
+
+/* Total bar with hazard tape */
+.total-bar {
+  margin-top: 64px;
+  background: var(--text);
+  color: var(--bg);
+  border-radius: 16px;
+  padding: 44px 40px;
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.total-bar::before,
+.total-bar::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--yellow) 0, var(--yellow) 8px,
+    var(--text) 8px, var(--text) 16px
+  );
+}
+
+.total-bar::before { top: 0; }
+.total-bar::after { bottom: 0; }
+
+.total-item-num {
+  font-family: var(--serif);
+  font-size: 38px;
+  color: var(--yellow);
+  line-height: 1;
+}
+
+.total-item-label {
+  font-size: 11px;
+  color: rgba(245, 240, 232, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-top: 8px;
+}
+
+@media (max-width: 640px) {
+  .total-bar { flex-direction: column; gap: 32px; padding: 36px 24px; }
+}
+
+/* ===== KREATÖREN ===== */
+.kreator-content { margin-top: 48px; }
+
+.kreator-bio {
+  font-size: 17px;
+  color: var(--text-dim);
+  font-weight: 300;
+  line-height: 1.8;
+  max-width: 640px;
+  margin-bottom: 48px;
+}
+
+.kreator-bio strong { color: var(--text); font-weight: 500; }
+
+.kreator-platforms {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 48px;
+}
+
+.platform-card {
+  background: var(--bg-card);
+  padding: 28px 24px;
+  text-align: center;
+  transition: background 0.3s ease;
+}
+
+.platform-card:hover { background: var(--bg-elevated); }
+
+.platform-icon {
+  font-size: 12px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.platform-num {
+  font-family: var(--serif);
+  font-size: 34px;
+  color: var(--text);
+}
+
+.platform-label {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-weight: 300;
+}
+
+.partners-label {
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.partners-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.partner-tag {
+  background: var(--bg-card);
+  border: 1px solid var(--bg-elevated);
+  padding: 8px 20px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+  letter-spacing: 1.5px;
+  transition: all 0.3s ease;
+}
+
+.partner-tag:hover {
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+
+@media (max-width: 640px) {
+  .kreator-platforms { grid-template-columns: 1fr; }
+}
+
+/* ===== THE END ===== */
+.the-end {
+  text-align: center;
+  padding: 120px 24px;
+}
+
+.the-end::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 50% at 50% 60%, rgba(212, 136, 43, 0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.end-title {
+  font-family: var(--serif);
+  font-size: clamp(36px, 7vw, 64px);
+  position: relative;
+  z-index: 1;
+}
+
+.end-title em {
+  font-style: italic;
+  color: var(--accent-warm);
+}
+
+.footer {
+  padding: 32px 0;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  opacity: 0.5;
+}
+</style>
+</head>
+<body>
+
+<div class="particles" id="particles"></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <p class="hero-label">Samarbetsförslag 2026</p>
+    <h1 class="hero-title">Rezdar's<br><em>Drömbygge</em></h1>
+    <p class="hero-sub">Jag är ingen snickare och jag kan ingenting om bygg. Men om jag ger mig på mitt drömprojekt — kanske jag kan lära mig på vägen.</p>
+  </div>
+  <div class="scroll-cue"><span></span></div>
+</section>
+
+<!-- IDEEN -->
+<div class="section-divider"></div>
+<section class="ideen">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-num">01 — Idén</p>
+      <h2 class="section-title">Bygga drömmar<br>från noll</h2>
+      <p class="section-body">Rezdar tar sig an omöjliga byggprojekt utan erfarenhet och bjuder in tittarna på hela resan. Från drömhusbil till drömrum, från fejk-tivoli till att överraska följare. Allt byggs live, allt dokumenteras, allt delas.</p>
+    </div>
+    <div class="idea-grid reveal">
+      <div class="idea-card">
+        <div class="idea-card-icon">🔨</div>
+        <div class="idea-card-title">Renovering</div>
+        <div class="idea-card-desc">Verkliga byggprojekt från start till mål</div>
+      </div>
+      <div class="idea-card">
+        <div class="idea-card-icon">🎁</div>
+        <div class="idea-card-title">Överraskningar</div>
+        <div class="idea-card-desc">Följare får sina drömmar uppfyllda</div>
+      </div>
+      <div class="idea-card">
+        <div class="idea-card-icon">🎬</div>
+        <div class="idea-card-title">Underhållning</div>
+        <div class="idea-card-desc">Storytelling som håller tittarna kvar</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERIEN -->
+<div class="section-divider"></div>
+<section class="delarna">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-num">02 — Serien</p>
+      <h2 class="section-title">6 avsnitt.<br>6 miljoner visningar.</h2>
+    </div>
+
+    <div class="del-group reveal" style="--progress: 49%">
+      <div class="del-group-header">
+        <span class="del-group-num">Del I</span>
+        <span class="del-group-title">Drömprojekten</span>
+        <span class="del-group-views">2,94M visningar</span>
+      </div>
+      <a class="episode" href="https://www.youtube.com/watch?v=FzdXCrFkGxM&list=PLQBkpIiKUg0zqTA4PUY1I9zP-oc1q-NrQ&index=1" target="_blank" rel="noopener">
+        <div class="episode-thumb">
+          <img src="https://i.ibb.co/h1LHMXZy/maxresdefault.jpg" alt="Drömhusbil" loading="lazy">
+          <div class="episode-thumb-overlay"><div class="play-icon"></div></div>
+          <span class="episode-duration">23:15</span>
+        </div>
+        <div class="episode-info">
+          <h3>Jag ville resa... så jag BYGGDE MIN DRÖMHUSBIL!</h3>
+          <div class="episode-views">2 000 000 <span>visningar</span></div>
+        </div>
+      </a>
+      <a class="episode" href="https://www.youtube.com/watch?v=UhAxogznq_Y&list=PLQBkpIiKUg0zqTA4PUY1I9zP-oc1q-NrQ&index=2" target="_blank" rel="noopener">
+        <div class="episode-thumb">
+          <img src="https://i.ibb.co/HDD43Mdn/maxresdefault-kopia.jpg" alt="Fejk Gröna Lund" loading="lazy">
+          <div class="episode-thumb-overlay"><div class="play-icon"></div></div>
+          <span class="episode-duration">17:44</span>
+        </div>
+        <div class="episode-info">
+          <h3>Jag ÖPPNADE ett FEJK GRÖNA LUND TIVOLI</h3>
+          <div class="episode-views">941 855 <span>visningar</span></div>
+        </div>
+      </a>
+    </div>
+
+    <div class="del-group reveal" style="--progress: 32%">
+      <div class="del-group-header">
+        <span class="del-group-num">Del II</span>
+        <span class="del-group-title">Drömrummen</span>
+        <span class="del-group-views">1,89M visningar</span>
+      </div>
+      <a class="episode" href="https://www.youtube.com/watch?v=UhAxogznq_Y&list=PLQBkpIiKUg0zqTA4PUY1I9zP-oc1q-NrQ&index=3" target="_blank" rel="noopener">
+        <div class="episode-thumb">
+          <img src="https://i.ibb.co/RxZb8Yv/maxresdefault-kopia-2.jpg" alt="Drömrum" loading="lazy">
+          <div class="episode-thumb-overlay"><div class="play-icon"></div></div>
+          <span class="episode-duration">16:10</span>
+        </div>
+        <div class="episode-info">
+          <h3>Min mamma sa städa... så jag BYGGDE MITT DRÖMRUM!</h3>
+          <div class="episode-views">1 100 000 <span>visningar</span></div>
+        </div>
+      </a>
+      <a class="episode" href="https://www.youtube.com/watch?v=UhAxogznq_Y&list=PLQBkpIiKUg0zqTA4PUY1I9zP-oc1q-NrQ&index=4" target="_blank" rel="noopener">
+        <div class="episode-thumb">
+          <img src="https://i.ibb.co/DgQ8k0ZM/maxresdefault-kopia-3.jpg" alt="Följarens drömrum" loading="lazy">
+          <div class="episode-thumb-overlay"><div class="play-icon"></div></div>
+          <span class="episode-duration">20:28</span>
+        </div>
+        <div class="episode-info">
+          <h3>Följaren med stökigast rum får ett drömrum</h3>
+          <div class="episode-views">790 099 <span>visningar</span></div>
+        </div>
+      </a>
+    </div>
+
+    <div class="del-group reveal" style="--progress: 19%">
+      <div class="del-group-header">
+        <span class="del-group-num">Del III</span>
+        <span class="del-group-title">Följardrömmar</span>
+        <span class="del-group-views">1,13M visningar</span>
+      </div>
+      <a class="episode" href="https://www.youtube.com/watch?v=UhAxogznq_Y&list=PLQBkpIiKUg0zqTA4PUY1I9zP-oc1q-NrQ&index=5" target="_blank" rel="noopener">
+        <div class="episode-thumb">
+          <img src="https://i.ibb.co/cSbHR33p/maxresdefault-kopia-5.jpg" alt="Överraskade följare" loading="lazy">
+          <div class="episode-thumb-overlay"><div class="play-icon"></div></div>
+          <span class="episode-duration">18:12</span>
+        </div>
+        <div class="episode-info">
+          <h3>Jag överraskade en följare & BYGGDE HANS DRÖMRUM!</h3>
+          <div class="episode-views">935 637 <span>visningar</span></div>
+        </div>
+      </a>
+      <a class="episode" href="https://www.youtube.com/watch?v=UhAxogznq_Y&list=PLQBkpIiKUg0zqTA4PUY1I9zP-oc1q-NrQ&index=6" target="_blank" rel="noopener">
+        <div class="episode-thumb">
+          <img src="https://i.ibb.co/TByzXQkB/maxresdefault-kopia-4.jpg" alt="Gaming drömrum" loading="lazy">
+          <div class="episode-thumb-overlay"><div class="play-icon"></div></div>
+          <span class="episode-duration">23:10</span>
+        </div>
+        <div class="episode-info">
+          <h3>Jag ville spela... SÅ JAG BYGGDE MITT DRÖMRUM!</h3>
+          <div class="episode-views">191 307 <span>visningar</span></div>
+        </div>
+      </a>
+    </div>
+
+    <div class="total-bar reveal">
+      <div>
+        <div class="total-item-num">5,96M</div>
+        <div class="total-item-label">Totala visningar</div>
+      </div>
+      <div>
+        <div class="total-item-num">~1M</div>
+        <div class="total-item-label">Snitt per video</div>
+      </div>
+      <div>
+        <div class="total-item-num">2M</div>
+        <div class="total-item-label">Bäst presterande</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- KREATÖREN -->
+<div class="section-divider"></div>
+<section class="kreator">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-num">03 — Kreatören</p>
+      <h2 class="section-title">Rezdar Bakri</h2>
+    </div>
+    <div class="kreator-content reveal">
+      <p class="kreator-bio">
+        <strong>Tvåbarnspappa, filmare och äventyrare</strong> med över 750 000 svenska följare. Programledare för SVT:s <em>Utmaningen</em>, föreläsare på Berghs School of Communication och utnämnd till en av Sveriges mest inflytelserika kreatörer av Svenska Media Akademin. Har överlevt Amazonas, vandrat genom Sahara och jagat i den afrikanska savannen.
+      </p>
+      <div class="kreator-platforms">
+        <div class="platform-card">
+          <div class="platform-icon">YouTube</div>
+          <div class="platform-num">214K</div>
+          <div class="platform-label">prenumeranter</div>
+        </div>
+        <div class="platform-card">
+          <div class="platform-icon">TikTok</div>
+          <div class="platform-num">486K</div>
+          <div class="platform-label">följare</div>
+        </div>
+        <div class="platform-card">
+          <div class="platform-icon">Instagram</div>
+          <div class="platform-num">79K</div>
+          <div class="platform-label">följare</div>
+        </div>
+      </div>
+      <p class="partners-label">Tidigare samarbeten</p>
+      <div class="partners-grid">
+        <span class="partner-tag">RED BULL</span>
+        <span class="partner-tag">NVIDIA</span>
+        <span class="partner-tag">DISNEY</span>
+        <span class="partner-tag">MARVEL</span>
+        <span class="partner-tag">ASUS</span>
+        <span class="partner-tag">REVOLUTIONRACE</span>
+        <span class="partner-tag">EA</span>
+        <span class="partner-tag">WARNER BROS</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- THE END -->
+<div class="section-divider"></div>
+<section class="the-end">
+  <div class="container reveal">
+    <h2 class="end-title">Var med och <em>bygg</em></h2>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">Rezdar × Drömbygge · 2026</div>
+</footer>
+
+<script>
+// Scroll reveal + del-group progress bars
+const els = document.querySelectorAll('.reveal, .del-group');
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+els.forEach(el => obs.observe(el));
+
+// Floating particles
+(function() {
+  const c = document.getElementById('particles');
+  const types = ['nail', 'dot', 'square'];
+  for (let i = 0; i < 18; i++) {
+    const el = document.createElement('div');
+    const t = types[Math.floor(Math.random() * types.length)];
+    el.className = 'particle particle--' + t;
+    el.style.left = Math.random() * 100 + '%';
+    el.style.animationDuration = (14 + Math.random() * 20) + 's';
+    el.style.animationDelay = (Math.random() * 15) + 's';
+    el.style.setProperty('--p-opacity', (0.04 + Math.random() * 0.06).toFixed(2));
+    el.style.setProperty('--p-rot', (90 + Math.random() * 270) + 'deg');
+    c.appendChild(el);
+  }
+})();
+</script>
+</body>
+</html>
