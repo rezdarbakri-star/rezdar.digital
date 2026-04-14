@@ -1,1 +1,966 @@
-.
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REZDAR'S MATRESA — Samarbetsförslag</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #fafaf7;
+  --bg-card: #f0efea;
+  --bg-elevated: #e6e5df;
+  --text: #1a1a18;
+  --text-dim: #6b6b63;
+  --red: #d44a2e;
+  --red-deep: #b33d26;
+  --gold: #e2a63b;
+  --gold-soft: rgba(226, 166, 59, 0.08);
+  --spice: #c47a24;
+  --herb: #5a8a4a;
+  --cream: #f0e8dc;
+  --serif: 'Instrument Serif', Georgia, serif;
+  --sans: 'DM Sans', system-ui, sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Warm ambient glow */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(212, 74, 46, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 60% at 80% 100%, rgba(226, 166, 59, 0.03) 0%, transparent 50%);
+}
+
+/* Subtle texture */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1;
+}
+
+section { padding: 100px 0; position: relative; }
+@media (max-width: 640px) { section { padding: 64px 0; } }
+
+/* ===== HERO ===== */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 24px;
+  position: relative;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 50% 40% at 50% 40%, rgba(212, 74, 46, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 30% 70%, rgba(226, 166, 59, 0.06) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.hero-inner { position: relative; z-index: 1; }
+
+.hero-label {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 5px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 40px;
+  opacity: 0; animation: fadeUp 0.8s ease 0.3s forwards;
+}
+
+.hero-title {
+  font-family: var(--serif);
+  font-size: clamp(52px, 11vw, 110px);
+  line-height: 0.95; font-weight: 400;
+  margin-bottom: 36px;
+  opacity: 0; animation: fadeUp 0.8s ease 0.5s forwards;
+}
+
+.hero-title .line1 {
+  display: block;
+  color: var(--text);
+}
+
+.hero-title .line2 {
+  display: block;
+  font-style: italic;
+  background: linear-gradient(135deg, var(--red), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-tagline {
+  font-family: var(--serif);
+  font-size: clamp(17px, 2.5vw, 22px);
+  font-style: italic;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.7s forwards;
+}
+
+.hero-meta {
+  font-size: 15px;
+  color: var(--text-dim);
+  font-weight: 300;
+  opacity: 0.6;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.9s forwards;
+}
+
+.hero-divider {
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--red), var(--gold), var(--red), transparent);
+  margin: 48px auto 0;
+  opacity: 0;
+  animation: fadeUp 0.6s ease 1s forwards, expandLine 1.2s ease 1.2s forwards;
+}
+
+@keyframes expandLine { to { width: min(300px, 50vw); } }
+
+.scroll-cue {
+  position: absolute;
+  bottom: 40px; left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  animation: fadeUp 0.8s ease 1.8s forwards;
+}
+
+.scroll-cue span {
+  display: block;
+  width: 1px; height: 48px;
+  background: linear-gradient(to bottom, var(--gold), transparent);
+  margin: 0 auto;
+  animation: pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.8; }
+}
+
+/* Section headers */
+.section-num {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 4px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 16px;
+}
+
+.section-title {
+  font-family: var(--serif);
+  font-size: clamp(32px, 6vw, 52px);
+  line-height: 1.1; margin-bottom: 24px;
+}
+
+.section-body {
+  font-size: 17px; color: var(--text-dim);
+  max-width: 560px; font-weight: 300; line-height: 1.8;
+}
+
+/* Divider */
+.divider {
+  max-width: 960px; margin: 0 auto; padding: 0 24px;
+}
+.divider-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(226,166,59,0.15), rgba(212,74,46,0.1), rgba(226,166,59,0.15), transparent);
+}
+
+/* ===== IDEEN ===== */
+.idea-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px; margin-top: 56px;
+  border-radius: 16px; overflow: hidden;
+  background: var(--bg-elevated);
+}
+
+.idea-card {
+  background: var(--bg-card);
+  padding: 40px 24px;
+  text-align: center;
+  transition: all 0.4s ease;
+  position: relative;
+}
+
+.idea-card:hover {
+  background: var(--bg-elevated);
+}
+
+.idea-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 2px;
+  background: linear-gradient(90deg, var(--red), var(--gold));
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.idea-card:hover::after { width: 60%; }
+
+.idea-card-icon { font-size: 32px; margin-bottom: 16px; }
+
+.idea-card-title {
+  font-family: var(--serif); font-size: 21px;
+  margin-bottom: 8px;
+}
+
+.idea-card-desc { font-size: 13px; color: var(--text-dim); font-weight: 300; }
+
+@media (max-width: 640px) { .idea-grid { grid-template-columns: 1fr; } }
+
+/* ===== EPISODES ===== */
+.del-group { margin-top: 56px; }
+.del-group + .del-group { margin-top: 72px; }
+
+.del-group-header {
+  display: flex; align-items: baseline; gap: 16px;
+  margin-bottom: 28px; padding-bottom: 14px;
+  border-bottom: 2px solid var(--bg-elevated);
+  position: relative;
+}
+
+.del-group-header::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 0;
+  height: 2px; width: 0;
+  background: linear-gradient(90deg, var(--red), var(--gold));
+  transition: width 1.4s ease;
+}
+
+.del-group.visible .del-group-header::after { width: var(--progress, 50%); }
+
+.del-group-num { font-family: var(--serif); font-size: 14px; color: var(--red); font-style: italic; }
+.del-group-title { font-family: var(--serif); font-size: 23px; }
+.del-group-views { margin-left: auto; font-size: 13px; color: var(--text-dim); font-weight: 300; }
+
+/* Episode cards - visual grid */
+.episodes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.episodes-grid--single {
+  grid-template-columns: 1fr;
+  max-width: 500px;
+}
+
+.ep-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--bg-card);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.ep-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+}
+
+.ep-card-thumb {
+  position: relative;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+}
+
+.ep-card-thumb img {
+  width: 100%; height: 100%; object-fit: cover;
+  display: block;
+  transition: transform 0.6s ease;
+}
+
+.ep-card:hover .ep-card-thumb img { transform: scale(1.06); }
+
+.ep-card-thumb-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%);
+  display: flex; align-items: flex-end;
+  padding: 16px;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.ep-card:hover .ep-card-thumb-overlay { opacity: 1; }
+
+.ep-card-duration {
+  position: absolute; top: 12px; right: 12px;
+  background: rgba(0,0,0,0.7); color: #fff;
+  padding: 3px 8px; border-radius: 4px;
+  font-size: 12px; font-weight: 500;
+  backdrop-filter: blur(4px);
+}
+
+.ep-card-play {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  width: 52px; height: 52px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.ep-card:hover .ep-card-play {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.ep-card-play::after {
+  content: '';
+  border-style: solid;
+  border-width: 8px 0 8px 14px;
+  border-color: transparent transparent transparent var(--bg);
+  margin-left: 3px;
+}
+
+.ep-card-body {
+  padding: 20px;
+}
+
+.ep-card-title {
+  font-family: var(--serif);
+  font-size: 18px; line-height: 1.3;
+  margin-bottom: 8px; font-weight: 400;
+}
+
+.ep-card-views {
+  font-size: 14px; font-weight: 600;
+  color: var(--gold);
+}
+
+.ep-card-views span {
+  color: var(--text-dim); font-weight: 300; margin-left: 4px;
+}
+
+@media (max-width: 640px) {
+  .episodes-grid { grid-template-columns: 1fr; }
+  .del-group-header { flex-direction: column; gap: 4px; }
+  .del-group-views { margin-left: 0; }
+}
+
+/* Total bar */
+.total-bar {
+  margin-top: 56px;
+  position: relative;
+  border-radius: 20px;
+  padding: 3px;
+  background: linear-gradient(135deg, var(--red), var(--gold), var(--red), var(--gold));
+  background-size: 300% 300%;
+  animation: shimmerBorder 6s ease infinite;
+}
+
+@keyframes shimmerBorder {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.total-bar-inner {
+  background: var(--bg);
+  border-radius: 18px;
+  padding: 48px 40px;
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.total-bar-inner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 40% 60% at 20% 50%, rgba(212,74,46,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 60% at 80% 50%, rgba(226,166,59,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.total-item {
+  position: relative;
+  z-index: 1;
+}
+
+.total-item-num {
+  font-family: var(--serif);
+  font-size: 42px;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--red), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.total-item-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-top: 10px;
+}
+@media (max-width: 640px) {
+  .total-bar-inner { flex-direction: column; gap: 32px; padding: 36px 24px; }
+}
+
+/* ===== INTEGRATIONS ===== */
+.sponsor-card {
+  background: var(--bg-card);
+  border: 1px solid var(--bg-elevated);
+  border-radius: 16px;
+  padding: 40px;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+}
+
+.sponsor-card:hover {
+  background: var(--bg-elevated);
+  border-color: var(--bg-elevated);
+}
+
+.sponsor-header {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 20px;
+}
+
+.sponsor-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 14px; border-radius: 100px;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+}
+
+.sponsor-badge--locked { background: var(--herb); color: #fff; }
+.sponsor-badge--locked::before { content: '✓'; font-size: 11px; }
+
+.sponsor-badge--open {
+  background: transparent;
+  border: 1.5px dashed var(--gold);
+  color: var(--gold);
+}
+
+.sponsor-name { font-family: var(--serif); font-size: 28px; line-height: 1; }
+.sponsor-role { font-size: 13px; color: var(--text-dim); font-weight: 300; margin-top: 2px; }
+
+.sponsor-body {
+  font-size: 15px; color: var(--text-dim);
+  font-weight: 300; line-height: 1.7; max-width: 560px;
+}
+
+.sponsor-body strong { color: var(--text); font-weight: 500; }
+
+.sponsor-touchpoints { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+
+.touchpoint {
+  padding: 6px 14px; border-radius: 100px;
+  font-size: 12px; font-weight: 500; letter-spacing: 0.5px;
+  background: rgba(0,0,0,0.04); color: var(--text-dim);
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+.sponsor-card--open {
+  border: 1.5px dashed var(--bg-elevated);
+  background: transparent;
+}
+
+.sponsor-card--open:hover {
+  border-color: var(--red);
+  background: var(--gold-soft);
+}
+
+.open-desc { font-size: 15px; color: var(--text-dim); font-weight: 300; line-height: 1.7; }
+.open-examples { margin-top: 16px; font-size: 13px; color: var(--text-dim); font-weight: 400; font-style: italic; }
+
+/* ===== KREATÖREN ===== */
+.kreator-name {
+  font-family: var(--serif);
+  font-size: clamp(36px, 6vw, 56px);
+  line-height: 1.1; margin-bottom: 32px;
+}
+
+.kreator-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 48px;
+  background: var(--bg-elevated);
+}
+
+.kreator-stat {
+  background: var(--bg-card);
+  padding: 32px 16px;
+  text-align: center;
+  transition: background 0.3s ease;
+}
+
+.kreator-stat:hover { background: var(--bg-elevated); }
+
+.kreator-stat-num {
+  font-family: var(--serif);
+  font-size: clamp(34px, 5vw, 48px);
+  background: linear-gradient(135deg, var(--red), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.kreator-stat-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 500;
+}
+
+.kreator-bio {
+  font-size: 17px; color: var(--text-dim);
+  font-weight: 300; line-height: 1.8;
+  max-width: 620px;
+}
+
+.kreator-bio strong { color: var(--text); font-weight: 500; }
+
+@media (max-width: 640px) {
+  .kreator-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ===== THE END ===== */
+.the-end { text-align: center; padding: 120px 24px; }
+
+.the-end::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 40% 40% at 50% 60%, rgba(212,74,46,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.end-title {
+  font-family: var(--serif);
+  font-size: clamp(36px, 7vw, 64px);
+  position: relative; z-index: 1;
+}
+
+.end-title em {
+  font-style: italic;
+  background: linear-gradient(135deg, var(--red), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.footer {
+  padding: 32px 0; text-align: center;
+  font-size: 12px; color: var(--text-dim);
+  letter-spacing: 2px; opacity: 0.3;
+}
+/* ===== FLOATING FOOD ===== */
+.food-particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.food-particle {
+  position: absolute;
+  font-size: var(--fp-size, 20px);
+  opacity: 0;
+  animation: foodFloat linear infinite;
+  filter: brightness(1) saturate(0.8);
+}
+
+@keyframes foodFloat {
+  0% {
+    opacity: 0;
+    transform: translateY(105vh) rotate(0deg) scale(0.8);
+  }
+  8% { opacity: var(--fp-o, 0.12); }
+  50% {
+    transform: translateY(50vh) rotate(var(--fp-spin, 90deg)) translateX(var(--fp-drift, 15px)) scale(1);
+  }
+  92% { opacity: var(--fp-o, 0.12); }
+  100% {
+    opacity: 0;
+    transform: translateY(-5vh) rotate(var(--fp-spin2, 200deg)) translateX(calc(var(--fp-drift, 15px) * -1)) scale(0.8);
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="food-particles" id="foodParticles"></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <p class="hero-label">Samarbetsförslag 2026</p>
+    <h1 class="hero-title">
+      <span class="line1">Rezdar's</span>
+      <span class="line2">Matresa</span>
+    </h1>
+    <p class="hero-tagline">En underhållningsserie om mat och äkta reaktioner.</p>
+
+    <div class="hero-divider"></div>
+  </div>
+  <div class="scroll-cue"><span></span></div>
+</section>
+
+<!-- SERIEN -->
+<div class="divider"><div class="divider-line"></div></div>
+<section>
+  <div class="container">
+    <div class="reveal">
+      <p class="section-num">01 — Serien</p>
+      <h2 class="section-title">6 avsnitt.<br>4,3 miljoner visningar.</h2>
+    </div>
+
+    <div class="episodes-grid reveal" style="margin-top: 48px;">
+        <a class="ep-card" href="https://www.youtube.com/watch?v=pMC7HSoTHk0&list=PLQBkpIiKUg0xiWjIhdS0-ls_VFw4RkG1u&index=6" target="_blank" rel="noopener">
+          <div class="ep-card-thumb">
+            <img src="https://i.ibb.co/cXScsHcM/matresa5.jpg" alt="Afrikansk stam godis" loading="lazy">
+            <div class="ep-card-thumb-overlay"></div>
+            <span class="ep-card-duration">20:47</span>
+            <div class="ep-card-play"></div>
+          </div>
+          <div class="ep-card-body">
+            <h3 class="ep-card-title">Bjuder afrikansk stam på SVENSKT GODIS</h3>
+            <div class="ep-card-views">1 500 000 <span>visningar</span></div>
+          </div>
+        </a>
+        <a class="ep-card" href="https://www.youtube.com/watch?v=pMC7HSoTHk0&list=PLQBkpIiKUg0xiWjIhdS0-ls_VFw4RkG1u&index=1" target="_blank" rel="noopener">
+          <div class="ep-card-thumb">
+            <img src="https://i.ibb.co/WpnwG4vh/matresa1.jpg" alt="Mat från hela Sverige" loading="lazy">
+            <div class="ep-card-thumb-overlay"></div>
+            <span class="ep-card-duration">36:26</span>
+            <div class="ep-card-play"></div>
+          </div>
+          <div class="ep-card-body">
+            <h3 class="ep-card-title">Jag var hungrig... så jag åt mat från hela Sverige!</h3>
+            <div class="ep-card-views">880 159 <span>visningar</span></div>
+          </div>
+        </a>
+        <a class="ep-card" href="https://www.youtube.com/watch?v=pMC7HSoTHk0&list=PLQBkpIiKUg0xiWjIhdS0-ls_VFw4RkG1u&index=2" target="_blank" rel="noopener">
+          <div class="ep-card-thumb">
+            <img src="https://i.ibb.co/PvDHvG75/matresa2.jpg" alt="Svensk restaurang Thailand" loading="lazy">
+            <div class="ep-card-thumb-overlay"></div>
+            <span class="ep-card-duration">18:12</span>
+            <div class="ep-card-play"></div>
+          </div>
+          <div class="ep-card-body">
+            <h3 class="ep-card-title">Jag har öppnat en svensk restaurang i Thailand!</h3>
+            <div class="ep-card-views">677 503 <span>visningar</span></div>
+          </div>
+        </a>
+        <a class="ep-card" href="https://www.youtube.com/watch?v=pMC7HSoTHk0&list=PLQBkpIiKUg0xiWjIhdS0-ls_VFw4RkG1u&index=3" target="_blank" rel="noopener">
+          <div class="ep-card-thumb">
+            <img src="https://i.ibb.co/21y632Fg/matresa3.jpg" alt="Araber godis" loading="lazy">
+            <div class="ep-card-thumb-overlay"></div>
+            <span class="ep-card-duration">22:17</span>
+            <div class="ep-card-play"></div>
+          </div>
+          <div class="ep-card-body">
+            <h3 class="ep-card-title">Bjuder araber på SVENSKT GODIS</h3>
+            <div class="ep-card-views">612 833 <span>visningar</span></div>
+          </div>
+        </a>
+        <a class="ep-card" href="https://www.youtube.com/watch?v=pMC7HSoTHk0&list=PLQBkpIiKUg0xiWjIhdS0-ls_VFw4RkG1u&index=4" target="_blank" rel="noopener">
+          <div class="ep-card-thumb">
+            <img src="https://i.ibb.co/k2ZMN50B/matresa4.jpg" alt="Indianer godis" loading="lazy">
+            <div class="ep-card-thumb-overlay"></div>
+            <span class="ep-card-duration">21:42</span>
+            <div class="ep-card-play"></div>
+          </div>
+          <div class="ep-card-body">
+            <h3 class="ep-card-title">Bjuder indianer på SVENSKT GODIS!</h3>
+            <div class="ep-card-views">463 471 <span>visningar</span></div>
+          </div>
+        </a>
+        <a class="ep-card" href="https://www.youtube.com/watch?v=3ctJtHBxUSA" target="_blank" rel="noopener">
+          <div class="ep-card-thumb">
+            <img src="https://i.ibb.co/svyKQRdY/thumbnailgrabbypabby.jpg" alt="Öppnar restaurang på 30 dagar" loading="lazy">
+            <div class="ep-card-thumb-overlay"></div>
+            <div class="ep-card-play"></div>
+          </div>
+          <div class="ep-card-body">
+            <h3 class="ep-card-title">Jag öppnar en restaurang på 30 dagar</h3>
+            <div class="ep-card-views">250 823 <span>visningar</span></div>
+          </div>
+        </a>
+    </div>
+
+    <div class="total-bar reveal">
+      <div class="total-bar-inner">
+        <div class="total-item">
+          <div class="total-item-num" data-total-target="4.3" data-total-suffix="M">0</div>
+          <div class="total-item-label">Totala visningar</div>
+        </div>
+        <div class="total-item">
+          <div class="total-item-num" data-total-target="720" data-total-prefix="~" data-total-suffix="K">0</div>
+          <div class="total-item-label">Snitt per video</div>
+        </div>
+        <div class="total-item">
+          <div class="total-item-num" data-total-target="1.5" data-total-suffix="M">0</div>
+          <div class="total-item-label">Bäst presterande</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INTEGRATIONER -->
+<div class="divider"><div class="divider-line"></div></div>
+<section>
+  <div class="container">
+    <div class="reveal">
+      <p class="section-num">02 — Integrationer</p>
+      <h2 class="section-title">Vem lagar<br>med Rezdar?</h2>
+    </div>
+
+    <div class="sponsor-card reveal">
+      <div class="sponsor-header">
+        <div>
+          <div class="sponsor-name">Red Bull</div>
+          <div class="sponsor-role">Energi & Driv</div>
+        </div>
+        <span class="sponsor-badge sponsor-badge--locked">Låst 2026</span>
+      </div>
+      <p class="sponsor-body">
+        <strong>Red Bull är med genom hela resan.</strong> Tidiga morgnar på matmarknader, långa dagar på resande fot och sena kvällar i köket. Red Bull syns naturligt i pauserna mellan smakningar och kulturmöten.
+      </p>
+      <div class="sponsor-touchpoints">
+        <span class="touchpoint">Naturliga drinkmoment</span>
+        <span class="touchpoint">Reseenergi</span>
+        <span class="touchpoint">Integrerad i berättelsen</span>
+      </div>
+    </div>
+
+    <div class="sponsor-card reveal">
+      <div class="sponsor-header">
+        <div>
+          <div class="sponsor-name">RevolutionRace</div>
+          <div class="sponsor-role">Kläder som tål en resa</div>
+        </div>
+        <span class="sponsor-badge sponsor-badge--locked">Låst 2026</span>
+      </div>
+      <p class="sponsor-body">
+        <strong>Slitstarka kläder för den som reser på riktigt.</strong> RVRC sitter på Rezdar genom varje avsnitt. Från matmarknader utomlands till köket hemma. Samma plagg, alla miljöer. Tittarna ser kläderna i aktion.
+      </p>
+      <div class="sponsor-touchpoints">
+        <span class="touchpoint">Genomgående i varje avsnitt</span>
+        <span class="touchpoint">Alla klimat och miljöer</span>
+        <span class="touchpoint">Produkten i kontext</span>
+      </div>
+    </div>
+
+    <div class="sponsor-card sponsor-card--open reveal">
+      <div class="sponsor-header">
+        <div>
+          <div class="sponsor-name" style="color: var(--gold);">Din plats</div>
+          <div class="sponsor-role">Mat, dryck eller livsmedel</div>
+        </div>
+        <span class="sponsor-badge sponsor-badge--open">Öppen</span>
+      </div>
+      <p class="open-desc">
+        Matresa söker en partner inom mat, dryck eller livsmedel. Ett varumärke som vill synas i ett format där smak, kultur och äkta reaktioner står i centrum, framför en publik på miljoner.
+      </p>
+      <p class="open-examples">Livsmedel, godis, snacks, dryck, köksutrustning, matupplevelser...</p>
+    </div>
+  </div>
+</section>
+
+<!-- KREATÖREN -->
+<div class="divider"><div class="divider-line"></div></div>
+<section>
+  <div class="container">
+    <div class="reveal">
+      <p class="section-num">03 — Kreatören</p>
+    </div>
+    <div class="reveal">
+      <h2 class="kreator-name">Rezdar Bakri</h2>
+      <div class="kreator-stats">
+        <div class="kreator-stat">
+          <div class="kreator-stat-num" data-target="750" data-suffix="K+">0</div>
+          <div class="kreator-stat-label">Följare</div>
+        </div>
+        <div class="kreator-stat">
+          <div class="kreator-stat-num" data-target="214" data-suffix="K">0</div>
+          <div class="kreator-stat-label">YouTube</div>
+        </div>
+        <div class="kreator-stat">
+          <div class="kreator-stat-num" data-target="486" data-suffix="K">0</div>
+          <div class="kreator-stat-label">TikTok</div>
+        </div>
+        <div class="kreator-stat">
+          <div class="kreator-stat-num" data-target="79" data-suffix="K">0</div>
+          <div class="kreator-stat-label">Instagram</div>
+        </div>
+      </div>
+    </div>
+    <div class="reveal">
+      <p class="kreator-bio">
+        Programledare för SVT:s <em>Utmaningen</em>, semifinalist i Talang 2019 och utnämnd till en av Sveriges mest inflytelserika kreatörer av Svenska Media Akademin. Har överlevt Amazonas, vandrat genom Sahara och jagat i den afrikanska savannen.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- THE END -->
+<div class="divider"><div class="divider-line"></div></div>
+<section class="the-end">
+  <div class="container reveal">
+    <h2 class="end-title">Var med och <em>laga</em></h2>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">Rezdar × Matresa · 2026</div>
+</footer>
+
+<script>
+// Scroll reveal
+const els = document.querySelectorAll('.reveal, .del-group');
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+els.forEach(el => obs.observe(el));
+
+// Animated counters
+const counterEls = document.querySelectorAll('.kreator-stat-num[data-target]');
+let countersDone = false;
+const counterObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting && !countersDone) {
+      countersDone = true;
+      counterEls.forEach(el => {
+        const target = parseInt(el.dataset.target);
+        const suffix = el.dataset.suffix || '';
+        const duration = 1800;
+        const start = performance.now();
+        function tick(now) {
+          const progress = Math.min((now - start) / duration, 1);
+          const ease = 1 - Math.pow(1 - progress, 4);
+          el.textContent = Math.round(target * ease) + suffix;
+          if (progress < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      });
+    }
+  });
+}, { threshold: 0.3 });
+counterEls.forEach(el => counterObs.observe(el));
+
+// Animated total bar counters
+const totalEls = document.querySelectorAll('.total-item-num[data-total-target]');
+let totalsDone = false;
+const totalObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting && !totalsDone) {
+      totalsDone = true;
+      totalEls.forEach(el => {
+        const target = parseFloat(el.dataset.totalTarget);
+        const suffix = el.dataset.totalSuffix || '';
+        const prefix = el.dataset.totalPrefix || '';
+        const isDecimal = target % 1 !== 0;
+        const duration = 2000;
+        const start = performance.now();
+        function tick(now) {
+          const progress = Math.min((now - start) / duration, 1);
+          const ease = 1 - Math.pow(1 - progress, 4);
+          const current = target * ease;
+          const display = isDecimal ? current.toFixed(1).replace('.', ',') : Math.round(current);
+          el.textContent = prefix + display + suffix;
+          if (progress < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      });
+    }
+  });
+}, { threshold: 0.3 });
+totalEls.forEach(el => totalObs.observe(el));
+
+// Floating food particles
+(function() {
+  const c = document.getElementById('foodParticles');
+  const foods = ['🍬','🍫','🍕','🌶️','🧁','🍿','🍩','🥐','🍭','🧀','🌮','🍪','🥤','🍰','🍣'];
+  for (let i = 0; i < 18; i++) {
+    const el = document.createElement('div');
+    el.className = 'food-particle';
+    el.textContent = foods[Math.floor(Math.random() * foods.length)];
+    el.style.left = Math.random() * 100 + '%';
+    el.style.animationDuration = (20 + Math.random() * 28) + 's';
+    el.style.animationDelay = (Math.random() * 25) + 's';
+    el.style.setProperty('--fp-size', (16 + Math.random() * 14) + 'px');
+    el.style.setProperty('--fp-o', (0.08 + Math.random() * 0.1).toFixed(2));
+    el.style.setProperty('--fp-spin', (60 + Math.random() * 240) + 'deg');
+    el.style.setProperty('--fp-spin2', (120 + Math.random() * 300) + 'deg');
+    el.style.setProperty('--fp-drift', (-40 + Math.random() * 80) + 'px');
+    c.appendChild(el);
+  }
+})();
+</script>
+</body>
+</html>
