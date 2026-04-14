@@ -147,7 +147,8 @@ section { padding: 100px 0; position: relative; }
 .hero-video-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(246, 242, 235, 0.75);
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 50%, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.4) 100%);
   z-index: 1;
 }
 
@@ -171,7 +172,7 @@ section { padding: 100px 0; position: relative; }
   width: 0;
   height: 2px;
   z-index: 3;
-  background: linear-gradient(90deg, transparent, var(--gold), var(--accent), var(--gold), transparent);
+  background: linear-gradient(90deg, transparent, var(--gold), #fff, var(--gold), transparent);
   animation: measureExtend 2s ease 1.5s forwards;
   border-radius: 2px;
 }
@@ -183,8 +184,9 @@ section { padding: 100px 0; position: relative; }
 .hero-label {
   font-size: 11px; font-weight: 600;
   letter-spacing: 4px; text-transform: uppercase;
-  color: var(--accent); margin-bottom: 32px;
+  color: var(--gold); margin-bottom: 32px;
   opacity: 0; animation: fadeUp 0.8s ease 0.3s forwards;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.3);
 }
 
 .hero-title {
@@ -192,6 +194,8 @@ section { padding: 100px 0; position: relative; }
   font-size: clamp(48px, 10vw, 100px);
   line-height: 1.0; font-weight: 400;
   margin-bottom: 32px;
+  color: #fff;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.3);
   opacity: 0; animation: fadeUp 0.8s ease 0.5s forwards;
 }
 
@@ -218,19 +222,21 @@ section { padding: 100px 0; position: relative; }
   font-family: var(--serif);
   font-size: clamp(18px, 3vw, 24px);
   font-style: italic;
-  color: var(--text);
+  color: #fff;
   margin-bottom: 12px;
+  text-shadow: 0 1px 10px rgba(0,0,0,0.3);
   opacity: 0;
   animation: fadeUp 0.8s ease 0.7s forwards;
 }
 
 .hero-meta {
   font-size: 15px;
-  color: var(--text-dim);
+  color: rgba(255,255,255,0.7);
   font-weight: 300;
   line-height: 1.7;
   max-width: 400px;
   margin: 0 auto;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.2);
   opacity: 0;
   animation: fadeUp 0.8s ease 0.9s forwards;
 }
@@ -249,7 +255,7 @@ section { padding: 100px 0; position: relative; }
 .scroll-cue span {
   display: block;
   width: 1px; height: 48px;
-  background: linear-gradient(to bottom, var(--accent), transparent);
+  background: linear-gradient(to bottom, rgba(255,255,255,0.6), transparent);
   margin: 0 auto;
   animation: pulse 2.5s ease-in-out infinite;
 }
@@ -666,7 +672,7 @@ section { padding: 100px 0; position: relative; }
 <!-- HERO -->
 <section class="hero">
   <div class="hero-video">
-    <iframe src="https://www.youtube.com/embed/TbUBTikjo18?autoplay=1&mute=1&controls=0&loop=1&start=120&playlist=TbUBTikjo18&showinfo=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1" allow="autoplay" loading="lazy"></iframe>
+    <iframe src="https://www.youtube.com/embed/TbUBTikjo18?autoplay=1&mute=1&controls=0&loop=1&start=180&playlist=TbUBTikjo18&showinfo=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1" allow="autoplay" loading="lazy"></iframe>
     <div class="hero-video-overlay"></div>
   </div>
   <div class="hero-inner">
@@ -861,7 +867,7 @@ section { padding: 100px 0; position: relative; }
         <span class="sponsor-badge sponsor-badge--locked">Låst 2026</span>
       </div>
       <p class="sponsor-body">
-        <strong>Red Bull är med genom hela resan.</strong> Varje avsnitt har tidiga morgnar, sena kvällar och långa dagar med borr i hand. Red Bull syns naturligt i pauser, under bygget och i de klassiska "innan vi kör igång"-momenten. Samma roll som i 100WILD, anpassat till verkstan istället för vildmarken.
+        <strong>Red Bull är med genom hela resan.</strong> Varje avsnitt har tidiga morgnar, sena kvällar och långa dagar med borr i hand. Red Bull syns naturligt i pauser, under bygget och i de klassiska "innan vi kör igång"-momenten.
       </p>
       <div class="sponsor-touchpoints">
         <span class="touchpoint">Naturliga drinkmoment</span>
