@@ -131,7 +131,6 @@ section { padding: 100px 0; position: relative; }
   overflow: hidden;
 }
 
-.hero-video #heroPlayer,
 .hero-video iframe {
   position: absolute;
   top: 50%;
@@ -673,7 +672,7 @@ section { padding: 100px 0; position: relative; }
 <!-- HERO -->
 <section class="hero">
   <div class="hero-video">
-    <div id="heroPlayer"></div>
+    <iframe src="https://www.youtube.com/embed/TbUBTikjo18?autoplay=1&mute=1&controls=0&loop=0&start=180&showinfo=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1" allow="autoplay" loading="lazy"></iframe>
     <div class="hero-video-overlay"></div>
   </div>
   <div class="hero-inner">
@@ -958,61 +957,6 @@ section { padding: 100px 0; position: relative; }
 <footer class="footer">
   <div class="container">Rezdar × Drömbygge · 2026</div>
 </footer>
-
-<script>
-// YouTube IFrame API
-var tag = document.createElement('script');
-tag.src = 'https://www.youtube.com/iframe_api';
-document.head.appendChild(tag);
-
-var heroPlayer;
-var videos = [
-  { id: 'TbUBTikjo18', start: 180, end: 300 },  // 3:00 - 5:00
-  { id: 'BObLfEePLuo', start: 30, end: 150 }     // 0:30 - 2:30
-];
-var currentVideo = 0;
-
-function onYouTubeIframeAPIReady() {
-  heroPlayer = new YT.Player('heroPlayer', {
-    videoId: videos[0].id,
-    playerVars: {
-      autoplay: 1,
-      mute: 1,
-      controls: 0,
-      showinfo: 0,
-      modestbranding: 1,
-      rel: 0,
-      iv_load_policy: 3,
-      disablekb: 1,
-      fs: 0,
-      playsinline: 1,
-      start: videos[0].start
-    },
-    events: {
-      onReady: function(e) {
-        e.target.seekTo(videos[0].start);
-        e.target.playVideo();
-        checkLoop();
-      }
-    }
-  });
-}
-
-function checkLoop() {
-  if (!heroPlayer || typeof heroPlayer.getCurrentTime !== 'function') {
-    requestAnimationFrame(checkLoop);
-    return;
-  }
-  var v = videos[currentVideo];
-  var t = heroPlayer.getCurrentTime();
-  if (t >= v.end) {
-    currentVideo = (currentVideo + 1) % videos.length;
-    var next = videos[currentVideo];
-    heroPlayer.loadVideoById({ videoId: next.id, startSeconds: next.start });
-  }
-  requestAnimationFrame(checkLoop);
-}
-</script>
 
 <script>
 // Scroll reveal
