@@ -1,1 +1,571 @@
-.
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Tidskollen</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@200;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0D0D0D;
+    --surface: #161616;
+    --surface2: #1A1A1A;
+    --border: #222;
+    --text: #F2F0ED;
+    --text2: #888;
+    --text3: #555;
+    --text4: #444;
+    --red: #E8453C;
+    --orange: #D4963A;
+    --gray: #7B8794;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', 'Helvetica Neue', sans-serif;
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    user-select: none;
+    -webkit-user-select: none;
+    overflow-x: hidden;
+  }
+
+  /* ── Header ── */
+  .header {
+    padding: 20px 24px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  .logo { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+  .nav { display:flex; gap:4px; background:var(--surface2); border-radius:12px; padding:3px; }
+  .nav button {
+    padding: 8px 16px;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    color: #666;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .nav button.active { background: #2A2A2A; color: var(--text); }
+  .back-btn {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 8px 0;
+    font-family: inherit;
+  }
+
+  /* ── Hint ── */
+  .hint { padding: 8px 24px 0; font-size: 13px; color: var(--text3); }
+
+  /* ── Category List ── */
+  .cat-list { padding: 12px 24px 100px; display:flex; flex-direction:column; gap:10px; }
+  .cat-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .cat-card:active { transform: scale(0.98); }
+  .cat-emoji {
+    font-size: 28px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: #1E1E1E;
+    flex-shrink: 0;
+  }
+  .cat-info { flex:1; min-width:0; }
+  .cat-name { font-size:16px; font-weight:600; margin-bottom:3px; }
+  .cat-meta { font-size:12px; color:#666; display:flex; align-items:center; gap:8px; }
+  .priority-dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
+  .cat-time { font-size:15px; font-weight:600; color:#999; font-variant-numeric:tabular-nums; flex-shrink:0; }
+  .edit-btn {
+    background:none; border:none; color:#444; font-size:18px;
+    cursor:pointer; padding:4px 0 4px 8px;
+  }
+
+  /* ── FAB ── */
+  .fab {
+    position:fixed; bottom:24px; right:24px;
+    width:56px; height:56px; border-radius:50%;
+    border:none; background:#2A2A2A; color:var(--text);
+    font-size:28px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    z-index: 20;
+  }
+
+  /* ── Timer ── */
+  .timer-view {
+    display:flex; flex-direction:column; align-items:center;
+    justify-content:center; min-height:calc(100vh - 80px);
+    min-height:calc(100dvh - 80px);
+    padding:0 24px; gap:0;
+  }
+  .timer-emoji { font-size:48px; margin-bottom:12px; }
+  .timer-label { font-size:18px; font-weight:600; margin-bottom:40px; opacity:0.7; }
+  .timer-display {
+    font-size: 72px;
+    font-weight: 200;
+    letter-spacing: -2px;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 48px;
+  }
+  .big-btn {
+    width:140px; height:140px; border-radius:50%;
+    border:none; color:#fff; font-size:16px; font-weight:700;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition: all 0.2s; letter-spacing:1px; text-transform:uppercase;
+  }
+  .big-btn:active { transform: scale(0.93); }
+  .stop-icon { width:32px; height:32px; border-radius:6px; background:#fff; }
+  .timer-hint { margin-top:32px; font-size:13px; color:var(--text4); }
+  .timer-today { margin-top:24px; font-size:14px; color:var(--text3); }
+
+  /* ── Stats ── */
+  .stats-section { padding:12px 24px 100px; }
+  .summary-card {
+    background:var(--surface); border-radius:16px;
+    padding:20px 24px; margin-bottom:24px;
+  }
+  .summary-label { font-size:13px; color:var(--text3); margin-bottom:4px; }
+  .summary-time { font-size:36px; font-weight:200; font-variant-numeric:tabular-nums; }
+  .summary-prio { margin-top:12px; display:flex; gap:16px; font-size:13px; }
+  .summary-prio span { color:var(--text2); margin-left:6px; }
+  .stat-row { padding:14px 0; border-bottom:1px solid var(--surface2); }
+  .stat-label { display:flex; justify-content:space-between; align-items:center; font-size:14px; font-weight:500; }
+  .stat-bar { height:8px; border-radius:4px; margin-top:6px; margin-bottom:4px; transition:all 0.5s; }
+  .stat-prio { font-size:11px; color:var(--text4); }
+  .empty-state { text-align:center; color:var(--text4); padding:40px 0; font-size:14px; }
+  .reset-btn {
+    margin-top:24px; width:100%; padding:14px 24px; border-radius:12px;
+    background:var(--surface2); border:1px solid #333; color:var(--red);
+    font-size:15px; font-weight:600; cursor:pointer; font-family:inherit;
+  }
+
+  /* ── Form ── */
+  .form-view { padding: 12px 24px; }
+  .form-view h2 { font-size:20px; font-weight:600; margin-bottom:28px; }
+  .form-group { margin-bottom:20px; }
+  .form-label {
+    font-size:12px; font-weight:600; color:#666;
+    text-transform:uppercase; letter-spacing:1px;
+    margin-bottom:8px; display:block;
+  }
+  .form-input {
+    background:var(--surface2); border:1px solid #333; border-radius:12px;
+    padding:14px 16px; color:var(--text); font-size:16px;
+    width:100%; outline:none; font-family:inherit;
+  }
+  .form-input:focus { border-color: #555; }
+  .prio-row { display:flex; gap:8px; }
+  .prio-btn {
+    padding:10px 20px; border-radius:10px; border:2px solid #333;
+    background:var(--surface2); color:#666; font-size:14px; font-weight:600;
+    cursor:pointer; font-family:inherit; transition:all 0.15s;
+  }
+  .prio-btn.active-1 { border-color:var(--gray); background:rgba(123,135,148,0.13); color:var(--gray); }
+  .prio-btn.active-2 { border-color:var(--orange); background:rgba(212,150,58,0.13); color:var(--orange); }
+  .prio-btn.active-3 { border-color:var(--red); background:rgba(232,69,60,0.13); color:var(--red); }
+  .action-btn {
+    padding:14px 24px; border-radius:12px; border:none;
+    font-size:15px; font-weight:600; cursor:pointer;
+    width:100%; font-family:inherit; color:#fff;
+  }
+  .delete-btn {
+    margin-top:12px; width:100%; padding:14px 24px; border-radius:12px;
+    background:transparent; border:1px solid #333; color:var(--red);
+    font-size:15px; font-weight:600; cursor:pointer; font-family:inherit;
+  }
+
+  .view { display:none; }
+  .view.active { display:block; }
+</style>
+</head>
+<body>
+
+<!-- ═══ CATEGORIES ═══ -->
+<div id="v-categories" class="view active">
+  <div class="header">
+    <div class="logo">Tidskollen</div>
+    <div class="nav">
+      <button class="active" onclick="showView('categories')">Logga</button>
+      <button onclick="showView('stats')">Översikt</button>
+    </div>
+  </div>
+  <div class="hint">Välj kategori för att starta</div>
+  <div id="cat-list" class="cat-list"></div>
+  <button class="fab" onclick="showView('add')">+</button>
+</div>
+
+<!-- ═══ TIMER ═══ -->
+<div id="v-timer" class="view">
+  <div class="header">
+    <button class="back-btn" onclick="stopAndBack()">← Tillbaka</button>
+  </div>
+  <div class="timer-view">
+    <div class="timer-emoji" id="t-emoji"></div>
+    <div class="timer-label" id="t-label"></div>
+    <div class="timer-display" id="t-display">00:00</div>
+    <button class="big-btn" id="t-btn" onclick="toggleTimer()"></button>
+    <div class="timer-hint" id="t-hint"></div>
+    <div class="timer-today" id="t-today"></div>
+  </div>
+</div>
+
+<!-- ═══ STATS ═══ -->
+<div id="v-stats" class="view">
+  <div class="header">
+    <div class="logo">Tidskollen</div>
+    <div class="nav">
+      <button onclick="showView('categories')">Logga</button>
+      <button class="active" onclick="showView('stats')">Översikt</button>
+    </div>
+  </div>
+  <div class="stats-section" id="stats-content"></div>
+</div>
+
+<!-- ═══ ADD ═══ -->
+<div id="v-add" class="view">
+  <div class="header">
+    <button class="back-btn" onclick="showView('categories')">← Tillbaka</button>
+  </div>
+  <div class="form-view">
+    <h2>Ny kategori</h2>
+    <div class="form-group">
+      <label class="form-label">Namn</label>
+      <input class="form-input" id="add-name" placeholder="T.ex. Research">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Emoji</label>
+      <input class="form-input" id="add-emoji" value="⏱️" style="width:80px">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Prioritet</label>
+      <div class="prio-row" id="add-prio"></div>
+    </div>
+    <button class="action-btn" style="background:var(--red)" onclick="addCategory()">Lägg till</button>
+  </div>
+</div>
+
+<!-- ═══ EDIT ═══ -->
+<div id="v-edit" class="view">
+  <div class="header">
+    <button class="back-btn" onclick="showView('categories')">← Tillbaka</button>
+  </div>
+  <div class="form-view">
+    <h2>Redigera kategori</h2>
+    <div class="form-group">
+      <label class="form-label">Namn</label>
+      <input class="form-input" id="edit-name">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Emoji</label>
+      <input class="form-input" id="edit-emoji" style="width:80px">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Prioritet</label>
+      <div class="prio-row" id="edit-prio"></div>
+    </div>
+    <button class="action-btn" style="background:#2A2A2A" onclick="saveEdit()">Spara</button>
+    <button class="delete-btn" onclick="deleteCategory()">Ta bort kategori</button>
+  </div>
+</div>
+
+<script>
+const DEFAULTS = [
+  { id:"filma",    name:"Filma",           emoji:"🎬", priority:3, color:"#E8453C" },
+  { id:"redigera", name:"Redigera",        emoji:"✂️", priority:3, color:"#D4763A" },
+  { id:"planering",name:"Planering",       emoji:"📋", priority:2, color:"#3A8FD4" },
+  { id:"email",    name:"Email / Admin",   emoji:"📧", priority:1, color:"#7B8794" },
+  { id:"sociala",  name:"Sociala medier",  emoji:"📱", priority:2, color:"#9B59B6" },
+  { id:"moten",    name:"Möten",           emoji:"🤝", priority:1, color:"#7B8794" },
+];
+const PRI_LABELS = {1:"Låg",2:"Medel",3:"Hög"};
+const PRI_COLORS = {1:"#7B8794",2:"#D4963A",3:"#E8453C"};
+const COLORS = ["#E8453C","#D4763A","#3A8FD4","#9B59B6","#2ECC71","#E67E22","#1ABC9C","#E74C3C"];
+
+let categories = [...DEFAULTS];
+let logs = {};
+let running = false;
+let startTime = null;
+let selectedCat = null;
+let elapsed = 0;
+let tickInterval = null;
+let editId = null;
+let addPrio = 2;
+let editPrio = 2;
+
+// ── Storage ──
+const LS = {
+  get(k) { try { const v=localStorage.getItem("tk-"+k); return v?JSON.parse(v):null; } catch{ return null; } },
+  set(k,v) { try { localStorage.setItem("tk-"+k,JSON.stringify(v)); } catch{} }
+};
+
+function load() {
+  const c = LS.get("categories"); if(c) categories=c;
+  const l = LS.get("logs"); if(l) logs=l;
+  const r = LS.get("running");
+  if(r && r.running) {
+    running=true; startTime=r.startTime; selectedCat=r.catId;
+    elapsed=Date.now()-startTime;
+    startTick();
+    showView("timer");
+  }
+}
+
+function save() { LS.set("categories",categories); LS.set("logs",logs); }
+
+// ── Helpers ──
+function todayKey() {
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+function fmtTime(ms) {
+  const s=Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
+  if(h>0) return `${h}:${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
+  return `${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
+}
+function fmtHM(ms) {
+  const m=Math.floor(ms/60000), h=Math.floor(m/60), mm=m%60;
+  return h>0?`${h}h ${mm}m`:`${mm}m`;
+}
+function getTotals() {
+  const day=logs[todayKey()]||[], t={};
+  day.forEach(l=>{ t[l.catId]=(t[l.catId]||0)+l.duration; });
+  if(running&&selectedCat) t[selectedCat]=(t[selectedCat]||0)+elapsed;
+  return t;
+}
+function getCat(id) { return categories.find(c=>c.id===id); }
+
+// ── Views ──
+function showView(name) {
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.getElementById("v-"+name).classList.add("active");
+  if(name==="categories") renderCats();
+  if(name==="timer") renderTimer();
+  if(name==="stats") renderStats();
+  if(name==="add") renderAddForm();
+  if(name==="edit") renderEditForm();
+}
+
+// ── Categories ──
+function renderCats() {
+  const el=document.getElementById("cat-list");
+  const totals=getTotals();
+  el.innerHTML=categories.map(c=>`
+    <div class="cat-card" onclick="startTimer('${c.id}')">
+      <div class="cat-emoji">${c.emoji}</div>
+      <div class="cat-info">
+        <div class="cat-name">${c.name}</div>
+        <div class="cat-meta">
+          <span class="priority-dot" style="background:${PRI_COLORS[c.priority]}"></span>
+          <span>${PRI_LABELS[c.priority]} prioritet</span>
+        </div>
+      </div>
+      <div class="cat-time">${totals[c.id]?fmtHM(totals[c.id]):""}</div>
+      <button class="edit-btn" onclick="event.stopPropagation();openEdit('${c.id}')">✎</button>
+    </div>
+  `).join("");
+}
+
+// ── Timer ──
+function startTimer(catId) {
+  if(running) stopTimer();
+  selectedCat=catId; startTime=Date.now(); elapsed=0; running=true;
+  LS.set("running",{running:true,startTime,catId});
+  startTick();
+  showView("timer");
+}
+
+function stopTimer() {
+  if(!running||!startTime||!selectedCat) return;
+  const dur=Date.now()-startTime;
+  const key=todayKey();
+  if(!logs[key]) logs[key]=[];
+  logs[key].push({catId:selectedCat,duration:dur,ts:Date.now()});
+  running=false; startTime=null; elapsed=0;
+  clearInterval(tickInterval);
+  LS.set("running",{running:false});
+  save();
+}
+
+function toggleTimer() {
+  if(running) { stopTimer(); showView("categories"); }
+  else if(selectedCat) startTimer(selectedCat);
+}
+
+function stopAndBack() {
+  if(running) stopTimer();
+  showView("categories");
+}
+
+function startTick() {
+  clearInterval(tickInterval);
+  tickInterval=setInterval(()=>{
+    if(!running) return;
+    elapsed=Date.now()-startTime;
+    const d=document.getElementById("t-display");
+    if(d) d.textContent=fmtTime(elapsed);
+  },200);
+}
+
+function renderTimer() {
+  const c=getCat(selectedCat); if(!c) return;
+  document.getElementById("t-emoji").textContent=c.emoji;
+  document.getElementById("t-label").textContent=c.name;
+  document.getElementById("t-display").textContent=fmtTime(elapsed);
+  const btn=document.getElementById("t-btn");
+  if(running) {
+    btn.style.background="#E8453C";
+    btn.style.boxShadow="0 0 60px rgba(232,69,60,0.3)";
+    btn.innerHTML='<div class="stop-icon"></div>';
+    document.getElementById("t-hint").textContent="Tryck för att stoppa";
+    document.getElementById("t-today").textContent="";
+  } else {
+    btn.style.background=c.color;
+    btn.style.boxShadow=`0 0 60px ${c.color}33`;
+    btn.textContent="START";
+    document.getElementById("t-hint").textContent="";
+    const totals=getTotals();
+    document.getElementById("t-today").textContent=totals[c.id]?`Idag: ${fmtHM(totals[c.id])}`:"";
+  }
+}
+
+// ── Stats ──
+function renderStats() {
+  const el=document.getElementById("stats-content");
+  const totals=getTotals();
+  const totalAll=Object.values(totals).reduce((a,b)=>a+b,0);
+  const hiPri=categories.filter(c=>c.priority===3);
+  const hiPriTime=hiPri.reduce((s,c)=>s+(totals[c.id]||0),0);
+  const hiPct=totalAll>0?Math.round(hiPriTime/totalAll*100):0;
+  const sorted=[...categories].sort((a,b)=>(totals[b.id]||0)-(totals[a.id]||0));
+  const maxTime=Math.max(...Object.values(totals),1);
+
+  let html=`
+    <div class="summary-card">
+      <div class="summary-label">Idag totalt</div>
+      <div class="summary-time">${totalAll>0?fmtHM(totalAll):"0m"}</div>
+      ${totalAll>0?`
+        <div class="summary-prio">
+          <div><span style="color:${PRI_COLORS[3]}">●</span><span>Hög prio: ${hiPct}%</span></div>
+          <div><span style="color:${PRI_COLORS[1]}">●</span><span>Övrig: ${100-hiPct}%</span></div>
+        </div>
+      `:""}
+    </div>
+  `;
+
+  if(totalAll===0) {
+    html+='<div class="empty-state">Ingen tid loggad idag ännu. Välj en kategori och kör igång!</div>';
+  } else {
+    sorted.forEach(c=>{
+      const t=totals[c.id]||0; if(!t) return;
+      const pct=Math.round(t/maxTime*100);
+      const share=Math.round(t/totalAll*100);
+      html+=`
+        <div class="stat-row">
+          <div class="stat-label">
+            <span>${c.emoji} ${c.name}</span>
+            <span style="color:var(--text2)">${fmtHM(t)} (${share}%)</span>
+          </div>
+          <div class="stat-bar" style="background:linear-gradient(90deg,${c.color} ${pct}%,#222 ${pct}%)"></div>
+          <div class="stat-prio">Prioritet: ${PRI_LABELS[c.priority]}</div>
+        </div>
+      `;
+    });
+    html+=`<button class="reset-btn" onclick="resetToday()">Nollställ idag</button>`;
+  }
+  el.innerHTML=html;
+}
+
+function resetToday() {
+  delete logs[todayKey()];
+  save(); renderStats();
+}
+
+// ── Add ──
+function renderAddForm() {
+  addPrio=2;
+  document.getElementById("add-name").value="";
+  document.getElementById("add-emoji").value="⏱️";
+  renderPrioRow("add-prio",addPrio,"add");
+}
+function renderPrioRow(elId,current,mode) {
+  const el=document.getElementById(elId);
+  el.innerHTML=[1,2,3].map(p=>`
+    <button class="prio-btn ${current===p?'active-'+p:''}"
+      onclick="${mode==='add'?'addPrio':'editPrio'}=${p};renderPrioRow('${elId}',${p},'${mode}')"
+    >${PRI_LABELS[p]}</button>
+  `).join("");
+}
+function addCategory() {
+  const name=document.getElementById("add-name").value.trim();
+  const emoji=document.getElementById("add-emoji").value.trim()||"⏱️";
+  if(!name) return;
+  categories.push({
+    id: name.toLowerCase().replace(/[^a-zåäö0-9]/g,"")+Date.now(),
+    name, emoji, priority:addPrio,
+    color: COLORS[categories.length%COLORS.length]
+  });
+  save(); showView("categories");
+}
+
+// ── Edit ──
+function openEdit(id) {
+  editId=id;
+  const c=getCat(id); if(!c) return;
+  editPrio=c.priority;
+  showView("edit");
+}
+function renderEditForm() {
+  const c=getCat(editId); if(!c) return;
+  document.getElementById("edit-name").value=c.name;
+  document.getElementById("edit-emoji").value=c.emoji;
+  editPrio=c.priority;
+  renderPrioRow("edit-prio",editPrio,"edit");
+}
+function saveEdit() {
+  const c=getCat(editId); if(!c) return;
+  c.name=document.getElementById("edit-name").value.trim()||c.name;
+  c.emoji=document.getElementById("edit-emoji").value.trim()||c.emoji;
+  c.priority=editPrio;
+  save(); showView("categories");
+}
+function deleteCategory() {
+  categories=categories.filter(c=>c.id!==editId);
+  save(); showView("categories");
+}
+
+// ── Init ──
+load();
+renderCats();
+</script>
+</body>
+</html>
