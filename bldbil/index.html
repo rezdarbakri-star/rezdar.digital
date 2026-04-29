@@ -1,1 +1,571 @@
-.
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BLD Bil — Webbdiagnostik & Förslag</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#050507;
+  --surface:#0c0c10;
+  --surface2:#111118;
+  --border:#1a1a24;
+  --text:#c8c8d0;
+  --text-dim:#64647a;
+  --text-muted:#3a3a4a;
+  --white:#f0f0f5;
+  --accent:#4f8cff;
+  --accent-glow:rgba(79,140,255,0.12);
+  --green:#34d399;
+  --green-glow:rgba(52,211,153,0.10);
+  --amber:#fbbf24;
+  --amber-glow:rgba(251,191,36,0.08);
+  --red:#f87171;
+  --font:'Outfit',system-ui,sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth;background:var(--bg);color:var(--text);font-family:var(--font)}
+body{overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{
+  content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  background-size:128px 128px;opacity:0.4;
+}
+section{
+  min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+  padding:80px 32px;max-width:900px;margin:0 auto;position:relative;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:0.4}50%{opacity:1}}
+@keyframes growBar{from{height:0}to{height:var(--h)}}
+.reveal{opacity:0;animation:fadeUp 0.8s ease forwards}
+.reveal-d1{animation-delay:0.1s}.reveal-d2{animation-delay:0.2s}.reveal-d3{animation-delay:0.3s}
+.reveal-d4{animation-delay:0.4s}.reveal-d5{animation-delay:0.5s}.reveal-d6{animation-delay:0.6s}
+.reveal-d7{animation-delay:0.7s}.reveal-d8{animation-delay:0.8s}.reveal-d9{animation-delay:0.9s}
+.label{font-family:var(--mono);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);font-weight:500}
+h1{font-size:clamp(42px,7vw,72px);font-weight:800;color:var(--white);line-height:1.05;letter-spacing:-2px}
+h2{font-size:clamp(28px,4vw,40px);font-weight:700;color:var(--white);line-height:1.15;letter-spacing:-1px}
+h3{font-size:18px;font-weight:600;color:var(--white);line-height:1.3}
+p{line-height:1.7;font-size:15px}
+.hero-line{display:block}
+.hero-accent{color:var(--accent)}
+.hero-sub{font-size:clamp(16px,2vw,19px);color:var(--text-dim);max-width:520px;margin-top:24px;line-height:1.6;font-weight:300}
+.page-num{position:absolute;top:40px;right:0;font-family:var(--mono);font-size:11px;color:var(--text-muted);letter-spacing:2px}
+.scroll-hint{
+  position:absolute;bottom:32px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--text-muted);
+  text-transform:uppercase;animation:pulse 2s ease infinite;
+}
+.scroll-arrow{width:16px;height:16px;border-right:1.5px solid var(--text-muted);border-bottom:1.5px solid var(--text-muted);transform:rotate(45deg)}
+.diag-grid{display:flex;flex-direction:column;gap:12px;margin-top:32px}
+.diag-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:24px 28px;display:flex;gap:20px;align-items:flex-start;
+  transition:border-color 0.3s,background 0.3s;
+}
+.diag-card:hover{border-color:#2a2a3a;background:var(--surface2)}
+.diag-icon{
+  width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;margin-top:2px;
+}
+.diag-icon.info{background:var(--accent-glow);color:var(--accent)}
+.diag-icon.opportunity{background:var(--green-glow);color:var(--green)}
+.diag-icon.neutral{background:rgba(200,200,208,0.06);color:var(--text-dim)}
+.diag-body h3{margin-bottom:6px;font-size:16px}
+.diag-body p{font-size:13.5px;color:var(--text-dim);line-height:1.6}
+.diag-tag{
+  display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:1px;
+  padding:3px 8px;border-radius:4px;margin-top:8px;text-transform:uppercase;font-weight:600;
+}
+.tag-fact{background:rgba(200,200,208,0.06);color:var(--text-dim)}
+.tag-upgrade{background:var(--green-glow);color:var(--green)}
+.tag-missing{background:var(--amber-glow);color:var(--amber)}
+.get-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:32px}
+@media(max-width:600px){.get-grid{grid-template-columns:1fr}}
+.get-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;
+  transition:border-color 0.3s,transform 0.3s;
+}
+.get-card:hover{border-color:#2a2a3a;transform:translateY(-2px)}
+.get-card .icon{font-size:24px;margin-bottom:12px;display:block}
+.get-card h3{font-size:15px;margin-bottom:6px}
+.get-card p{font-size:13px;color:var(--text-dim);line-height:1.6}
+.price-grid{display:flex;flex-direction:column;gap:16px;margin-top:32px}
+.price-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:18px;
+  padding:32px;position:relative;overflow:hidden;transition:border-color 0.3s;
+}
+.price-card:hover{border-color:#2a2a3a}
+.price-card.featured{border-color:var(--accent);background:linear-gradient(160deg,var(--surface) 0%,rgba(79,140,255,0.03) 100%)}
+.price-card.featured::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+.price-card.coming{opacity:0.55;border-style:dashed}
+.price-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;flex-wrap:wrap;gap:12px}
+.price-name{font-size:20px;font-weight:700;color:var(--white)}
+.price-amount{font-family:var(--mono);font-size:28px;font-weight:600;color:var(--white);text-align:right}
+.price-amount span{font-size:14px;color:var(--text-dim);font-weight:400;display:block}
+.price-desc{font-size:14px;color:var(--text-dim);margin-bottom:20px;line-height:1.6}
+.price-features{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px 16px}
+@media(max-width:600px){.price-features{grid-template-columns:1fr}}
+.price-features li{font-size:13px;color:var(--text);display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.price-features li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0;margin-top:1px}
+.price-badge{position:absolute;top:16px;right:16px;background:var(--accent);color:#000;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;letter-spacing:0.5px}
+.coming-badge{
+  display:inline-block;background:rgba(200,200,208,0.06);color:var(--text-dim);
+  font-family:var(--mono);font-size:10px;font-weight:600;padding:4px 10px;border-radius:6px;
+  letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;
+}
+
+/* Graph */
+.graph-container{
+  background:var(--surface);border:1px solid var(--border);border-radius:18px;
+  padding:36px 32px;margin-top:32px;
+}
+.graph-title{font-size:13px;font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);margin-bottom:28px}
+.graph{display:flex;align-items:flex-end;gap:0;height:280px;padding:0 0 44px;position:relative}
+.graph-baseline{position:absolute;bottom:44px;left:0;right:0;height:1px;background:var(--border)}
+.graph-year-group{flex:1;display:flex;gap:8px;justify-content:center;align-items:flex-end;position:relative;height:100%}
+.graph-year-label{
+  position:absolute;bottom:-34px;left:50%;transform:translateX(-50%);
+  font-family:var(--mono);font-size:12px;color:var(--text-dim);white-space:nowrap;
+}
+.bar{
+  width:clamp(28px,6vw,48px);border-radius:8px 8px 4px 4px;position:relative;
+  display:flex;align-items:flex-start;justify-content:center;
+  animation:growBar 0.8s ease forwards;height:0;
+}
+.bar-ghl{background:linear-gradient(180deg,#f87171 0%,rgba(248,113,113,0.4) 100%)}
+.bar-rd{background:linear-gradient(180deg,var(--green) 0%,rgba(52,211,153,0.4) 100%)}
+.bar-amount{
+  position:absolute;top:-26px;left:50%;transform:translateX(-50%);
+  font-family:var(--mono);font-size:11px;font-weight:600;white-space:nowrap;
+}
+.bar-ghl .bar-amount{color:var(--red)}
+.bar-rd .bar-amount{color:var(--green)}
+.graph-legend{display:flex;gap:24px;margin-top:24px;justify-content:center}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-dim)}
+.legend-dot{width:10px;height:10px;border-radius:3px}
+.legend-dot.ghl{background:var(--red)}
+.legend-dot.rd{background:var(--green)}
+
+.savings-callout{
+  background:var(--green-glow);border:1px solid rgba(52,211,153,0.15);border-radius:14px;
+  padding:28px;margin-top:20px;text-align:center;
+}
+.savings-number{font-family:var(--mono);font-size:clamp(32px,5vw,42px);font-weight:700;color:var(--green)}
+.savings-label{font-size:14px;color:var(--text-dim);margin-top:6px}
+
+.cta-section{text-align:center;padding:100px 32px}
+.cta-btn{
+  display:inline-block;padding:16px 48px;background:var(--accent);color:#000;
+  font-family:var(--font);font-size:16px;font-weight:700;border-radius:50px;
+  text-decoration:none;transition:all 0.3s;letter-spacing:0.3px;
+}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(79,140,255,0.25)}
+/* Animated comparison */
+.compare-toggle{
+  display:flex;gap:4px;background:rgba(255,255,255,0.03);border-radius:12px;padding:4px;margin-bottom:32px;
+}
+.toggle-btn{
+  flex:1;position:relative;padding:14px 16px;border:none;border-radius:10px;
+  cursor:pointer;font-family:var(--font);font-size:14px;font-weight:600;
+  background:transparent;color:var(--text-dim);transition:color 0.4s;overflow:hidden;
+}
+.toggle-btn.active{color:var(--white)}
+.toggle-label{position:relative;z-index:2}
+.toggle-progress{
+  position:absolute;inset:0;border-radius:10px;background:rgba(255,255,255,0.06);
+  transform:scaleX(0);transform-origin:left;z-index:1;
+}
+.toggle-btn.active .toggle-progress{
+  animation:progressFill var(--cycle-duration) linear forwards;
+}
+@keyframes progressFill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+.compare-graph{
+  display:flex;align-items:flex-end;justify-content:center;gap:clamp(16px,4vw,32px);
+  height:240px;position:relative;padding-bottom:4px;
+  border-bottom:1px solid var(--border);
+}
+.compare-years{
+  display:flex;justify-content:center;gap:clamp(16px,4vw,32px);padding-top:12px;
+}
+.compare-years span{
+  width:clamp(40px,8vw,64px);text-align:center;
+  font-family:var(--mono);font-size:12px;color:var(--text-dim);
+}
+.col{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  width:clamp(40px,8vw,64px);position:relative;
+}
+.col-bar{
+  width:100%;border-radius:8px 8px 4px 4px;
+  transition:height 0.8s cubic-bezier(0.34,1.56,0.64,1), background 0.6s, opacity 0.6s;
+  position:relative;min-height:0;
+}
+.col-amount{
+  font-family:var(--mono);font-size:12px;font-weight:600;
+  transition:opacity 0.4s, transform 0.4s, color 0.4s;
+  white-space:nowrap;position:absolute;top:-24px;left:50%;transform:translateX(-50%);
+}
+
+/* States */
+.col-bar.state-now{
+  background:linear-gradient(180deg,#f87171 0%,rgba(248,113,113,0.35) 100%);
+}
+.col-bar.state-rezdar{
+  background:linear-gradient(180deg,var(--green) 0%,rgba(52,211,153,0.35) 100%);
+}
+.col-bar.state-gone{
+  height:0 !important;opacity:0;
+}
+.col-amount.state-now{color:var(--red)}
+.col-amount.state-rezdar{color:var(--green)}
+.col-amount.state-gone{opacity:0;transform:translateX(-50%) translateY(8px)}
+
+footer{text-align:center;padding:40px 32px 60px;font-size:12px;color:var(--text-muted);font-family:var(--mono);letter-spacing:1px}
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1: COVER -->
+<section>
+  <span class="page-num reveal">01 / 04</span>
+  <div class="label reveal" style="margin-bottom:32px">
+    <span style="color:var(--accent)">●</span>&nbsp;&nbsp;Rezdar Digital — Webbdiagnostik
+  </div>
+  <h1 class="reveal reveal-d1">
+    <span class="hero-line">Ny hemsida</span>
+    <span class="hero-line">för <span class="hero-accent">BLD Bil.</span></span>
+  </h1>
+  <p class="hero-sub reveal reveal-d2">
+    Vi har gått igenom bldbil.se och satt ihop en sammanfattning av vad som kan förbättras, vad ni får och vad det kostar.
+  </p>
+  <div class="scroll-hint">Scrolla<div class="scroll-arrow"></div></div>
+</section>
+
+<!-- SLIDE 2: DIAGNOSTIK -->
+<section>
+  <span class="page-num reveal">02 / 04</span>
+  <div class="label reveal" style="margin-bottom:12px">Diagnostik</div>
+  <h2 class="reveal reveal-d1">Vad vi hittade.</h2>
+  <p class="reveal reveal-d2" style="color:var(--text-dim);max-width:560px;margin-top:12px">
+    En snabb genomgång av bldbil.se. Konkreta saker som kan göras bättre.
+  </p>
+  <div class="diag-grid">
+    <div class="diag-card reveal reveal-d3">
+      <div class="diag-icon neutral">🔗</div>
+      <div class="diag-body">
+        <h3>Logotypens länk pekar fel</h3>
+        <p>Loggan i navigeringen länkar till <em>bldbil.se/www.bldbil.se</em> istället för startsidan. Besökare som klickar hamnar på en 404-sida.</p>
+        <span class="diag-tag tag-fact">Bruten länk</span>
+      </div>
+    </div>
+
+    <div class="diag-card reveal reveal-d5">
+      <div class="diag-icon opportunity">🎬</div>
+      <div class="diag-body">
+        <h3>Video i hero-sektionen</h3>
+        <p>En kort video av bilhallen, verkstaden eller en nöjd kund som hämtar sin bil ger ett starkare förstaintryck och bygger förtroende snabbare.</p>
+        <span class="diag-tag tag-upgrade">Möjlighet</span>
+      </div>
+    </div>
+
+    <div class="diag-card reveal reveal-d7">
+      <div class="diag-icon opportunity">🚗</div>
+      <div class="diag-body">
+        <h3>Bilar direkt på startsidan</h3>
+        <p>Ert lager från Blocket kan visas direkt på hemsidan via en automatisk koppling. Besökaren ser vad ni har utan att lämna sajten.</p>
+        <span class="diag-tag tag-missing">Saknas idag</span>
+      </div>
+    </div>
+    <div class="diag-card reveal reveal-d8">
+      <div class="diag-icon opportunity">⚡</div>
+      <div class="diag-body">
+        <h3>Enklare värderingsformulär</h3>
+        <p>Dagens formulär har 9 fält. Med registreringsnummer, namn och telefon (3 fält) kommer fler att fylla i, vilket ger er fler leads. Resten tar ni i samtalet.</p>
+        <span class="diag-tag tag-upgrade">Möjlighet</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 3: VAD NI FÅR -->
+<section>
+  <span class="page-num reveal">03 / 04</span>
+  <div class="label reveal" style="margin-bottom:12px">Leverans</div>
+  <h2 class="reveal reveal-d1">Vad ni får.</h2>
+  <p class="reveal reveal-d2" style="color:var(--text-dim);max-width:560px;margin-top:12px">
+    En sajt som matchar kvaliteten ni levererar i verkstaden och bilhallen.
+  </p>
+  <div class="get-grid">
+    <div class="get-card reveal reveal-d3">
+      <span class="icon">🎨</span>
+      <h3>Custom design</h3>
+      <p>Unik design byggd för BLD. Anpassad för desktop, mobil och surfplatta.</p>
+    </div>
+    <div class="get-card reveal reveal-d3">
+      <span class="icon">🚗</span>
+      <h3>Bilvisning från Blocket</h3>
+      <p>Ert lager synkas automatiskt via Blockets API. Nya bilar dyker upp, sålda försvinner.</p>
+    </div>
+    <div class="get-card reveal reveal-d4">
+      <span class="icon">⚡</span>
+      <h3>Snabb laddtid</h3>
+      <p>Optimerade bilder och modern kod. Under 2 sekunder till fulladdat.</p>
+    </div>
+    <div class="get-card reveal reveal-d4">
+      <span class="icon">⭐</span>
+      <h3>Google Reviews-widget</h3>
+      <p>Recensioner hämtas automatiskt från ert Google Business-konto.</p>
+    </div>
+    <div class="get-card reveal reveal-d5">
+      <span class="icon">🔍</span>
+      <h3>SEO & Google-synlighet</h3>
+      <p>Korrekt sidstruktur och schema-markup så Google vet att ni är en bilhandlare i Haninge.</p>
+    </div>
+    <div class="get-card reveal reveal-d5">
+      <span class="icon">📱</span>
+      <h3>Mobil-first</h3>
+      <p>Över 70 % av besökarna kommer från mobilen. Sidan designas därifrån.</p>
+    </div>
+    <div class="get-card reveal reveal-d6">
+      <span class="icon">📝</span>
+      <h3>Förenklat formulär</h3>
+      <p>3 fält istället för 9. Fler leads, mindre friktion.</p>
+    </div>
+    <div class="get-card reveal reveal-d6">
+      <span class="icon">📍</span>
+      <h3>Kontakt & karta</h3>
+      <p>Öppettider, telefon, e-post och Google Maps. Tydligt och direkt.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 4: PRISER + GRAF -->
+<section style="min-height:auto;padding-bottom:40px">
+  <span class="page-num reveal">04 / 04</span>
+  <div class="label reveal" style="margin-bottom:12px">Investering</div>
+  <h2 class="reveal reveal-d1">Välj ert paket.</h2>
+  <p class="reveal reveal-d2" style="color:var(--text-dim);max-width:560px;margin-top:12px">
+    Engångskostnad. Ingen löpande avgift. Alla priser exklusive moms.
+  </p>
+  <div class="price-grid">
+    <div class="price-card reveal reveal-d3">
+      <div class="price-header">
+        <div>
+          <div class="price-name">Ny hemsida</div>
+          <div style="font-size:13px;color:var(--text-dim);margin-top:2px">Med era nuvarande bilder</div>
+        </div>
+        <div class="price-amount">19 500<span>engångskostnad</span></div>
+      </div>
+      <p class="price-desc">Modern, custom-byggd hemsida med era befintliga bilder. Allt det viktiga på plats från dag ett.</p>
+      <ul class="price-features">
+        <li>Custom design (ej mall)</li>
+        <li>Responsiv (mobil + desktop)</li>
+        <li>Alla sektioner (Köp, Sälj, Däck, Medlem, Om oss)</li>
+        <li>Bilvisning via Blocket-koppling</li>
+        <li>Förenklat kontaktformulär</li>
+        <li>Google Reviews-widget</li>
+        <li>SEO-grundpaket</li>
+        <li>Google Maps</li>
+      </ul>
+    </div>
+    <div class="price-card featured reveal reveal-d4">
+      <div class="price-badge">Rekommenderad</div>
+      <div class="price-header">
+        <div>
+          <div class="price-name">Ny hemsida + foto & video</div>
+          <div style="font-size:13px;color:var(--text-dim);margin-top:2px">Vi kommer ut och filmar hos er</div>
+        </div>
+        <div class="price-amount">29 500<span>engångskostnad</span></div>
+      </div>
+      <p class="price-desc">Allt i steg 1, plus att vi filmar en hero-video, tar personalporträtt och fotograferar anläggningen. Ert eget material istället för stockfoton.</p>
+      <ul class="price-features">
+        <li>Allt i Ny hemsida</li>
+        <li>Halvdags foto & video på plats</li>
+        <li>Hero-video (30–60 sek, redigerad)</li>
+        <li>Personalporträtt</li>
+        <li>Bilder på anläggning & bilhall</li>
+        <li>Copywriting (alla texter)</li>
+        <li>2 korrigeringsrundor</li>
+        <li>30 dagars support efter lansering</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<!-- SLIDE 4b: KOSTNADSJÄMFÖRELSE -->
+<section style="min-height:auto;padding-top:0">
+  <div class="graph-container reveal reveal-d3" id="compareBox">
+    
+    <!-- Toggle -->
+    <div class="compare-toggle" id="toggleBar">
+      <button class="toggle-btn active" id="btnNow" onclick="setState('now')">
+        <span class="toggle-label">Nuvarande</span>
+        <div class="toggle-progress" id="progressNow"></div>
+      </button>
+      <button class="toggle-btn" id="btnRezdar" onclick="setState('rezdar')">
+        <span class="toggle-label">Med Rezdar Digital</span>
+        <div class="toggle-progress" id="progressRezdar"></div>
+      </button>
+    </div>
+
+    <!-- Graph area -->
+    <div class="compare-graph" id="compareGraph">
+      <!-- Year columns built by JS -->
+    </div>
+    <div class="compare-years" id="compareYears"></div>
+
+  </div>
+
+  <p class="reveal reveal-d6" style="font-size:13px;color:var(--text-muted);margin-top:20px;line-height:1.7;text-align:center">
+    Betalning: 50 % vid projektstart, 50 % vid leverans. Leveranstid 2–4 veckor.
+  </p>
+</section>
+
+<!-- SLIDE 5: CTA -->
+<section class="cta-section" style="max-width:900px;margin:0 auto;min-height:auto;padding-top:0">
+  <div class="label reveal" style="margin-bottom:24px">Nästa steg</div>
+  <h2 class="reveal reveal-d1" style="font-size:clamp(28px,5vw,48px);max-width:600px;margin:0 auto 16px">
+    Redo att uppgradera <a href="https://bldbil.se" style="color:var(--accent);text-decoration:none">bldbil.se</a>?
+  </h2>
+</section>
+
+<footer>Rezdar Digital · 2026</footer>
+
+<script>
+// Config
+const CYCLE_MS = 4000;
+const maxVal = 96000;
+const barMaxH = 200;
+const years = ['År 1','År 2','År 3','År 4'];
+const nowData = [24000, 48000, 72000, 96000];
+const rezdarData = [19500, 0, 0, 0];
+
+// Set CSS variable for progress bar duration
+document.documentElement.style.setProperty('--cycle-duration', CYCLE_MS + 'ms');
+
+// Build columns
+const graphEl = document.getElementById('compareGraph');
+const yearsEl = document.getElementById('compareYears');
+const cols = [];
+
+years.forEach((yr, i) => {
+  const col = document.createElement('div');
+  col.className = 'col';
+  
+  const amount = document.createElement('div');
+  amount.className = 'col-amount';
+  
+  const bar = document.createElement('div');
+  bar.className = 'col-bar';
+  bar.style.height = '0px';
+  
+  col.appendChild(amount);
+  col.appendChild(bar);
+  graphEl.appendChild(col);
+  
+  const label = document.createElement('span');
+  label.textContent = yr;
+  yearsEl.appendChild(label);
+  
+  cols.push({ bar, amount });
+});
+
+// State management
+let currentState = null;
+let autoTimer = null;
+
+function setState(state) {
+  if (currentState === state) return;
+  currentState = state;
+  
+  // Update toggle buttons
+  const btnNow = document.getElementById('btnNow');
+  const btnRezdar = document.getElementById('btnRezdar');
+  btnNow.classList.toggle('active', state === 'now');
+  btnRezdar.classList.toggle('active', state === 'rezdar');
+  
+  // Reset progress animations
+  document.getElementById('progressNow').style.animation = 'none';
+  document.getElementById('progressRezdar').style.animation = 'none';
+  void document.getElementById('progressNow').offsetHeight;
+  void document.getElementById('progressRezdar').offsetHeight;
+  if (state === 'now') {
+    document.getElementById('progressNow').style.animation = 'progressFill ' + CYCLE_MS + 'ms linear forwards';
+    document.getElementById('progressRezdar').style.animation = 'none';
+  } else {
+    document.getElementById('progressRezdar').style.animation = 'progressFill ' + CYCLE_MS + 'ms linear forwards';
+    document.getElementById('progressNow').style.animation = 'none';
+  }
+  
+  // Animate bars
+  cols.forEach((col, i) => {
+    if (state === 'now') {
+      const h = (nowData[i] / maxVal) * barMaxH;
+      col.bar.style.height = h + 'px';
+      col.bar.style.opacity = '1';
+      col.bar.className = 'col-bar state-now';
+      col.amount.className = 'col-amount state-now';
+      col.amount.textContent = (nowData[i] / 1000).toFixed(0) + 'k';
+      col.bar.style.transitionDelay = (i * 0.1) + 's';
+    } else {
+      if (rezdarData[i] > 0) {
+        const h = (rezdarData[i] / maxVal) * barMaxH;
+        col.bar.style.height = h + 'px';
+        col.bar.style.opacity = '1';
+        col.bar.className = 'col-bar state-rezdar';
+        col.amount.className = 'col-amount state-rezdar';
+        col.amount.textContent = (rezdarData[i] / 1000).toFixed(1) + 'k';
+        col.bar.style.transitionDelay = '0.2s';
+      } else {
+        col.bar.style.height = '0px';
+        col.bar.style.opacity = '0';
+        col.bar.className = 'col-bar state-gone';
+        col.amount.className = 'col-amount state-gone';
+        col.bar.style.transitionDelay = (i * 0.05) + 's';
+      }
+    }
+  });
+  
+  // Reset auto-cycle timer
+  clearTimeout(autoTimer);
+  autoTimer = setTimeout(() => {
+    setState(state === 'now' ? 'rezdar' : 'now');
+  }, CYCLE_MS);
+}
+
+// Intersection Observer - start animation when visible
+const compareObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      setTimeout(() => setState('now'), 400);
+      compareObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.3 });
+compareObserver.observe(document.getElementById('compareBox'));
+
+// General reveal observer
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.animationPlayState = 'running';
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => {
+  el.style.animationPlayState = 'paused';
+  observer.observe(el);
+});
+document.querySelectorAll('section:first-of-type .reveal').forEach(el => {
+  el.style.animationPlayState = 'running';
+});
+</script>
+</body>
+</html>
