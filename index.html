@@ -1224,7 +1224,7 @@ footer a {
         <span class="portfolio-tag">Hemsida</span>
         <h3 class="portfolio-name">Stolt Gym</h3>
         <p class="portfolio-desc">Modern gymsida med bokningssystem.</p>
-        <a href="https://rezdarbakri-star.github.io/stoltgym/" target="_blank" class="portfolio-link">Se live →</a>
+        <a href="https://www.stoltgym.se" target="_blank" class="portfolio-link">Se live →</a>
       </div>
     </div>
     <div class="portfolio-card reveal reveal-delay-3">
@@ -1239,7 +1239,7 @@ footer a {
         <span class="portfolio-tag">Hemsida</span>
         <h3 class="portfolio-name">Kelvin Wokomaty</h3>
         <p class="portfolio-desc">Proffsig sida för kock & catering.</p>
-        <a href="https://rezdarbakri-star.github.io/kelvinwokomaty/" target="_blank" class="portfolio-link">Se live →</a>
+        <a href="https://wokomaty.se" target="_blank" class="portfolio-link">Se live →</a>
       </div>
     </div>
     <div class="portfolio-card reveal reveal-delay-4">
@@ -1383,8 +1383,10 @@ footer a {
       </div>
     </div>
     <div class="contact-form reveal reveal-delay-2">
-      <form id="contactForm">
+      <form id="contactForm" action="https://api.web3forms.com/submit" method="POST">
+        <input type="hidden" name="access_key" value="d692175f-8ddd-4e85-96f9-8a27fc3041c5">
         <input type="hidden" name="subject" value="Ny förfrågan — Rezdar Digital">
+        <input type="hidden" name="redirect" value="https://rezdar.com">
         <input type="checkbox" name="botcheck" style="display:none">
 
         <div class="form-group">
@@ -1647,39 +1649,6 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     const target = document.querySelector(a.getAttribute('href'));
     if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
-});
-
-// ── FORM SUBMIT (Web3Forms) ──
-// IMPORTANT: Replace YOUR_ACCESS_KEY with your key from https://web3forms.com
-const FORM_KEY = 'YOUR_ACCESS_KEY';
-
-document.getElementById('contactForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const form = e.target;
-  const btn = form.querySelector('.submit-btn span');
-  const originalText = btn.textContent;
-  btn.textContent = 'Skickar...';
-
-  const formData = new FormData(form);
-  formData.append('access_key', FORM_KEY);
-
-  try {
-    const res = await fetch('https://api.web3forms.com/submit', {
-      method: 'POST',
-      body: formData
-    });
-    const data = await res.json();
-    if (data.success) {
-      form.style.display = 'none';
-      document.getElementById('formSuccess').classList.add('show');
-    } else {
-      btn.textContent = 'Något gick fel — försök igen';
-      setTimeout(() => btn.textContent = originalText, 3000);
-    }
-  } catch (err) {
-    btn.textContent = 'Något gick fel — försök igen';
-    setTimeout(() => btn.textContent = originalText, 3000);
-  }
 });
 </script>
 
