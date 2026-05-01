@@ -1,1 +1,587 @@
-.
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stolt Gym — Digital Marknadsföring</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #FAFAF7;
+    --card: #FFFFFF;
+    --text: #1A1A1A;
+    --muted: #6B6B6B;
+    --accent: #2D6A4F;
+    --accent-light: #E8F5EE;
+    --accent-glow: #40916C;
+    --warm: #F5F0EB;
+    --red-muted: #C1534C;
+    --red-bg: #FDF0EF;
+    --border: #E8E5DF;
+    --shadow: 0 2px 20px rgba(0,0,0,0.04);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 80px 0 60px;
+    text-align: center;
+    position: relative;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .badge {
+    display: inline-block;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 28px;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  .hero h1 span {
+    color: var(--accent);
+  }
+
+  .hero p {
+    color: var(--muted);
+    font-size: 17px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* ── SECTIONS ── */
+  section {
+    padding: 56px 0;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(22px, 4vw, 30px);
+    font-weight: 600;
+    margin-bottom: 32px;
+    line-height: 1.3;
+  }
+
+  /* ── BENEFIT CARDS ── */
+  .benefits-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .benefit-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 28px 28px 72px;
+    position: relative;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+
+  .benefit-card:hover {
+    box-shadow: var(--shadow);
+    transform: translateY(-1px);
+  }
+
+  .benefit-icon {
+    position: absolute;
+    left: 24px;
+    top: 28px;
+    width: 36px;
+    height: 36px;
+    background: var(--accent-light);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .benefit-card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .benefit-card p {
+    color: var(--muted);
+    font-size: 14.5px;
+    line-height: 1.6;
+  }
+
+  /* ── STEPS ── */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+  }
+
+  .step {
+    display: flex;
+    gap: 20px;
+    padding: 24px 0;
+    position: relative;
+  }
+
+  .step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: 60px;
+    bottom: 0;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .step-number {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-content h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .step-content p {
+    color: var(--muted);
+    font-size: 14.5px;
+    line-height: 1.6;
+  }
+
+  /* ── PRICING ── */
+  .pricing-section {
+    background: var(--warm);
+    border-radius: 20px;
+    padding: 48px 32px;
+    margin: 20px 0;
+  }
+
+  .pricing-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .price-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    text-align: center;
+    transition: box-shadow 0.3s ease;
+  }
+
+  .price-card:hover {
+    box-shadow: var(--shadow);
+  }
+
+  .price-card.featured {
+    border: 2px solid var(--accent);
+    position: relative;
+  }
+
+  .price-tag {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 16px;
+  }
+
+  .price-label {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .price-amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .price-amount span {
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  .price-note {
+    font-size: 13.5px;
+    color: var(--muted);
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  /* ── COMPARE ── */
+  .compare-box {
+    background: var(--red-bg);
+    border: 1px solid #EACAC8;
+    border-radius: 14px;
+    padding: 28px;
+    position: relative;
+  }
+
+  .compare-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--red-muted);
+    border-radius: 14px 14px 0 0;
+  }
+
+  .compare-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--red-muted);
+    margin-bottom: 12px;
+  }
+
+  .compare-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #EACAC8;
+    font-size: 14.5px;
+  }
+
+  .compare-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .compare-row .them {
+    color: var(--red-muted);
+    font-weight: 700;
+    text-decoration: line-through;
+    opacity: 0.7;
+  }
+
+  .compare-row .us {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* ── TOTAL ── */
+  .total-box {
+    background: var(--accent);
+    border-radius: 14px;
+    padding: 28px;
+    text-align: center;
+    margin-top: 16px;
+  }
+
+  .total-box p {
+    color: rgba(255,255,255,0.7);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  .total-box .total-amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .total-box .total-note {
+    color: rgba(255,255,255,0.6);
+    font-size: 13px;
+    margin-top: 6px;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  /* ── GUARANTEE ── */
+  .guarantee {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 32px;
+    text-align: center;
+    margin: 40px 0;
+  }
+
+  .guarantee-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+  }
+
+  .guarantee h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+
+  .guarantee p {
+    color: var(--muted);
+    font-size: 14.5px;
+    max-width: 440px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 48px 0;
+    color: var(--muted);
+    font-size: 13px;
+    border-top: 1px solid var(--border);
+  }
+
+  footer .sig {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero, section, .pricing-section, .guarantee {
+    animation: fadeUp 0.6s ease both;
+  }
+
+  @media (max-width: 520px) {
+    .pricing-section { padding: 36px 20px; }
+    .compare-row { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="badge">Förslag till Stolt Gym</div>
+    <h1>Äntligen. Någon som <span>fixar det.</span></h1>
+    <p>En enkel plan för att få din digitala marknadsföring att fungera — utan krångel, utan luft, utan överpriser.</p>
+  </div>
+
+  <!-- WHAT I WILL DO -->
+  <section>
+    <div class="section-label">Det här bygger jag åt dig</div>
+    <div class="section-title">Allt du behöver för att<br>nå nya medlemmar</div>
+
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <div class="benefit-icon">🔧</div>
+        <h3>Fixar din Facebook-sida</h3>
+        <p>Löser varningar, återställer kontot och ser till att allt är rent och redo att köra annonser igen.</p>
+      </div>
+
+      <div class="benefit-card">
+        <div class="benefit-icon">📊</div>
+        <h3>Meta Pixel & spårning</h3>
+        <p>Installerar spårning på stoltgym.se så vi ser exakt vilka som klickar, besöker och registrerar sig.</p>
+      </div>
+
+      <div class="benefit-card">
+        <div class="benefit-icon">🎯</div>
+        <h3>Annonskampanjer som konverterar</h3>
+        <p>Bygger kampanjer riktade mot Skogås och Trångsund — rätt personer, rätt budskap, rätt tid.</p>
+      </div>
+
+      <div class="benefit-card">
+        <div class="benefit-icon">🗓️</div>
+        <h3>Helgdagskampanjer</h3>
+        <p>Färdiga kampanjer för säsongens erbjudanden — sommar, nyår, höststart — redo att trycka på play.</p>
+      </div>
+
+      <div class="benefit-card">
+        <div class="benefit-icon">📈</div>
+        <h3>Månadsrapport</h3>
+        <p>Tydlig rapport varje månad: vad vi spenderade, hur många som såg annonsen, och hur många som agerade.</p>
+      </div>
+
+      <div class="benefit-card">
+        <div class="benefit-icon">💬</div>
+        <h3>En person att ringa</h3>
+        <p>Inga ärendenummer, inga tröga mailkedjor. Du skriver till mig, jag svarar.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW WE START -->
+  <section>
+    <div class="section-label">Så här startar vi</div>
+    <div class="section-title">Tre steg. Inget krångel.</div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h3>Google Meet — 30 min</h3>
+          <p>Vi loggar in tillsammans. Jag ser vad Facebook säger, vad som behöver fixas, och gör en plan.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h3>Du gör mig till admin</h3>
+          <p>Du lägger till mig i Meta Business Suite. Tar 30 sekunder. Sedan sköter jag resten.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h3>Jag sätter upp allt</h3>
+          <p>Fixar sidan, installerar pixel, bygger första kampanjen, och skickar den till dig för godkännande innan den går live.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <div class="pricing-section">
+    <div class="section-label">Prissättning</div>
+    <div class="section-title">Tydligt. Rakt. Inga överraskningar.</div>
+
+    <div class="pricing-cards">
+      <div class="price-card">
+        <div class="price-label">Uppstart & setup</div>
+        <div class="price-amount">5 000 <span>kr</span></div>
+        <div class="price-note">Fixa sidan, pixel, första kampanjen — en engångskostnad.</div>
+      </div>
+
+      <div class="price-card featured">
+        <div class="price-tag">Testperiod</div>
+        <div class="price-label">Löpande förvaltning</div>
+        <div class="price-amount">5 000 <span>kr/mån</span></div>
+        <div class="price-note">3 månader. Kampanjer, optimering, rapportering. Vi utvärderar efter perioden.</div>
+      </div>
+    </div>
+
+    <!-- COMPARE -->
+    <div class="compare-box">
+      <div class="compare-label">Jämförelse</div>
+      <div class="compare-row">
+        <span>Setup</span>
+        <span class="them">Okänd</span>
+        <span class="us">5 000 kr</span>
+      </div>
+      <div class="compare-row">
+        <span>Per månad</span>
+        <span class="them">15 000 kr</span>
+        <span class="us">5 000 kr</span>
+      </div>
+      <div class="compare-row">
+        <span>Resultat</span>
+        <span class="them">Ingenting</span>
+        <span class="us">Mätbart</span>
+      </div>
+      <div class="compare-row">
+        <span>Kontakt</span>
+        <span class="them">Långsam</span>
+        <span class="us">Direkt</span>
+      </div>
+    </div>
+
+    <!-- TOTAL -->
+    <div class="total-box">
+      <p>Total kostnad — 3 månader</p>
+      <div class="total-amount">20 000 kr</div>
+      <p class="total-note">Setup + 3 mån förvaltning. Annonsbudget tillkommer.</p>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="sig">Rezdar Digital</div>
+    <p>rezdar.com</p>
+  </footer>
+
+</div>
+
+</body>
+</html>
