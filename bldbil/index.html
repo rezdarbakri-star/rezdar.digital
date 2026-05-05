@@ -77,10 +77,38 @@ nav.scrolled{border-color:var(--border)}
   .nav-links{display:none}
   .nav-menu-btn{display:block}
   .nav-links.open{
-    display:flex;flex-direction:column;position:fixed;top:69px;left:0;right:0;bottom:0;
-    background:var(--bg);padding:40px 32px;gap:24px;z-index:99;
+    display:flex;flex-direction:column;position:fixed;top:0;left:0;right:0;bottom:0;
+    background:var(--bg);padding:100px 32px 40px;gap:24px;z-index:99;
   }
-  .nav-links.open a{font-size:18px}
+  .nav-links.open a{font-size:18px;color:var(--white)}
+}
+
+@media(max-width:600px){
+  nav{padding:12px 20px;padding-top:calc(12px + env(safe-area-inset-top))}
+  .hero{min-height:100svh;padding:0 20px 40px;align-items:flex-end}
+  .hero-bg::after{
+    background:linear-gradient(180deg,rgba(7,7,9,0.4) 0%,rgba(7,7,9,0.75) 40%,rgba(7,7,9,0.97) 85%,rgba(7,7,9,1) 100%);
+  }
+  .hero h1{font-size:36px;letter-spacing:-1.5px;margin-bottom:14px}
+  .hero p{font-size:15px;margin-bottom:28px;color:var(--text);max-width:100%}
+  .hero-label{font-size:10px;letter-spacing:2px;margin-bottom:14px}
+  .hero-actions{flex-direction:column;gap:10px}
+  .hero-actions a{text-align:center;justify-content:center}
+  .stats-bar{gap:0;margin-top:32px;padding-top:32px;display:grid;grid-template-columns:1fr 1fr;row-gap:20px}
+  .stat-num{font-size:22px}
+  .stat-label{font-size:11px}
+  section{padding:60px 20px}
+  .section-title{font-size:28px;letter-spacing:-1px}
+  .section-desc{font-size:14px}
+  .services-grid{gap:12px}
+  .service-img{height:160px}
+  .service-body{padding:20px}
+  .facility-grid{grid-template-columns:1fr;gap:10px}
+  .reviews-grid{gap:12px}
+  .review-card{padding:24px}
+  .member-box{padding:28px}
+  .form-card{padding:28px}
+  .contact-grid{gap:32px}
 }
 
 /* ======= HERO ======= */
