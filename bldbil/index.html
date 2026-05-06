@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#070709">
 <title>BLD Bil AB — Din lokala bilhandlare i Haninge</title>
 <meta name="description" content="BLD Bil AB i Haninge — bilköp, inbyte, däckservice och medlemsklubb. Över 10 års erfarenhet i bilbranschen.">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -115,13 +116,13 @@ nav.menu-open{background:transparent;backdrop-filter:none;-webkit-backdrop-filte
   .nav-links{display:none}
   .nav-menu-btn{display:block}
   nav{padding:14px 20px;padding-top:calc(14px + env(safe-area-inset-top,0px))}
-  .hero{min-height:100svh;min-height:100vh;padding:0 20px 40px;align-items:flex-end}
+  .hero{min-height:auto;height:100svh;height:100vh;padding:0 20px 40px;align-items:flex-end}
   .hero-bg::after{
-    background:linear-gradient(180deg,rgba(7,7,9,0.05) 0%,rgba(7,7,9,0.5) 30%,rgba(7,7,9,0.85) 60%,rgba(7,7,9,0.97) 85%,rgba(7,7,9,1) 100%);
+    background:linear-gradient(180deg,rgba(7,7,9,0.05) 0%,rgba(7,7,9,0.55) 25%,rgba(7,7,9,0.85) 50%,rgba(7,7,9,0.97) 80%,rgba(7,7,9,1) 100%);
   }
-  .hero h1{font-size:34px;letter-spacing:-1.5px;margin-bottom:14px}
-  .hero p{font-size:15px;margin-bottom:28px;color:var(--text);max-width:100%}
-  .hero-label{font-size:10px;letter-spacing:2px;margin-bottom:14px}
+  .hero h1{font-size:34px;letter-spacing:-1.5px;margin-bottom:14px;text-shadow:0 2px 20px rgba(0,0,0,0.5)}
+  .hero p{font-size:15px;margin-bottom:28px;color:rgba(220,220,230,0.9);max-width:100%;text-shadow:0 1px 10px rgba(0,0,0,0.6)}
+  .hero-label{font-size:10px;letter-spacing:2px;margin-bottom:14px;text-shadow:0 1px 8px rgba(0,0,0,0.5)}
   .hero-actions{flex-direction:column;gap:10px}
   .hero-actions a{text-align:center;justify-content:center}
   .stats-bar{
@@ -144,6 +145,7 @@ nav.menu-open{background:transparent;backdrop-filter:none;-webkit-backdrop-filte
   .form-card{padding:28px}
   .contact-grid{grid-template-columns:1fr;gap:32px}
   .cars-grid{grid-template-columns:1fr}
+  .cars-section{padding-top:40px}
   .price-features{grid-template-columns:1fr}
 }
 
