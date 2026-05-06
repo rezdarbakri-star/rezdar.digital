@@ -50,13 +50,14 @@ body::after{
 
 /* ======= NAV ======= */
 nav{
-  position:fixed;top:0;left:0;right:0;z-index:100;
+  position:fixed;top:0;left:0;right:0;z-index:200;
   padding:16px 32px;
   background:rgba(7,7,9,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   border-bottom:1px solid transparent;
   transition:border-color 0.3s;
 }
 nav.scrolled{border-color:var(--border)}
+nav.menu-open{background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;border-color:transparent}
 .nav-inner{max-width:var(--max);margin:0 auto;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:101}
 .nav-logo{height:36px;width:auto;filter:brightness(0) invert(1)}
 .nav-links{display:flex;gap:32px;align-items:center}
@@ -70,18 +71,49 @@ nav.scrolled{border-color:var(--border)}
   border-radius:50px;text-decoration:none;transition:all 0.3s;letter-spacing:0.3px;
 }
 .nav-cta:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(74,144,255,0.3)}
-.nav-menu-btn{display:none;background:none;border:none;cursor:pointer;padding:8px;position:relative;z-index:101}
-.nav-menu-btn span{display:block;width:24px;height:2px;background:var(--white);margin:5px 0;transition:0.3s}
+.nav-menu-btn{display:none;background:none;border:none;cursor:pointer;padding:8px;position:relative;z-index:201;width:40px;height:40px}
+.nav-menu-btn span{display:block;width:24px;height:2px;background:var(--white);transition:0.4s;position:absolute;left:8px}
+.nav-menu-btn span:nth-child(1){top:12px}
+.nav-menu-btn span:nth-child(2){top:19px}
+.nav-menu-btn span:nth-child(3){top:26px}
+.nav-menu-btn.active span:nth-child(1){top:19px;transform:rotate(45deg)}
+.nav-menu-btn.active span:nth-child(2){opacity:0;transform:translateX(-8px)}
+.nav-menu-btn.active span:nth-child(3){top:19px;transform:rotate(-45deg)}
+
+/* Mobile fullscreen menu */
+.mobile-overlay{
+  position:fixed;inset:0;z-index:150;
+  background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  opacity:0;visibility:hidden;transition:opacity 0.4s,visibility 0.4s;
+}
+.mobile-overlay.open{opacity:1;visibility:visible}
+.mobile-overlay nav-area{display:flex;flex-direction:column;align-items:center;gap:8px}
+.mobile-overlay a{
+  color:var(--white);font-size:clamp(22px,5vw,28px);font-weight:600;text-decoration:none;
+  padding:14px 0;letter-spacing:-0.5px;transition:color 0.3s,transform 0.3s,opacity 0.3s;
+  opacity:0;transform:translateY(16px);
+}
+.mobile-overlay.open a{opacity:1;transform:translateY(0)}
+.mobile-overlay a:hover{color:var(--accent)}
+.mobile-overlay .mob-divider{width:40px;height:1px;background:var(--border);margin:8px 0}
+.mobile-overlay .mob-cta{
+  margin-top:24px;padding:16px 48px;background:var(--accent);color:#000;
+  font-weight:700;font-size:16px;border-radius:50px;transition:all 0.3s;
+  opacity:0;transform:translateY(16px);
+}
+.mobile-overlay.open .mob-cta{opacity:1;transform:translateY(0)}
+.mobile-overlay .mob-cta:hover{box-shadow:0 8px 30px rgba(74,144,255,0.25);transform:translateY(-2px)}
+.mobile-overlay .mob-label{
+  position:absolute;bottom:40px;font-family:var(--mono);font-size:10px;
+  letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;
+  opacity:0;transition:opacity 0.4s 0.5s;
+}
+.mobile-overlay.open .mob-label{opacity:1}
 
 @media(max-width:800px){
   .nav-links{display:none}
   .nav-menu-btn{display:block}
-  .nav-links.open{
-    display:flex;flex-direction:column;position:fixed;top:0;left:0;right:0;bottom:0;
-    background:var(--bg);padding:100px 32px 40px;gap:24px;z-index:99;
-  }
-  .nav-links.open a{font-size:18px;color:var(--white)}
-  .nav-links.open .nav-cta{font-size:16px;padding:14px 32px;text-align:center;display:block;color:#000}
 }
 
 @media(max-width:600px){
@@ -335,6 +367,19 @@ footer{
     </button>
   </div>
 </nav>
+
+<!-- MOBILE MENU OVERLAY -->
+<div class="mobile-overlay" id="mobileMenu">
+  <a href="#tjanster" style="transition-delay:0.05s">Tjänster</a>
+  <a href="#recensioner" style="transition-delay:0.1s">Recensioner</a>
+  <a href="#medlem" style="transition-delay:0.15s">Medlemskap</a>
+  <a href="#vardera" style="transition-delay:0.2s">Värdera bil</a>
+  <div class="mob-divider" style="transition-delay:0.22s"></div>
+  <a href="#faq" style="transition-delay:0.25s">FAQ</a>
+  <a href="#kontakt" style="transition-delay:0.3s">Kontakt</a>
+  <a href="tel:08-40888807" class="mob-cta" style="transition-delay:0.35s">Ring oss</a>
+  <span class="mob-label">BLD Bil AB — Haninge</span>
+</div>
 
 <!-- HERO -->
 <section class="hero" id="top">
@@ -620,12 +665,21 @@ window.addEventListener('scroll', () => {
 });
 
 // Mobile menu
-document.getElementById('menuBtn').addEventListener('click', () => {
-  document.getElementById('navLinks').classList.toggle('open');
+const menuBtn = document.getElementById('menuBtn');
+const mobileMenu = document.getElementById('mobileMenu');
+const navEl = document.getElementById('nav');
+menuBtn.addEventListener('click', () => {
+  menuBtn.classList.toggle('active');
+  mobileMenu.classList.toggle('open');
+  navEl.classList.toggle('menu-open');
+  document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
 });
-document.querySelectorAll('#navLinks a').forEach(a => {
+mobileMenu.querySelectorAll('a').forEach(a => {
   a.addEventListener('click', () => {
-    document.getElementById('navLinks').classList.remove('open');
+    menuBtn.classList.remove('active');
+    mobileMenu.classList.remove('open');
+    navEl.classList.remove('menu-open');
+    document.body.style.overflow = '';
   });
 });
 
