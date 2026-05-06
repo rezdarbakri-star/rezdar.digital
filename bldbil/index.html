@@ -2,826 +2,2215 @@
 <html lang="sv">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#070709">
-<title>BLD Bil AB — Din lokala bilhandlare i Haninge</title>
-<meta name="description" content="BLD Bil AB i Haninge — bilköp, inbyte, däckservice och medlemsklubb. Över 10 års erfarenhet i bilbranschen.">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BLD BIL — Din lokala &amp; trygga bilhandlare i Haninge</title>
+<meta name="description" content="BLD Bil i Haninge. Köp bil, sälj bil, inbyte, finansiering & däckservice. Över 10 år i branschen. Trygghet i varje affär.">
+<link rel="icon" type="image/png" href="https://assets.cdn.filesafe.space/AQMCInrv6MSypZTc0JES/media/66c88c9328818f062fb9d35a.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
 <style>
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#070709;
-  --surface:#0d0d12;
-  --surface2:#131319;
-  --surface3:#1a1a22;
-  --border:#1e1e2a;
-  --border-light:#2a2a38;
-  --text:#b8b8c8;
-  --text-dim:#6a6a80;
-  --text-muted:#44445a;
-  --white:#f0f0f5;
-  --accent:#4a90ff;
-  --accent2:#6aa6ff;
-  --accent-glow:rgba(74,144,255,0.08);
-  --green:#3dd69a;
-  --amber:#f0b840;
-  --font:'Outfit',system-ui,sans-serif;
-  --mono:'JetBrains Mono',monospace;
-  --radius:16px;
-  --max:1200px;
-}
-html{scroll-behavior:smooth;background:var(--bg);min-height:100%}
-body{font-family:var(--font);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden;background:var(--bg)}
+  /* Core palette — trust, calm, authority */
+  --navy-deep: #050b18;
+  --navy: #0a1628;
+  --navy-soft: #0f1f3a;
+  --blue-1: #1e3a8a;
+  --blue-2: #2563eb;
+  --blue-3: #3b82f6;
+  --blue-tint: #eff6ff;
+  --blue-line: #dbeafe;
+  --ice: #f1f5f9;
 
-/* Noise */
-body::after{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
-  background-size:128px;opacity:0.5;
+  --white: #ffffff;
+  --off: #fafbfc;
+  --line: #e5e9f0;
+  --line-strong: #d1d9e6;
+
+  --ink: #0a1628;
+  --ink-soft: #1e293b;
+  --muted: #475569;
+  --muted-2: #64748b;
+
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+
+  /* Typography */
+  --display: 'Archivo', system-ui, sans-serif;
+  --body: 'Manrope', system-ui, sans-serif;
+
+  /* Layout */
+  --max: 1280px;
+  --pad: clamp(20px, 5vw, 48px);
+  --radius: 4px;
+  --radius-lg: 12px;
 }
 
-/* Scroll animations */
-@keyframes fadeUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.anim{opacity:0}.anim.visible{animation:fadeUp 0.7s ease forwards}
-.anim-d1.visible{animation-delay:0.08s}.anim-d2.visible{animation-delay:0.16s}
-.anim-d3.visible{animation-delay:0.24s}.anim-d4.visible{animation-delay:0.32s}
-.anim-d5.visible{animation-delay:0.4s}.anim-d6.visible{animation-delay:0.48s}
-.anim-d7.visible{animation-delay:0.56s}.anim-d8.visible{animation-delay:0.64s}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--body);
+  color:var(--ink);
+  background:var(--white);
+  line-height:1.6;
+  font-weight:400;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
 
-/* ======= NAV ======= */
-nav{
-  position:fixed;top:0;left:0;right:0;z-index:200;
-  padding:16px 32px;
-  background:var(--bg);
-  border-bottom:1px solid transparent;
-  transition:border-color 0.3s;
+.container{max-width:var(--max);margin:0 auto;padding:0 var(--pad);position:relative}
+
+/* ============ HEADER ============ */
+.header{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(5,11,24,0.85);
+  backdrop-filter:blur(20px) saturate(180%);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  transition:all .3s ease;
 }
-nav.scrolled{border-color:var(--border)}
-nav.menu-open{background:var(--bg);border-color:transparent}
-.nav-inner{max-width:var(--max);margin:0 auto;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:101}
-.nav-logo{height:36px;width:auto;filter:brightness(0) invert(1)}
-.nav-links{display:flex;gap:32px;align-items:center}
-.nav-links a{
-  color:var(--text-dim);font-size:13px;font-weight:500;text-decoration:none;
-  letter-spacing:0.5px;transition:color 0.3s;text-transform:uppercase;
+.header.scrolled{
+  background:rgba(255,255,255,0.96);
+  border-bottom:1px solid var(--line);
 }
-.nav-links a:hover{color:var(--white)}
+.header.scrolled .nav-link,
+.header.scrolled .logo-text{color:var(--ink)}
+.header.scrolled .nav-link:hover{color:var(--accent)}
+
+.nav{
+  display:flex;align-items:center;justify-content:space-between;
+  height:72px;
+}
+.logo{display:flex;align-items:center}
+.logo img{height:44px;width:auto;filter:brightness(0) invert(1);transition:filter .3s ease}
+.header.scrolled .logo img{filter:none}
+
+.nav-links{display:none;gap:36px;align-items:center}
+.nav-link{
+  font-family:var(--display);
+  font-weight:600;font-size:13px;letter-spacing:0.08em;
+  color:rgba(255,255,255,0.85);
+  text-transform:uppercase;
+  transition:color .2s ease;
+  position:relative;
+}
+.nav-link:hover{color:var(--white)}
+.nav-link::after{
+  content:'';position:absolute;bottom:-6px;left:0;right:0;
+  height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;
+  transition:transform .3s ease;
+}
+.nav-link:hover::after{transform:scaleX(1);transform-origin:left}
+
 .nav-cta{
-  padding:10px 24px;background:var(--accent);color:#000;font-weight:600;font-size:13px;
-  border-radius:50px;text-decoration:none;transition:all 0.3s;letter-spacing:0.3px;
+  display:none;
+  font-family:var(--display);
+  font-weight:700;font-size:13px;letter-spacing:0.08em;
+  background:var(--accent);
+  color:var(--white);
+  padding:12px 22px;
+  border-radius:var(--radius);
+  text-transform:uppercase;
+  transition:all .2s ease;
 }
-.nav-cta:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(74,144,255,0.3)}
-.nav-menu-btn{display:none;background:none;border:none;cursor:pointer;padding:8px;position:relative;z-index:201;width:40px;height:40px}
-.nav-menu-btn span{display:block;width:24px;height:2px;background:var(--white);transition:0.4s;position:absolute;left:8px}
-.nav-menu-btn span:nth-child(1){top:12px}
-.nav-menu-btn span:nth-child(2){top:19px}
-.nav-menu-btn span:nth-child(3){top:26px}
-.nav-menu-btn.active span:nth-child(1){top:19px;transform:rotate(45deg)}
-.nav-menu-btn.active span:nth-child(2){opacity:0;transform:translateX(-8px)}
-.nav-menu-btn.active span:nth-child(3){top:19px;transform:rotate(-45deg)}
+.nav-cta:hover{background:var(--accent-hover);transform:translateY(-1px)}
 
-/* Mobile fullscreen menu */
-.mobile-overlay{
-  position:fixed;inset:0;z-index:150;
-  background:var(--bg);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  opacity:0;visibility:hidden;transition:opacity 0.4s,visibility 0.4s;
+.menu-btn{
+  width:42px;height:42px;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;
+  color:var(--white);
+  border:1px solid rgba(255,255,255,0.18);
+  border-radius:var(--radius);
+  background:rgba(255,255,255,0.04);
+  transition:all .2s ease;
 }
-.mobile-overlay.open{opacity:1;visibility:visible}
-.mobile-overlay nav-area{display:flex;flex-direction:column;align-items:center;gap:8px}
-.mobile-overlay a{
-  color:var(--white);font-size:clamp(22px,5vw,28px);font-weight:600;text-decoration:none;
-  padding:14px 0;letter-spacing:-0.5px;transition:color 0.3s,transform 0.3s,opacity 0.3s;
-  opacity:0;transform:translateY(16px);
-}
-.mobile-overlay.open a{opacity:1;transform:translateY(0)}
-.mobile-overlay a:hover{color:var(--accent)}
-.mobile-overlay .mob-divider{width:40px;height:1px;background:var(--border);margin:8px 0}
-.mobile-overlay .mob-cta{
-  margin-top:24px;padding:16px 48px;background:var(--accent);color:#000;
-  font-weight:700;font-size:16px;border-radius:50px;transition:all 0.3s;
-  opacity:0;transform:translateY(16px);
-}
-.mobile-overlay.open .mob-cta{opacity:1;transform:translateY(0)}
-.mobile-overlay .mob-cta:hover{box-shadow:0 8px 30px rgba(74,144,255,0.25);transform:translateY(-2px)}
-.mobile-overlay .mob-label{
-  position:absolute;bottom:40px;font-family:var(--mono);font-size:10px;
-  letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;
-  opacity:0;transition:opacity 0.4s 0.5s;
-}
-.mobile-overlay.open .mob-label{opacity:1}
+.header.scrolled .menu-btn{color:var(--ink);border-color:var(--line)}
+.menu-btn span{width:18px;height:1.5px;background:currentColor;transition:all .3s ease;display:block}
+.menu-btn.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.menu-btn.open span:nth-child(2){opacity:0}
+.menu-btn.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
 
-@media(max-width:800px){
-  .nav-links{display:none}
-  .nav-menu-btn{display:block}
-  nav{padding:14px 20px}
-  .hero{min-height:auto;height:100svh;height:100vh;padding:0 20px 40px;align-items:flex-end}
-  .hero-bg::after{
-    background:linear-gradient(180deg,rgba(7,7,9,0.3) 0%,rgba(7,7,9,0.7) 30%,rgba(7,7,9,0.92) 60%,rgba(7,7,9,1) 100%);
-  }
-  .hero h1{font-size:34px;letter-spacing:-1.5px;margin-bottom:14px;text-shadow:0 2px 20px rgba(0,0,0,0.5)}
-  .hero p{font-size:15px;margin-bottom:28px;color:rgba(220,220,230,0.9);max-width:100%;text-shadow:0 1px 10px rgba(0,0,0,0.6)}
-  .hero-label{font-size:10px;letter-spacing:2px;margin-bottom:14px;text-shadow:0 1px 8px rgba(0,0,0,0.5)}
-  .hero-actions{flex-direction:column;gap:10px}
-  .hero-actions a{text-align:center;justify-content:center}
-  .stats-bar{
-    display:grid !important;grid-template-columns:1fr 1fr 1fr !important;
-    gap:0 !important;margin-top:32px;padding-top:32px;flex-wrap:nowrap !important;
-  }
-  .stat-num{font-size:18px;font-family:var(--font)}
-  .stat-label{font-size:9px;letter-spacing:0.3px}
-  section{padding:60px 20px}
-  .section-title{font-size:28px;letter-spacing:-1px}
-  .section-desc{font-size:14px}
-  .services-grid{grid-template-columns:1fr;gap:12px}
-  .service-img{height:180px}
-  .service-body{padding:20px}
-  .facility-grid{grid-template-columns:1fr;gap:10px}
-  .reviews-grid{grid-template-columns:1fr;gap:12px}
-  .review-card{padding:24px}
-  .member-box{grid-template-columns:1fr;padding:28px}
-  .form-grid{grid-template-columns:1fr}
-  .form-card{padding:28px}
-  .contact-grid{grid-template-columns:1fr;gap:32px}
-  .cars-grid{grid-template-columns:1fr}
-  .cars-section{padding-top:40px}
-  .price-features{grid-template-columns:1fr}
+/* Mobile drawer */
+.drawer{
+  position:fixed;top:72px;left:0;right:0;bottom:0;
+  background:var(--white);
+  z-index:99;
+  transform:translateX(100%);
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+  padding:40px var(--pad) 60px;
+  display:flex;flex-direction:column;gap:6px;
+  overflow-y:auto;
 }
+.drawer.open{transform:translateX(0)}
+.drawer-link{
+  font-family:var(--display);
+  font-weight:700;font-size:32px;letter-spacing:-0.02em;
+  color:var(--ink);
+  padding:18px 0;
+  border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.drawer-link span{font-size:18px;color:var(--accent)}
+.drawer-cta{
+  margin-top:24px;
+  display:flex;flex-direction:column;gap:12px;
+}
+.drawer-btn{
+  font-family:var(--display);
+  font-weight:700;font-size:14px;letter-spacing:0.08em;
+  text-transform:uppercase;
+  padding:18px;
+  border-radius:var(--radius);
+  text-align:center;
+  transition:all .2s ease;
+}
+.drawer-btn.primary{background:var(--accent);color:var(--white)}
+.drawer-btn.secondary{background:var(--ice);color:var(--ink)}
+.drawer-contact{
+  margin-top:auto;padding-top:32px;
+  font-size:14px;color:var(--muted);
+}
+.drawer-contact a{display:block;color:var(--ink);font-weight:600;margin-top:4px}
 
-/* ======= HERO ======= */
+/* ============ HERO ============ */
 .hero{
-  position:relative;min-height:100vh;display:flex;align-items:flex-end;
-  padding:0 32px 80px;overflow:hidden;
+  position:relative;
+  min-height:100vh;
+  min-height:100svh;
+  background:var(--navy-deep);
+  color:var(--white);
+  display:flex;align-items:center;
+  padding:120px 0 80px;
+  overflow:hidden;
+  isolation:isolate;
 }
-.hero-bg{
-  position:absolute;inset:0;
-  background:url('https://images.leadconnectorhq.com/image/f_webp/q_80/r_1200/u_https://assets.cdn.filesafe.space/AQMCInrv6MSypZTc0JES/media/6703ebd5a3d8cffe6260c4db.png') center/cover no-repeat;
-}
-.hero-bg::after{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(7,7,9,0.2) 0%,rgba(7,7,9,0.5) 40%,rgba(7,7,9,0.85) 70%,rgba(7,7,9,0.97) 100%);
-}
-.hero-content{position:relative;z-index:2;max-width:var(--max);margin:0 auto;width:100%}
-.hero-label{
-  font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--accent);
-  text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:10px;
-}
-.hero-label::before{content:'';width:24px;height:1px;background:var(--accent)}
-.hero h1{
-  font-size:clamp(40px,7vw,80px);font-weight:800;color:var(--white);
-  line-height:1.0;letter-spacing:-3px;margin-bottom:20px;max-width:700px;
-}
-.hero p{font-size:clamp(16px,2vw,19px);color:var(--text-dim);max-width:480px;line-height:1.6;font-weight:300;margin-bottom:36px}
-.hero-actions{display:flex;gap:12px;flex-wrap:wrap}
-.btn-primary{
-  display:inline-flex;align-items:center;gap:8px;padding:14px 32px;
-  background:var(--accent);color:#000;font-family:var(--font);font-size:15px;
-  font-weight:600;border-radius:50px;text-decoration:none;transition:all 0.3s;
-}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(74,144,255,0.25)}
-.btn-secondary{
-  display:inline-flex;align-items:center;gap:8px;padding:14px 32px;
-  background:rgba(255,255,255,0.06);color:var(--white);font-family:var(--font);font-size:15px;
-  font-weight:500;border-radius:50px;text-decoration:none;transition:all 0.3s;
-  border:1px solid rgba(255,255,255,0.1);
-}
-.btn-secondary:hover{background:rgba(255,255,255,0.1);transform:translateY(-2px)}
 
-/* Stats bar */
-.stats-bar{
-  display:flex;gap:48px;padding-top:48px;margin-top:48px;
+/* Atmospheric backdrop layers */
+.hero::before{
+  content:'';position:absolute;inset:0;z-index:-2;
+  background:
+    radial-gradient(ellipse 80% 60% at 70% 30%, rgba(37,99,235,0.18), transparent 60%),
+    radial-gradient(ellipse 100% 80% at 20% 80%, rgba(30,58,138,0.22), transparent 60%),
+    linear-gradient(180deg, var(--navy-deep) 0%, var(--navy) 50%, var(--navy-deep) 100%);
+}
+.hero::after{
+  content:'';position:absolute;inset:0;z-index:-1;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size:80px 80px;
+  mask-image:radial-gradient(ellipse 90% 70% at 50% 40%, black 30%, transparent 80%);
+  -webkit-mask-image:radial-gradient(ellipse 90% 70% at 50% 40%, black 30%, transparent 80%);
+}
+
+.hero-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:48px;
+  align-items:center;
+  position:relative;
+}
+
+.eyebrow{
+  display:flex;align-items:center;gap:16px;
+  font-family:var(--display);
+  font-weight:600;font-size:11px;letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.65);
+  margin-bottom:32px;
+}
+.eyebrow::before{
+  content:'';
+  width:48px;height:1px;
+  background:var(--blue-3);
+  flex-shrink:0;
+}
+.eyebrow strong{
+  font-weight:700;
+  color:var(--white);
+  letter-spacing:0.22em;
+}
+.eyebrow .sep{
+  color:rgba(255,255,255,0.3);
+  font-weight:400;
+}
+
+.hero h1{
+  font-family:var(--display);
+  font-weight:800;
+  font-size:clamp(40px, 8vw, 88px);
+  line-height:0.98;
+  letter-spacing:-0.035em;
+  color:var(--white);
+  margin-bottom:28px;
+}
+.hero h1 .accent{
+  color:var(--blue-3);
+  font-weight:700;
+  font-style:italic;
+  font-family:var(--display);
+}
+.hero h1 .light{
+  font-weight:300;
+  color:rgba(255,255,255,0.85);
+}
+
+.hero-sub{
+  font-size:clamp(16px, 2.2vw, 19px);
+  line-height:1.6;
+  color:rgba(255,255,255,0.7);
+  max-width:520px;
+  margin-bottom:40px;
+  font-weight:400;
+}
+
+.hero-actions{
+  display:flex;flex-direction:column;gap:12px;
+  margin-bottom:48px;
+}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  font-family:var(--display);
+  font-weight:700;font-size:14px;letter-spacing:0.08em;
+  text-transform:uppercase;
+  padding:18px 32px;
+  border-radius:var(--radius);
+  transition:all .25s ease;
+  cursor:pointer;
+  border:1px solid transparent;
+  text-align:center;
+}
+.btn-primary{
+  background:var(--accent);
+  color:var(--white);
+  box-shadow:0 1px 0 rgba(255,255,255,0.15) inset, 0 12px 32px -8px rgba(37,99,235,0.55);
+}
+.btn-primary:hover{
+  background:var(--accent-hover);
+  transform:translateY(-2px);
+  box-shadow:0 1px 0 rgba(255,255,255,0.2) inset, 0 16px 40px -8px rgba(37,99,235,0.65);
+}
+.btn-ghost{
+  background:rgba(255,255,255,0.04);
+  color:var(--white);
+  border-color:rgba(255,255,255,0.18);
+  backdrop-filter:blur(10px);
+}
+.btn-ghost:hover{
+  background:rgba(255,255,255,0.08);
+  border-color:rgba(255,255,255,0.32);
+}
+.btn .arrow{transition:transform .25s ease}
+.btn:hover .arrow{transform:translateX(4px)}
+
+/* Trust strip */
+.trust-strip{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:24px 32px;
+  padding-top:32px;
   border-top:1px solid rgba(255,255,255,0.08);
 }
-.stat{display:flex;flex-direction:column;gap:4px}
-.stat-num{font-family:var(--mono);font-size:28px;font-weight:700;color:var(--white)}
-.stat-label{font-size:12px;color:var(--text-dim);letter-spacing:0.5px}
-
-/* ======= SECTIONS ======= */
-section{padding:100px 32px}
-.section-inner{max-width:var(--max);margin:0 auto}
-.section-label{
-  font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--accent);
-  text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px;
+.trust-item{
+  display:flex;flex-direction:column;gap:4px;
 }
-.section-label::before{content:'';width:16px;height:1px;background:var(--accent)}
-.section-title{font-size:clamp(28px,4vw,44px);font-weight:700;color:var(--white);letter-spacing:-1.5px;line-height:1.1;margin-bottom:16px}
-.section-desc{font-size:16px;color:var(--text-dim);max-width:520px;line-height:1.6;font-weight:300}
+.trust-num{
+  font-family:var(--display);
+  font-weight:800;
+  font-size:clamp(28px, 5vw, 40px);
+  letter-spacing:-0.02em;
+  color:var(--white);
+  line-height:1;
+}
+.trust-num sup{
+  font-size:0.5em;
+  color:var(--blue-3);
+  margin-left:2px;
+  vertical-align:super;
+}
+.trust-label{
+  font-size:12px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.5);
+  font-weight:500;
+}
 
-/* ======= CAR LISTINGS ======= */
-.cars-section{background:var(--surface)}
-.cars-header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;margin-bottom:32px}
-.cars-header .section-desc{margin-bottom:0}
+/* Hero visual — premium layered composition */
+.hero-visual{
+  position:relative;
+  padding:8px;
+  margin:0 4px;
+}
+.hero-visual-frame{
+  position:relative;
+  aspect-ratio: 4/5;
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  background:var(--navy-soft);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.06) inset,
+    0 60px 120px -30px rgba(0,0,0,0.7),
+    0 0 0 1px rgba(255,255,255,0.05);
+}
+.hero-visual-frame img{
+  width:100%;height:100%;object-fit:cover;
+  filter:saturate(1.05) contrast(1.02);
+}
+.hero-visual-frame::before{
+  content:'';position:absolute;inset:0;z-index:1;
+  background:
+    linear-gradient(180deg, rgba(5,11,24,0.15) 0%, transparent 30%, transparent 60%, rgba(5,11,24,0.5) 100%);
+  pointer-events:none;
+}
+
+/* Corner accents — subtle premium frame marks */
+.hero-visual-corner{
+  position:absolute;width:14px;height:14px;
+  border:1.5px solid var(--blue-3);
+  z-index:2;
+  opacity:0.9;
+}
+.hero-visual-corner.tl{top:14px;left:14px;border-right:none;border-bottom:none}
+.hero-visual-corner.tr{top:14px;right:14px;border-left:none;border-bottom:none}
+.hero-visual-corner.bl{bottom:14px;left:14px;border-right:none;border-top:none}
+.hero-visual-corner.br{bottom:14px;right:14px;border-left:none;border-top:none}
+
+/* Floating cards */
+.float-card{
+  position:absolute;
+  background:rgba(255,255,255,0.97);
+  backdrop-filter:blur(20px);
+  border-radius:10px;
+  padding:14px 16px;
+  display:flex;align-items:center;gap:12px;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.8) inset,
+    0 20px 40px -10px rgba(0,0,0,0.4),
+    0 0 0 1px rgba(15,23,42,0.04);
+  z-index:3;
+}
+.float-card-loc{
+  bottom:32px;left:-12px;
+  max-width:240px;
+}
+.float-card-rate{
+  top:32px;right:-8px;
+  flex-direction:column;align-items:flex-end;gap:2px;
+  padding:12px 16px;
+}
+.float-card-icon{
+  width:36px;height:36px;
+  border-radius:8px;
+  background:var(--blue-tint);
+  color:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.float-card-text{
+  display:flex;flex-direction:column;gap:2px;
+  line-height:1.2;
+  min-width:0;
+}
+.float-card-label{
+  font-family:var(--display);
+  font-size:9px;font-weight:600;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--muted-2);
+}
+.float-card-value{
+  font-family:var(--display);
+  font-size:13px;font-weight:700;
+  color:var(--ink);
+  letter-spacing:-0.005em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.float-card-value-big{
+  font-family:var(--display);
+  font-size:18px;font-weight:800;
+  color:var(--ink);
+  letter-spacing:-0.02em;
+  line-height:1;
+}
+.float-card-stars{
+  display:flex;gap:1px;
+  color:#fbbf24;
+}
+
+/* ============ SECTION DEFAULTS ============ */
+section{padding:clamp(64px, 10vw, 120px) 0;position:relative}
+
+.section-head{
+  margin-bottom:clamp(40px, 6vw, 72px);
+  max-width:780px;
+}
+.section-eyebrow{
+  display:inline-block;
+  font-family:var(--display);
+  font-weight:700;font-size:12px;letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin-bottom:20px;
+  padding-left:32px;
+  position:relative;
+}
+.section-eyebrow::before{
+  content:'';position:absolute;left:0;top:50%;
+  width:24px;height:1px;background:var(--accent);
+}
+.section-title{
+  font-family:var(--display);
+  font-weight:800;
+  font-size:clamp(32px, 5.5vw, 56px);
+  line-height:1.02;
+  letter-spacing:-0.03em;
+  color:var(--ink);
+  margin-bottom:20px;
+}
+.section-title .light{font-weight:300;color:var(--muted)}
+.section-title .blue{color:var(--accent)}
+.section-sub{
+  font-size:clamp(15px, 2vw, 17px);
+  line-height:1.6;
+  color:var(--muted);
+  max-width:600px;
+}
+
+/* ============ CARS SECTION ============ */
+.cars-section{
+  background:var(--white);
+  border-bottom:1px solid var(--line);
+}
+.cars-head{
+  display:flex;flex-direction:column;gap:24px;
+  margin-bottom:40px;
+}
+.cars-head-top{display:flex;flex-direction:column;gap:16px}
 .cars-link{
-  font-size:14px;font-weight:600;color:var(--accent);text-decoration:none;
-  display:inline-flex;align-items:center;gap:6px;transition:gap 0.3s;flex-shrink:0;
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--display);
+  font-weight:700;font-size:13px;letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--accent);
+  align-self:flex-start;
 }
-.cars-link:hover{gap:10px}
-.cars-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-@media(max-width:900px){.cars-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:550px){.cars-grid{grid-template-columns:1fr}}
+.cars-link:hover{color:var(--accent-hover)}
+
+.cars-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:20px;
+}
 .car-card{
-  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);
-  overflow:hidden;transition:border-color 0.4s,transform 0.4s;
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  transition:all .3s ease;
+  cursor:pointer;
+  display:flex;flex-direction:column;
 }
-.car-card:hover{border-color:var(--border-light);transform:translateY(-4px)}
+.car-card:hover{
+  transform:translateY(-4px);
+  border-color:var(--blue-line);
+  box-shadow:0 20px 40px -12px rgba(15,23,42,0.12);
+}
 .car-img{
-  width:100%;aspect-ratio:16/10;object-fit:cover;display:block;
-  background:var(--surface3);
+  position:relative;
+  aspect-ratio:16/10;
+  background:var(--ice);
+  overflow:hidden;
 }
 .car-img-placeholder{
-  width:100%;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;
-  background:var(--surface3);color:var(--text-muted);font-size:32px;
+  width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 50%, #e2e8f0 100%);
+  position:relative;
 }
-.car-body{padding:20px}
-.car-title{font-size:15px;font-weight:700;color:var(--white);margin-bottom:4px;line-height:1.3}
-.car-subtitle{font-size:12px;color:var(--text-dim);margin-bottom:14px}
-.car-specs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.car-img-placeholder::before{
+  content:'';position:absolute;inset:0;
+  background-image:repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 12px,
+    rgba(15,23,42,0.025) 12px,
+    rgba(15,23,42,0.025) 13px
+  );
+}
+.car-img-placeholder svg{
+  width:48px;height:48px;
+  color:var(--muted-2);
+  opacity:0.5;
+  z-index:1;
+}
+.car-badge{
+  position:absolute;top:14px;left:14px;
+  font-family:var(--display);
+  font-weight:700;font-size:10px;letter-spacing:0.12em;
+  text-transform:uppercase;
+  background:var(--white);
+  color:var(--ink);
+  padding:6px 10px;
+  border-radius:4px;
+  z-index:2;
+  box-shadow:0 2px 8px rgba(0,0,0,0.08);
+}
+.car-badge.new{background:var(--accent);color:var(--white)}
+.car-body{
+  padding:20px 22px 22px;
+  display:flex;flex-direction:column;gap:14px;
+  flex:1;
+}
+.car-title{
+  font-family:var(--display);
+  font-weight:700;font-size:18px;
+  letter-spacing:-0.01em;
+  color:var(--ink);
+  line-height:1.2;
+}
 .car-spec{
-  font-size:11px;font-family:var(--mono);color:var(--text-dim);
-  background:rgba(255,255,255,0.04);padding:4px 8px;border-radius:6px;
-  letter-spacing:0.3px;
+  display:flex;flex-wrap:wrap;gap:6px 12px;
+  font-size:12px;color:var(--muted);
+  font-weight:500;
 }
-.car-footer{display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid var(--border)}
-.car-price{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--white)}
-.car-price span{font-size:12px;color:var(--text-dim);font-weight:400}
-.car-cta{
-  font-size:12px;font-weight:600;color:var(--accent);text-decoration:none;
-  display:inline-flex;align-items:center;gap:4px;transition:gap 0.3s;
+.car-spec span{
+  display:inline-flex;align-items:center;gap:4px;
 }
-.car-cta:hover{gap:8px}
+.car-spec span:not(:last-child)::after{
+  content:'';width:3px;height:3px;border-radius:50%;background:var(--line-strong);
+  margin-left:8px;
+}
+.car-foot{
+  display:flex;justify-content:space-between;align-items:center;
+  padding-top:14px;border-top:1px solid var(--line);
+  margin-top:auto;
+}
+.car-price{
+  font-family:var(--display);
+  font-weight:800;font-size:22px;
+  letter-spacing:-0.02em;
+  color:var(--ink);
+}
+.car-price-mo{
+  font-size:11px;color:var(--muted);font-weight:500;
+  text-transform:uppercase;letter-spacing:0.06em;
+  display:block;margin-top:2px;
+}
+.car-arrow{
+  width:36px;height:36px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--ice);
+  border-radius:50%;
+  color:var(--ink);
+  transition:all .25s ease;
+}
+.car-card:hover .car-arrow{
+  background:var(--accent);
+  color:var(--white);
+  transform:rotate(-45deg);
+}
 
-/* ======= SERVICES ======= */
-.services-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:48px}
-@media(max-width:700px){.services-grid{grid-template-columns:1fr}}
+.cars-footer{
+  margin-top:48px;
+  padding:32px;
+  background:var(--ice);
+  border-radius:var(--radius-lg);
+  display:flex;flex-direction:column;gap:16px;
+  align-items:flex-start;
+}
+.cars-footer-text{
+  font-family:var(--display);
+  font-weight:700;
+  font-size:clamp(20px, 3vw, 26px);
+  letter-spacing:-0.01em;
+  color:var(--ink);
+  line-height:1.2;
+}
+.cars-footer-sub{
+  color:var(--muted);
+  font-size:15px;
+}
+
+/* ============ TRUST/STATS BAR ============ */
+.stats-bar{
+  background:var(--navy);
+  color:var(--white);
+  padding:60px 0;
+  position:relative;
+  overflow:hidden;
+}
+.stats-bar::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 60% 100% at 80% 50%, rgba(37,99,235,0.15), transparent 70%);
+}
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:32px 24px;
+  position:relative;
+}
+.stat-item{
+  display:flex;flex-direction:column;gap:8px;
+  padding:0 4px;
+  border-left:1px solid rgba(255,255,255,0.1);
+  padding-left:20px;
+}
+.stat-num{
+  font-family:var(--display);
+  font-weight:800;
+  font-size:clamp(32px, 5vw, 48px);
+  letter-spacing:-0.03em;
+  line-height:1;
+  color:var(--white);
+}
+.stat-num sup{font-size:0.45em;color:var(--blue-3);margin-left:2px}
+.stat-label{
+  font-size:12px;letter-spacing:0.06em;text-transform:uppercase;
+  color:rgba(255,255,255,0.55);
+  font-weight:500;
+  line-height:1.4;
+}
+
+/* ============ SERVICES SECTION ============ */
+.services-section{background:var(--off)}
+.services-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:20px;
+}
 .service-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  overflow:hidden;transition:border-color 0.4s,transform 0.4s;position:relative;
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  transition:all .35s ease;
+  position:relative;
 }
-.service-card:hover{border-color:var(--border-light);transform:translateY(-4px)}
+.service-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 24px 48px -16px rgba(15,23,42,0.12);
+  border-color:var(--blue-line);
+}
 .service-img{
-  width:100%;height:200px;object-fit:cover;display:block;
-  filter:brightness(0.8);transition:filter 0.4s;
+  aspect-ratio:16/10;
+  position:relative;
+  overflow:hidden;
+  background:var(--ice);
 }
-.service-card:hover .service-img{filter:brightness(0.95)}
-.service-body{padding:28px}
-.service-body h3{font-size:18px;font-weight:700;color:var(--white);margin-bottom:8px}
-.service-body p{font-size:14px;color:var(--text-dim);line-height:1.6}
+.service-img img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform .6s cubic-bezier(.4,0,.2,1);
+}
+.service-card:hover .service-img img{transform:scale(1.05)}
+.service-num{
+  position:absolute;top:16px;right:16px;
+  font-family:var(--display);
+  font-weight:800;font-size:12px;letter-spacing:0.08em;
+  background:rgba(5,11,24,0.85);
+  backdrop-filter:blur(8px);
+  color:var(--white);
+  padding:6px 10px;
+  border-radius:4px;
+  z-index:2;
+}
+.service-body{
+  padding:28px;
+  display:flex;flex-direction:column;gap:14px;
+  flex:1;
+}
+.service-title{
+  font-family:var(--display);
+  font-weight:800;
+  font-size:22px;
+  letter-spacing:-0.02em;
+  color:var(--ink);
+  line-height:1.2;
+}
+.service-text{
+  color:var(--muted);
+  font-size:15px;
+  line-height:1.6;
+  flex:1;
+}
 .service-link{
-  display:inline-flex;align-items:center;gap:6px;margin-top:16px;
-  font-size:13px;font-weight:600;color:var(--accent);text-decoration:none;
-  transition:gap 0.3s;
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--display);
+  font-weight:700;font-size:13px;letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin-top:8px;
+  align-self:flex-start;
 }
-.service-link:hover{gap:10px}
+.service-link svg{transition:transform .25s ease}
+.service-card:hover .service-link svg{transform:translateX(4px)}
 
-/* ======= ANLÄGGNING ======= */
-.facility-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:48px}
-@media(max-width:700px){.facility-grid{grid-template-columns:1fr}}
+/* ============ ECOSYSTEM / CTA SECTION ============ */
+.ecosystem{
+  background:var(--navy-deep);
+  color:var(--white);
+  padding:clamp(72px, 12vw, 140px) 0;
+  position:relative;
+  overflow:hidden;
+}
+.ecosystem::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 30% 20%, rgba(37,99,235,0.2), transparent 70%),
+    radial-gradient(ellipse 60% 60% at 90% 80%, rgba(30,58,138,0.15), transparent 70%);
+}
+.ecosystem-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:48px;
+  align-items:center;
+  position:relative;
+}
+.ecosystem h2{
+  font-family:var(--display);
+  font-weight:800;
+  font-size:clamp(34px, 6vw, 64px);
+  line-height:1.02;
+  letter-spacing:-0.03em;
+  margin-bottom:24px;
+}
+.ecosystem h2 .light{font-weight:300;color:rgba(255,255,255,0.7)}
+.ecosystem h2 .blue{color:var(--blue-3);font-style:italic;font-weight:700}
+.ecosystem-text{
+  font-size:17px;
+  line-height:1.6;
+  color:rgba(255,255,255,0.7);
+  margin-bottom:32px;
+  max-width:500px;
+}
+.ecosystem-features{
+  display:flex;flex-direction:column;gap:16px;
+  margin-bottom:36px;
+}
+.ecosystem-feat{
+  display:flex;align-items:center;gap:14px;
+  font-size:15px;
+  color:rgba(255,255,255,0.85);
+}
+.ecosystem-feat svg{
+  flex-shrink:0;
+  color:var(--blue-3);
+}
+
+.ecosystem-visual{
+  position:relative;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.ecosystem-img{
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  aspect-ratio:1;
+  border:1px solid rgba(255,255,255,0.08);
+}
+.ecosystem-img:nth-child(1){
+  aspect-ratio:1/1.4;
+  margin-top:32px;
+}
+.ecosystem-img:nth-child(2){aspect-ratio:1/1.4}
+.ecosystem-img img{width:100%;height:100%;object-fit:cover}
+
+/* ============ FACILITY ============ */
+.facility{background:var(--white)}
+.facility-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:16px;
+}
 .facility-card{
-  position:relative;border-radius:var(--radius);overflow:hidden;aspect-ratio:4/3;
+  position:relative;
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  aspect-ratio:4/5;
+  background:var(--ice);
   cursor:pointer;
 }
-.facility-card img{width:100%;height:100%;object-fit:cover;transition:transform 0.6s,filter 0.4s;filter:brightness(0.7)}
-.facility-card:hover img{transform:scale(1.05);filter:brightness(0.85)}
-.facility-card span{
-  position:absolute;bottom:20px;left:20px;font-size:14px;font-weight:600;color:var(--white);
-  letter-spacing:0.5px;z-index:2;
+.facility-card img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform .8s cubic-bezier(.4,0,.2,1);
 }
+.facility-card:hover img{transform:scale(1.06)}
 .facility-card::after{
   content:'';position:absolute;inset:0;
-  background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.7) 100%);
+  background:linear-gradient(180deg, transparent 30%, rgba(5,11,24,0.85) 100%);
+  z-index:1;
+}
+.facility-content{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:28px;
+  z-index:2;
+  color:var(--white);
+}
+.facility-num{
+  font-family:var(--display);
+  font-size:11px;letter-spacing:0.16em;
+  color:rgba(255,255,255,0.5);
+  font-weight:600;
+  margin-bottom:12px;
+  display:block;
+}
+.facility-title{
+  font-family:var(--display);
+  font-weight:800;
+  font-size:28px;
+  letter-spacing:-0.02em;
+  margin-bottom:8px;
+  line-height:1.05;
+}
+.facility-text{
+  font-size:14px;
+  color:rgba(255,255,255,0.75);
+  margin-bottom:18px;
+  line-height:1.5;
+}
+.facility-arrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--display);
+  font-weight:700;font-size:12px;letter-spacing:0.1em;
+  text-transform:uppercase;
+}
+.facility-arrow svg{transition:transform .25s ease}
+.facility-card:hover .facility-arrow svg{transform:translateX(4px)}
+
+/* ============ VALUATION CTA ============ */
+.value-cta{
+  padding:clamp(60px, 10vw, 100px) 0;
+  background:linear-gradient(135deg, var(--blue-1) 0%, var(--accent) 100%);
+  color:var(--white);
+  position:relative;
+  overflow:hidden;
+}
+.value-cta::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%);
+  -webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%);
+}
+.value-cta::after{
+  content:'BIL';
+  position:absolute;
+  bottom:-40px;right:-20px;
+  font-family:var(--display);
+  font-weight:900;
+  font-size:clamp(180px, 30vw, 380px);
+  letter-spacing:-0.04em;
+  color:rgba(255,255,255,0.05);
+  line-height:0.8;
+  pointer-events:none;
+}
+.value-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:32px;
+  align-items:center;
+  position:relative;
+  z-index:2;
+}
+.value-cta h2{
+  font-family:var(--display);
+  font-weight:800;
+  font-size:clamp(34px, 6vw, 56px);
+  line-height:1.02;
+  letter-spacing:-0.03em;
+  margin-bottom:20px;
+}
+.value-cta h2 .light{font-weight:300;opacity:0.8}
+.value-cta-text{
+  font-size:17px;
+  line-height:1.6;
+  color:rgba(255,255,255,0.85);
+  margin-bottom:32px;
+  max-width:500px;
+}
+.value-cta .btn-primary{
+  background:var(--white);
+  color:var(--ink);
+}
+.value-cta .btn-primary:hover{background:var(--ice)}
+
+.value-steps{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:16px;
+}
+.value-step{
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,0.14);
+  border-radius:var(--radius-lg);
+  padding:24px;
+  display:flex;gap:16px;align-items:flex-start;
+}
+.value-step-num{
+  font-family:var(--display);
+  font-weight:800;font-size:24px;
+  width:44px;height:44px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.12);
+  border-radius:8px;
+  flex-shrink:0;
+  letter-spacing:-0.02em;
+}
+.value-step-text{
+  display:flex;flex-direction:column;gap:4px;
+  flex:1;min-width:0;
+}
+.value-step-text strong{
+  display:block;
+  font-family:var(--display);
+  font-weight:700;font-size:16px;
+  color:var(--white);
+  letter-spacing:-0.005em;
+  line-height:1.3;
+}
+.value-step-text span{
+  display:block;
+  font-size:14px;
+  color:rgba(255,255,255,0.75);
+  line-height:1.5;
 }
 
-/* ======= REVIEWS ======= */
-.reviews-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:48px}
-@media(max-width:700px){.reviews-grid{grid-template-columns:1fr}}
+/* ============ REVIEWS ============ */
+.reviews{background:var(--off)}
+.reviews-head{
+  display:flex;flex-direction:column;gap:12px;
+  margin-bottom:48px;
+}
+.reviews-rating{
+  display:inline-flex;align-items:center;gap:12px;
+  align-self:flex-start;
+}
+.stars{display:flex;gap:2px;color:#fbbf24}
+.reviews-rating-text{
+  font-family:var(--display);
+  font-weight:700;font-size:14px;
+  color:var(--ink);
+}
+.reviews-rating-text span{color:var(--muted);font-weight:500}
+
+.reviews-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:20px;
+}
 .review-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  padding:32px;transition:border-color 0.3s;
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:var(--radius-lg);
+  padding:28px;
+  display:flex;flex-direction:column;gap:18px;
+  transition:all .25s ease;
 }
-.review-card:hover{border-color:var(--border-light)}
-.review-stars{color:var(--amber);font-size:16px;letter-spacing:2px;margin-bottom:16px}
-.review-text{font-size:15px;color:var(--text);line-height:1.7;font-style:italic;margin-bottom:20px}
-.review-author{font-size:13px;font-weight:600;color:var(--white)}
-.review-source{font-size:12px;color:var(--text-dim);margin-top:2px}
+.review-card:hover{
+  border-color:var(--blue-line);
+  box-shadow:0 12px 32px -12px rgba(15,23,42,0.08);
+}
+.review-quote{
+  font-family:var(--display);
+  font-weight:500;
+  font-size:17px;
+  line-height:1.5;
+  color:var(--ink);
+  letter-spacing:-0.005em;
+  position:relative;
+}
+.review-quote::before{
+  content:'"';
+  position:absolute;
+  left:-8px;top:-20px;
+  font-family:var(--display);
+  font-size:60px;
+  color:var(--blue-line);
+  font-weight:800;
+  line-height:1;
+}
+.review-meta{
+  display:flex;align-items:center;gap:12px;
+  padding-top:18px;
+  border-top:1px solid var(--line);
+}
+.review-avatar{
+  width:42px;height:42px;
+  border-radius:50%;
+  background:linear-gradient(135deg, var(--blue-1), var(--accent));
+  display:flex;align-items:center;justify-content:center;
+  color:var(--white);
+  font-family:var(--display);
+  font-weight:700;
+  font-size:15px;
+}
+.review-name{
+  font-family:var(--display);
+  font-weight:700;font-size:14px;
+  color:var(--ink);
+}
+.review-source{
+  font-size:12px;
+  color:var(--muted);
+  display:flex;align-items:center;gap:4px;
+}
 
-/* ======= MEMBERSHIP ======= */
-.member-box{
-  background:linear-gradient(160deg,var(--surface) 0%,rgba(74,144,255,0.04) 100%);
-  border:1px solid var(--border);border-radius:20px;padding:60px;margin-top:48px;
-  display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;
+/* ============ FAQ ============ */
+.faq{background:var(--white)}
+.faq-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:48px;
 }
-@media(max-width:700px){.member-box{grid-template-columns:1fr;padding:32px}}
-.member-benefits{list-style:none;display:flex;flex-direction:column;gap:12px;margin-top:24px}
-.member-benefits li{
-  display:flex;align-items:flex-start;gap:12px;font-size:14px;color:var(--text);line-height:1.6;
+.faq-list{display:flex;flex-direction:column}
+.faq-item{
+  border-top:1px solid var(--line);
 }
-.member-benefits li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0;margin-top:1px}
-.member-img{
-  width:100%;border-radius:var(--radius);object-fit:cover;aspect-ratio:4/3;
-  filter:brightness(0.8);
-}
-
-/* ======= VÄRDERA ======= */
-.form-section{background:var(--surface)}
-.form-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:48px;align-items:center;
-}
-@media(max-width:700px){.form-grid{grid-template-columns:1fr}}
-.form-card{
-  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);
-  padding:40px;
-}
-.form-card h3{font-size:22px;font-weight:700;color:var(--white);margin-bottom:8px}
-.form-card p{font-size:14px;color:var(--text-dim);margin-bottom:28px;line-height:1.6}
-.form-field{margin-bottom:16px}
-.form-field label{display:block;font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:6px;letter-spacing:0.5px;text-transform:uppercase}
-.form-field input,.form-field select{
-  width:100%;padding:14px 16px;background:var(--surface3);border:1px solid var(--border);
-  border-radius:10px;color:var(--white);font-family:var(--font);font-size:14px;
-  transition:border-color 0.3s;outline:none;
-}
-.form-field input::placeholder{color:var(--text-muted)}
-.form-field input:focus,.form-field select:focus{border-color:var(--accent)}
-.form-submit{
-  width:100%;padding:16px;background:var(--accent);color:#000;border:none;
-  border-radius:50px;font-family:var(--font);font-size:15px;font-weight:700;
-  cursor:pointer;transition:all 0.3s;margin-top:8px;
-}
-.form-submit:hover{box-shadow:0 8px 30px rgba(74,144,255,0.25);transform:translateY(-1px)}
-.form-trust{display:flex;flex-direction:column;gap:20px}
-.form-trust-item{display:flex;gap:16px;align-items:flex-start}
-.form-trust-icon{
-  width:44px;height:44px;border-radius:12px;background:var(--accent-glow);
-  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;
-}
-.form-trust-item h4{font-size:15px;font-weight:600;color:var(--white);margin-bottom:4px}
-.form-trust-item p{font-size:13px;color:var(--text-dim);line-height:1.5}
-
-/* ======= FAQ ======= */
-.faq-list{margin-top:48px;max-width:720px}
-.faq-item{border-bottom:1px solid var(--border)}
+.faq-item:last-child{border-bottom:1px solid var(--line)}
 .faq-q{
-  width:100%;padding:24px 0;display:flex;justify-content:space-between;align-items:center;
-  background:none;border:none;cursor:pointer;text-align:left;font-family:var(--font);
+  width:100%;
+  text-align:left;
+  padding:24px 0;
+  font-family:var(--display);
+  font-weight:700;
+  font-size:clamp(16px, 2.2vw, 19px);
+  letter-spacing:-0.01em;
+  color:var(--ink);
+  display:flex;justify-content:space-between;align-items:center;gap:24px;
+  transition:color .2s ease;
 }
-.faq-q h3{font-size:16px;font-weight:600;color:var(--white);padding-right:16px}
-.faq-q span{color:var(--text-dim);font-size:20px;transition:transform 0.3s;flex-shrink:0}
-.faq-item.open .faq-q span{transform:rotate(45deg)}
-.faq-a{max-height:0;overflow:hidden;transition:max-height 0.4s ease,padding 0.3s}
-.faq-item.open .faq-a{max-height:500px;padding-bottom:24px}
-.faq-a p{font-size:14px;color:var(--text-dim);line-height:1.7}
+.faq-q:hover{color:var(--accent)}
+.faq-icon{
+  width:32px;height:32px;
+  border-radius:50%;
+  background:var(--ice);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  transition:all .3s ease;
+}
+.faq-icon::before,
+.faq-icon::after{
+  content:'';
+  position:absolute;
+  background:var(--ink);
+  transition:all .3s ease;
+}
+.faq-icon::before{width:12px;height:1.5px}
+.faq-icon::after{width:1.5px;height:12px}
+.faq-item.open .faq-icon{
+  background:var(--accent);
+  transform:rotate(45deg);
+}
+.faq-item.open .faq-icon::before,
+.faq-item.open .faq-icon::after{background:var(--white)}
 
-/* ======= CONTACT ======= */
-.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:48px}
-@media(max-width:700px){.contact-grid{grid-template-columns:1fr}}
+.faq-icon{position:relative}
+
+.faq-a{
+  max-height:0;
+  overflow:hidden;
+  transition:max-height .4s cubic-bezier(.4,0,.2,1);
+}
+.faq-a-inner{
+  padding:0 0 24px;
+  font-size:15px;
+  line-height:1.7;
+  color:var(--muted);
+  max-width:640px;
+}
+.faq-item.open .faq-a{max-height:600px}
+
+/* ============ CONTACT ============ */
+.contact{
+  background:var(--navy-deep);
+  color:var(--white);
+  position:relative;
+  overflow:hidden;
+}
+.contact::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 80% at 80% 30%, rgba(37,99,235,0.18), transparent 70%);
+}
+.contact-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:48px;
+  position:relative;
+}
 .contact-info{display:flex;flex-direction:column;gap:32px}
-.contact-item h4{font-size:12px;font-weight:600;color:var(--text-dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
-.contact-item a,.contact-item p{font-size:18px;color:var(--white);text-decoration:none;font-weight:500;line-height:1.5}
-.contact-item a:hover{color:var(--accent)}
-.contact-hours{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;font-size:15px}
-.contact-hours span:nth-child(odd){color:var(--text-dim);font-weight:500}
-.contact-hours span:nth-child(even){color:var(--white);font-weight:500}
-.contact-map{
-  border-radius:var(--radius);overflow:hidden;aspect-ratio:4/3;
-  border:1px solid var(--border);
+.contact-block{
+  display:flex;flex-direction:column;gap:6px;
 }
-.contact-map iframe{width:100%;height:100%;border:0;filter:brightness(0.8) contrast(1.1) saturate(0)}
+.contact-label{
+  font-family:var(--display);
+  font-size:11px;letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.5);
+  font-weight:600;
+}
+.contact-value{
+  font-family:var(--display);
+  font-weight:700;
+  font-size:clamp(20px, 3vw, 26px);
+  letter-spacing:-0.01em;
+  color:var(--white);
+  display:flex;align-items:center;gap:12px;
+}
+.contact-value:hover{color:var(--blue-3)}
+.contact-value svg{
+  width:20px;height:20px;
+  color:var(--blue-3);
+  flex-shrink:0;
+}
 
-/* ======= FOOTER ======= */
-footer{
-  padding:40px 32px;border-top:1px solid var(--border);
-  text-align:center;font-size:12px;color:var(--text-muted);
-  font-family:var(--mono);letter-spacing:1px;
+.hours-grid{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:8px 20px;
+  font-size:14px;
+  margin-top:12px;
 }
+.hours-grid dt{
+  font-family:var(--display);
+  font-weight:600;
+  color:rgba(255,255,255,0.6);
+}
+.hours-grid dd{
+  color:var(--white);
+  font-weight:500;
+}
+.hours-grid dd.closed{color:rgba(255,255,255,0.4)}
+
+.contact-map{
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  aspect-ratio:4/3;
+  border:1px solid rgba(255,255,255,0.1);
+  background:var(--navy-soft);
+  position:relative;
+}
+.contact-map iframe{width:100%;height:100%;border:0;filter:invert(0.92) hue-rotate(180deg) saturate(0.3) brightness(0.95)}
+
+/* ============ FOOTER ============ */
+.footer{
+  background:#020617;
+  color:rgba(255,255,255,0.6);
+  padding:60px 0 32px;
+  border-top:1px solid rgba(255,255,255,0.06);
+}
+.footer-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:40px;
+  margin-bottom:48px;
+}
+.footer-brand img{
+  height:40px;width:auto;
+  filter:brightness(0) invert(1);
+  margin-bottom:16px;
+  opacity:0.9;
+}
+.footer-brand p{font-size:14px;line-height:1.6;max-width:320px}
+.footer-col h4{
+  font-family:var(--display);
+  font-weight:700;font-size:12px;letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--white);
+  margin-bottom:18px;
+}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.footer-col a{
+  font-size:14px;
+  color:rgba(255,255,255,0.6);
+  transition:color .2s ease;
+}
+.footer-col a:hover{color:var(--blue-3)}
+.footer-bottom{
+  padding-top:32px;
+  border-top:1px solid rgba(255,255,255,0.08);
+  display:flex;flex-direction:column;gap:16px;
+  font-size:12px;
+  color:rgba(255,255,255,0.4);
+  letter-spacing:0.04em;
+}
+
+/* Sticky mobile bottom bar */
+.mobile-cta{
+  position:fixed;bottom:0;left:0;right:0;z-index:90;
+  background:rgba(255,255,255,0.98);
+  backdrop-filter:blur(20px);
+  border-top:1px solid var(--line);
+  padding:12px;
+  display:flex;gap:8px;
+  box-shadow:0 -10px 30px rgba(0,0,0,0.06);
+}
+.mobile-cta .btn{flex:1;padding:14px 16px;font-size:12px}
+.mobile-cta .btn-primary{box-shadow:none}
+
+/* ============ RESPONSIVE ============ */
+@media (min-width: 700px){
+  .cars-grid{grid-template-columns:repeat(2, 1fr)}
+  .services-grid{grid-template-columns:repeat(2, 1fr)}
+  .facility-grid{grid-template-columns:repeat(3, 1fr)}
+  .reviews-grid{grid-template-columns:repeat(2, 1fr)}
+  .stats-grid{grid-template-columns:repeat(4, 1fr)}
+  .trust-strip{grid-template-columns:repeat(4, 1fr)}
+  .value-steps{grid-template-columns:repeat(2, 1fr)}
+  .footer-grid{grid-template-columns:2fr 1fr 1fr 1fr}
+  .footer-bottom{flex-direction:row;justify-content:space-between;align-items:center}
+  .cars-head{flex-direction:row;justify-content:space-between;align-items:flex-end;gap:48px}
+  .cars-head-top{flex:1}
+  .cars-footer{flex-direction:row;align-items:center;justify-content:space-between;padding:36px 40px}
+  .cars-footer-text{flex:1}
+}
+
+@media (min-width: 900px){
+  .nav-links{display:flex}
+  .nav-cta{display:inline-flex}
+  .menu-btn{display:none}
+  .mobile-cta{display:none}
+
+  .hero{padding:140px 0 100px}
+  .hero-grid{
+    grid-template-columns:1.1fr 1fr;
+    gap:80px;
+  }
+  .hero-actions{flex-direction:row;flex-wrap:wrap}
+  .hero-actions .btn{flex:0 0 auto}
+
+  .hero-visual{margin:0}
+  .hero-visual-frame{aspect-ratio:4/5}
+  .float-card-loc{left:-24px;bottom:48px}
+  .float-card-rate{right:-24px;top:48px}
+
+  .cars-grid{grid-template-columns:repeat(3, 1fr)}
+  .services-grid{grid-template-columns:repeat(2, 1fr);gap:24px}
+  .reviews-grid{grid-template-columns:repeat(2, 1fr);gap:24px}
+
+  .ecosystem-grid{grid-template-columns:1fr 1fr;gap:80px}
+  .value-grid{grid-template-columns:1.1fr 1fr;gap:64px}
+  .contact-grid{grid-template-columns:1fr 1fr;gap:64px}
+  .faq-grid{grid-template-columns:1fr 1.5fr;gap:80px}
+}
+
+@media (min-width: 1100px){
+  .services-grid{grid-template-columns:repeat(4, 1fr)}
+  .cars-grid{grid-template-columns:repeat(3, 1fr);gap:24px}
+}
+
+/* Scroll reveals */
+.reveal{
+  opacity:0;
+  transform:translateY(24px);
+  transition:opacity .8s cubic-bezier(.4,0,.2,1), transform .8s cubic-bezier(.4,0,.2,1);
+}
+.reveal.in{opacity:1;transform:none}
+
+/* Body padding for mobile sticky bar */
+@media (max-width: 899px){
+  body{padding-bottom:72px}
+}
+
+/* Selection */
+::selection{background:var(--accent);color:var(--white)}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav id="nav">
-  <div class="nav-inner">
-    <img src="https://assets.cdn.filesafe.space/AQMCInrv6MSypZTc0JES/media/66c88c9328818f062fb9d35a.png" alt="BLD Bil" class="nav-logo">
-    <div class="nav-links" id="navLinks">
-      <a href="#bilar">Bilar</a>
-      <a href="#tjanster">Tjänster</a>
-      <a href="#recensioner">Recensioner</a>
-      <a href="#vardera">Värdera bil</a>
-      <a href="#faq">FAQ</a>
-      <a href="#kontakt">Kontakt</a>
-      <a href="tel:08-40888807" class="nav-cta">Ring oss</a>
-    </div>
-    <button class="nav-menu-btn" id="menuBtn" aria-label="Meny">
-      <span></span><span></span><span></span>
-    </button>
+<!-- ============ HEADER ============ -->
+<header class="header" id="header">
+  <div class="container">
+    <nav class="nav">
+      <a href="#" class="logo" aria-label="BLD Bil hem">
+        <img src="https://assets.cdn.filesafe.space/AQMCInrv6MSypZTc0JES/media/66c88c9328818f062fb9d35a.png" alt="BLD Bil">
+      </a>
+
+      <div class="nav-links">
+        <a href="#bilar" class="nav-link">Köp</a>
+        <a href="#salj" class="nav-link">Sälj</a>
+        <a href="#tjanster" class="nav-link">Däckservice</a>
+        <a href="#medlem" class="nav-link">Medlem</a>
+        <a href="#kontakt" class="nav-link">Om oss</a>
+      </div>
+
+      <a href="#kontakt" class="nav-cta">Boka tid</a>
+
+      <button class="menu-btn" id="menuBtn" aria-label="Meny" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
   </div>
-</nav>
+</header>
 
-<!-- MOBILE MENU OVERLAY -->
-<div class="mobile-overlay" id="mobileMenu">
-  <a href="#bilar" style="transition-delay:0.05s">Bilar</a>
-  <a href="#tjanster" style="transition-delay:0.1s">Tjänster</a>
-  <a href="#recensioner" style="transition-delay:0.15s">Recensioner</a>
-  <a href="#medlem" style="transition-delay:0.2s">Medlemskap</a>
-  <a href="#vardera" style="transition-delay:0.25s">Värdera bil</a>
-  <div class="mob-divider" style="transition-delay:0.27s"></div>
-  <a href="#faq" style="transition-delay:0.3s">FAQ</a>
-  <a href="#kontakt" style="transition-delay:0.35s">Kontakt</a>
-  <a href="tel:08-40888807" class="mob-cta" style="transition-delay:0.4s">Ring oss</a>
-  <span class="mob-label">BLD Bil AB — Haninge</span>
-</div>
+<!-- Mobile drawer -->
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <a href="#bilar" class="drawer-link">Köp bil <span>→</span></a>
+  <a href="#salj" class="drawer-link">Sälj bil <span>→</span></a>
+  <a href="#tjanster" class="drawer-link">Däckservice <span>→</span></a>
+  <a href="#medlem" class="drawer-link">BLD Medlem <span>→</span></a>
+  <a href="#faq" class="drawer-link">FAQ <span>→</span></a>
+  <a href="#kontakt" class="drawer-link">Kontakt <span>→</span></a>
 
-<!-- HERO -->
-<section class="hero" id="top">
-  <div class="hero-bg"></div>
-  <div class="hero-content">
-    <div class="hero-label anim">BLD Bil AB — Haninge</div>
-    <h1 class="anim anim-d1">Din lokala bilhandlare.</h1>
-    <p class="anim anim-d2">Köp, sälj, serva och förvara. Allt du behöver för ditt bilägande under samma tak — sedan över 10 år tillbaka.</p>
-    <div class="hero-actions anim anim-d3">
-      <a href="#vardera" class="btn-primary">Värdera din bil →</a>
-      <a href="#bilar" class="btn-secondary">Se våra bilar</a>
-    </div>
-    <div class="stats-bar anim anim-d4">
-      <div class="stat">
-        <div class="stat-num">10+</div>
-        <div class="stat-label">År i branschen</div>
+  <div class="drawer-cta">
+    <a href="#kontakt" class="drawer-btn primary">Boka tid</a>
+    <a href="tel:0840888807" class="drawer-btn secondary">Ring 08-408 888 07</a>
+  </div>
+
+  <div class="drawer-contact">
+    Hantverkarvägen 22, 136 44 Handen
+    <a href="tel:0840888807">08-408 888 07</a>
+  </div>
+</aside>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div class="hero-content">
+        <div class="eyebrow reveal">
+          <strong>EST. 2013</strong>
+          <span class="sep">/</span>
+          <span>Haninge &middot; Stockholm</span>
+        </div>
+
+        <h1 class="reveal">
+          Din lokala<br>
+          <span class="accent">&amp; trygga bilhandlare.</span>
+        </h1>
+
+        <p class="hero-sub reveal">
+          Över 10 år i branschen. Genomgångna och kontrollerade bilar, transparenta priser och en komplett verkstad under samma tak.
+        </p>
+
+        <div class="hero-actions reveal">
+          <a href="#bilar" class="btn btn-primary">
+            Se våra bilar
+            <span class="arrow">→</span>
+          </a>
+          <a href="#salj" class="btn btn-ghost">
+            Värdera din bil
+          </a>
+        </div>
+
+        <div class="trust-strip reveal">
+          <div class="trust-item">
+            <span class="trust-num">10<sup>+</sup></span>
+            <span class="trust-label">År i branschen</span>
+          </div>
+          <div class="trust-item">
+            <span class="trust-num">4.8<sup>★</sup></span>
+            <span class="trust-label">Google Reviews</span>
+          </div>
+          <div class="trust-item">
+            <span class="trust-num">500<sup>+</sup></span>
+            <span class="trust-label">Nöjda kunder</span>
+          </div>
+          <div class="trust-item">
+            <span class="trust-num">100<sup>%</sup></span>
+            <span class="trust-label">Kontrollerade</span>
+          </div>
+        </div>
       </div>
-      <div class="stat">
-        <div class="stat-num">5.0</div>
-        <div class="stat-label">Google Reviews</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num">Handen</div>
-        <div class="stat-label">Haninge</div>
+
+      <div class="hero-visual reveal">
+        <div class="hero-visual-frame">
+          <img src="https://images.leadconnectorhq.com/image/f_webp/q_80/r_1200/u_https://assets.cdn.filesafe.space/AQMCInrv6MSypZTc0JES/media/661d824e-ee4e-4426-843e-8663d9610ab1.jpeg" alt="Provkör hos BLD Bil i Haninge" loading="eager">
+          <div class="hero-visual-corner tl"></div>
+          <div class="hero-visual-corner tr"></div>
+          <div class="hero-visual-corner bl"></div>
+          <div class="hero-visual-corner br"></div>
+        </div>
+
+        <!-- Floating address card -->
+        <div class="float-card float-card-loc">
+          <div class="float-card-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="10" r="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="float-card-text">
+            <span class="float-card-label">Vår anläggning</span>
+            <span class="float-card-value">Hantverkarvägen 22, Handen</span>
+          </div>
+        </div>
+
+        <!-- Floating rating card -->
+        <div class="float-card float-card-rate">
+          <div class="float-card-stars">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <div class="float-card-text">
+            <span class="float-card-value-big">4.8/5</span>
+            <span class="float-card-label">på Google</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- BILAR I LAGER -->
+<!-- ============ CARS / PLACEHOLDER ============ -->
 <section class="cars-section" id="bilar">
-  <div class="section-inner">
-    <div class="section-label anim">Lager</div>
-    <div class="cars-header">
-      <div>
-        <h2 class="section-title anim anim-d1">Bilar inne just nu.</h2>
-        <p class="section-desc anim anim-d2">Synkas automatiskt med Blocket. Alltid uppdaterat.</p>
+  <div class="container">
+    <div class="cars-head">
+      <div class="cars-head-top">
+        <span class="section-eyebrow">Aktuellt lager</span>
+        <h2 class="section-title">Våra <span class="blue">senaste bilar.</span></h2>
+        <p class="section-sub">Genomgångna, besiktigade och redo för provkörning. Hela vårt lager finns nedan &mdash; klicka för fullständig information och bokning.</p>
       </div>
-      <a href="https://bldbil.se/kopabil" class="cars-link anim anim-d2">Se alla bilar →</a>
+      <a href="#bilar" class="cars-link">
+        Se alla bilar →
+      </a>
     </div>
 
     <div class="cars-grid">
-
-      <div class="car-card anim anim-d3">
-        <div class="car-img-placeholder">🚗</div>
-        <div class="car-body">
-          <div class="car-title">Audi A4 Avant 2.0 TDI</div>
-          <div class="car-subtitle">2021 · Automatisk · Diesel</div>
-          <div class="car-specs">
-            <span class="car-spec">45 200 km</span>
-            <span class="car-spec">190 hk</span>
-            <span class="car-spec">Quattro</span>
-          </div>
-          <div class="car-footer">
-            <div class="car-price">289 900 <span>kr</span></div>
-            <a href="#" class="car-cta">Läs mer →</a>
+      <!-- Car cards 1-6 (placeholder, ready to populate from inventory) -->
+      <article class="car-card reveal">
+        <div class="car-img">
+          <span class="car-badge new">Ny</span>
+          <div class="car-img-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 17h14M5 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm14 0a2 2 0 1 1 4 0 2 2 0 0 1-4 0ZM3 13l2-7h14l2 7M3 13v4h2m16-4v4h-2"/></svg>
           </div>
         </div>
-      </div>
-
-      <div class="car-card anim anim-d4">
-        <div class="car-img-placeholder">🚗</div>
         <div class="car-body">
-          <div class="car-title">BMW 320d xDrive Touring</div>
-          <div class="car-subtitle">2020 · Automatisk · Diesel</div>
-          <div class="car-specs">
-            <span class="car-spec">62 100 km</span>
-            <span class="car-spec">190 hk</span>
-            <span class="car-spec">M Sport</span>
+          <h3 class="car-title">Bilmärke Modell</h3>
+          <div class="car-spec">
+            <span>2021</span>
+            <span>4 500 mil</span>
+            <span>Bensin</span>
+            <span>Automat</span>
           </div>
-          <div class="car-footer">
-            <div class="car-price">319 900 <span>kr</span></div>
-            <a href="#" class="car-cta">Läs mer →</a>
+          <div class="car-foot">
+            <div>
+              <span class="car-price">— kr</span>
+              <span class="car-price-mo">Från — kr/mån</span>
+            </div>
+            <span class="car-arrow">→</span>
           </div>
         </div>
-      </div>
+      </article>
 
-      <div class="car-card anim anim-d5">
-        <div class="car-img-placeholder">🚗</div>
-        <div class="car-body">
-          <div class="car-title">Volvo XC60 T6 AWD</div>
-          <div class="car-subtitle">2022 · Automatisk · Bensin</div>
-          <div class="car-specs">
-            <span class="car-spec">31 800 km</span>
-            <span class="car-spec">253 hk</span>
-            <span class="car-spec">Inscription</span>
-          </div>
-          <div class="car-footer">
-            <div class="car-price">429 900 <span>kr</span></div>
-            <a href="#" class="car-cta">Läs mer →</a>
+      <article class="car-card reveal">
+        <div class="car-img">
+          <div class="car-img-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 17h14M5 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm14 0a2 2 0 1 1 4 0 2 2 0 0 1-4 0ZM3 13l2-7h14l2 7M3 13v4h2m16-4v4h-2"/></svg>
           </div>
         </div>
-      </div>
+        <div class="car-body">
+          <h3 class="car-title">Bilmärke Modell</h3>
+          <div class="car-spec">
+            <span>2020</span>
+            <span>6 200 mil</span>
+            <span>Diesel</span>
+            <span>Manuell</span>
+          </div>
+          <div class="car-foot">
+            <div>
+              <span class="car-price">— kr</span>
+              <span class="car-price-mo">Från — kr/mån</span>
+            </div>
+            <span class="car-arrow">→</span>
+          </div>
+        </div>
+      </article>
 
+      <article class="car-card reveal">
+        <div class="car-img">
+          <span class="car-badge">Inbyte</span>
+          <div class="car-img-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 17h14M5 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm14 0a2 2 0 1 1 4 0 2 2 0 0 1-4 0ZM3 13l2-7h14l2 7M3 13v4h2m16-4v4h-2"/></svg>
+          </div>
+        </div>
+        <div class="car-body">
+          <h3 class="car-title">Bilmärke Modell</h3>
+          <div class="car-spec">
+            <span>2022</span>
+            <span>2 800 mil</span>
+            <span>Hybrid</span>
+            <span>Automat</span>
+          </div>
+          <div class="car-foot">
+            <div>
+              <span class="car-price">— kr</span>
+              <span class="car-price-mo">Från — kr/mån</span>
+            </div>
+            <span class="car-arrow">→</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="car-card reveal">
+        <div class="car-img">
+          <div class="car-img-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 17h14M5 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm14 0a2 2 0 1 1 4 0 2 2 0 0 1-4 0ZM3 13l2-7h14l2 7M3 13v4h2m16-4v4h-2"/></svg>
+          </div>
+        </div>
+        <div class="car-body">
+          <h3 class="car-title">Bilmärke Modell</h3>
+          <div class="car-spec">
+            <span>2019</span>
+            <span>8 100 mil</span>
+            <span>Bensin</span>
+            <span>Automat</span>
+          </div>
+          <div class="car-foot">
+            <div>
+              <span class="car-price">— kr</span>
+              <span class="car-price-mo">Från — kr/mån</span>
+            </div>
+            <span class="car-arrow">→</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="car-card reveal">
+        <div class="car-img">
+          <span class="car-badge new">Ny</span>
+          <div class="car-img-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 17h14M5 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm14 0a2 2 0 1 1 4 0 2 2 0 0 1-4 0ZM3 13l2-7h14l2 7M3 13v4h2m16-4v4h-2"/></svg>
+          </div>
+        </div>
+        <div class="car-body">
+          <h3 class="car-title">Bilmärke Modell</h3>
+          <div class="car-spec">
+            <span>2023</span>
+            <span>1 200 mil</span>
+            <span>El</span>
+            <span>Automat</span>
+          </div>
+          <div class="car-foot">
+            <div>
+              <span class="car-price">— kr</span>
+              <span class="car-price-mo">Från — kr/mån</span>
+            </div>
+            <span class="car-arrow">→</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="car-card reveal">
+        <div class="car-img">
+          <div class="car-img-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 17h14M5 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm14 0a2 2 0 1 1 4 0 2 2 0 0 1-4 0ZM3 13l2-7h14l2 7M3 13v4h2m16-4v4h-2"/></svg>
+          </div>
+        </div>
+        <div class="car-body">
+          <h3 class="car-title">Bilmärke Modell</h3>
+          <div class="car-spec">
+            <span>2021</span>
+            <span>5 600 mil</span>
+            <span>Bensin</span>
+            <span>Manuell</span>
+          </div>
+          <div class="car-foot">
+            <div>
+              <span class="car-price">— kr</span>
+              <span class="car-price-mo">Från — kr/mån</span>
+            </div>
+            <span class="car-arrow">→</span>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="cars-footer reveal">
+      <div>
+        <p class="cars-footer-text">Hittar du inte rätt bil idag?</p>
+        <p class="cars-footer-sub">Berätta vad du letar efter. Vi hör av oss när vi får in en match.</p>
+      </div>
+      <a href="#kontakt" class="btn btn-primary" style="background:var(--ink);">
+        Berätta för oss
+        <span class="arrow">→</span>
+      </a>
     </div>
   </div>
 </section>
 
-<!-- TJÄNSTER -->
-<section id="tjanster">
-  <div class="section-inner">
-    <div class="section-label anim">Tjänster</div>
-    <h2 class="section-title anim anim-d1">Allt under samma tak.</h2>
-    <p class="section-desc anim anim-d2">Från provkörning till däckhotell. Vi tar hand om hela ditt bilägande.</p>
+<!-- ============ STATS BAR ============ -->
+<section class="stats-bar">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-num">10<sup>+</sup></div>
+        <div class="stat-label">År som lokal<br>bilhandlare</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">4.8<sup>/5</sup></div>
+        <div class="stat-label">Snittbetyg<br>på Google</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">100<sup>%</sup></div>
+        <div class="stat-label">Genomgångna<br>och kontrollerade</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">1<sup>plats</sup></div>
+        <div class="stat-label">Köp, service<br>&amp; däck under samma tak</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SERVICES ============ -->
+<section class="services-section" id="tjanster">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="section-eyebrow">Våra tjänster</span>
+      <h2 class="section-title">En komplett <span class="light">bilhandlare.</span></h2>
+      <p class="section-sub">Köp, sälj, finansiering, service och däck. Allt du behöver för att äga bil &mdash; samlat på ett ställe i Haninge.</p>
+    </div>
 
     <div class="services-grid">
-      <div class="service-card anim anim-d3">
-        <img src="https://images.leadconnectorhq.com/image/f_webp/q_80/r_1200/u_https://assets.cdn.filesafe.space/AQMCInrv6MSypZTc0JES/media/661d824e-ee4e-4426-843e-8663d9610ab1.jpeg" alt="Provkörning" class="service-img">
-        <div class="service-body">
-          <h3>Provkörning</h3>
-          <p>Känn kraften och upplev komforten innan du bestämmer dig. Boka en tid som passar dig.</p>
-          <a href="tel:08-40888807" class="service-link">Boka provkörning →</a>
+      <article class="service-card reveal">
+        <div class="service-img">
+          <span class="service-num">01</span>
+          <img src="https://images.leadconnectorhq.com/image/f_webp/q_80/r_1200/u_https://assets.cdn.filesafe.space/AQMCInrv6MSypZTc0JES/media/661d824e-ee4e-4426-843e-8663d9610ab1.jpeg" alt="Provkör din drömbil" loading="lazy">
         </div>
-      </div>
-      <div class="service-card anim anim-d4">
-        <img src="https://images.leadconnectorhq.com/image/f_webp/q_80/r_1200/u_https://assets.cdn.filesafe.space/AQMCInrv6MSypZTc0JES/media/5a142c8b-471e-43d1-90a2-950e593b71fc.jpeg" alt="Inbyte" class="service-img">
         <div class="service-body">
-          <h3>Inbyte</h3>
-          <p>Uppgradera till en ny bil. Vi bedömer värdet och erbjuder transparenta inbytespriser.</p>
-          <a href="#vardera" class="service-link">Värdera din bil →</a>
+          <h3 class="service-title">Provkör din drömbil</h3>
+          <p class="service-text">Känn kraften, upplev komforten och upptäck alla finesser innan du bestämmer dig. Boka en tid som passar dig.</p>
+          <a href="#kontakt" class="service-link">
+            Boka provkörning
+            <svg width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M1 5h12m0 0L9 1m4 4L9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
         </div>
-      </div>
-      <div class="service-card anim anim-d5">
-        <img src="https://images.leadconnectorhq.com/image/f_webp/q_80/r_1200/u_https://assets.cdn.filesafe.space/AQMCInrv6MSypZTc0JES/media/671a24bd1e505432bbc287f9.png" alt="Finans" class="service-img">
-        <div class="service-body">
-          <h3>Finans & Leasing</h3>
-          <p>Flexibla finansierings- och leasingalternativ anpassade efter dina behov och din ekonomi.</p>
-          <a href="tel:08-40888807" class="service-link">Kontakta oss →</a>
+      </article>
+
+      <article class="service-card reveal">
+        <div class="service-img">
+          <span class="service-num">02</span>
+          <img src="https://images.leadconnectorhq.com/image/f_webp/q_80/r_1200/u_https://assets.cdn.filesafe.space/AQMCInrv6MSypZTc0JES/media/5a142c8b-471e-43d1-90a2-950e593b71fc.jpeg" alt="Smidigt inbyte" loading="lazy">
         </div>
-      </div>
-      <div class="service-card anim anim-d6">
-        <img src="https://images.leadconnectorhq.com/image/f_webp/q_80/r_1200/u_https://assets.cdn.filesafe.space/AQMCInrv6MSypZTc0JES/media/a4776ae6-670c-435b-bc78-70df0fe9c494.jpeg" alt="Däckservice" class="service-img">
         <div class="service-body">
-          <h3>Däckservice & Hotell</h3>
-          <p>Däckbyten, balansering, säkerhetskontroller och förvaring mellan säsongerna.</p>
-          <a href="tel:08-40888807" class="service-link">Boka tid →</a>
+          <h3 class="service-title">Smidigt inbyte</h3>
+          <p class="service-text">Vi värderar din nuvarande bil och drar av inbytesvärdet på din nya. Transparent, snabbt och rättvist.</p>
+          <a href="#salj" class="service-link">
+            Värdera bil
+            <svg width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M1 5h12m0 0L9 1m4 4L9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+      </article>
+
+      <article class="service-card reveal">
+        <div class="service-img">
+          <span class="service-num">03</span>
+          <img src="https://images.leadconnectorhq.com/image/f_webp/q_80/r_1200/u_https://assets.cdn.filesafe.space/AQMCInrv6MSypZTc0JES/media/671a24bd1e505432bbc287f9.png" alt="Finans och leasing" loading="lazy">
+        </div>
+        <div class="service-body">
+          <h3 class="service-title">Finans &amp; leasing</h3>
+          <p class="service-text">Flexibla finansierings- och leasinglösningar anpassade efter dina behov och din ekonomi. Konkurrenskraftiga räntor.</p>
+          <a href="tel:0840888807" class="service-link">
+            Kontakta oss
+            <svg width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M1 5h12m0 0L9 1m4 4L9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+      </article>
+
+      <article class="service-card reveal">
+        <div class="service-img">
+          <span class="service-num">04</span>
+          <img src="https://images.leadconnectorhq.com/image/f_webp/q_80/r_1200/u_https://assets.cdn.filesafe.space/AQMCInrv6MSypZTc0JES/media/a4776ae6-670c-435b-bc78-70df0fe9c494.jpeg" alt="Däckservice" loading="lazy">
+        </div>
+        <div class="service-body">
+          <h3 class="service-title">Däckservice</h3>
+          <p class="service-text">Däckhotell, däckbyten, balansering och säkerhetskontroller. Snabbt, smidigt och tryggt &mdash; oavsett säsong.</p>
+          <a href="#kontakt" class="service-link">
+            Till verkstad
+            <svg width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M1 5h12m0 0L9 1m4 4L9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ECOSYSTEM / WHY US ============ -->
+<section class="ecosystem">
+  <div class="container">
+    <div class="ecosystem-grid">
+      <div class="reveal">
+        <span class="section-eyebrow" style="color:var(--blue-3)">Bli en del av BLD</span>
+        <h2>
+          Hela ekosystemet<br>
+          <span class="light">när det kommer till</span><br>
+          <span class="blue">att äga bil.</span>
+        </h2>
+        <p class="ecosystem-text">
+          Hos oss får du allt du behöver för att ta hand om din bil på ett och samma ställe. Komplett verkstad med erfarna tekniker, däckservice oavsett säsong och en medlemsklubb som gör bilägandet enklare.
+        </p>
+
+        <div class="ecosystem-features">
+          <div class="ecosystem-feat">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Erfarna tekniker &amp; full verkstad
+          </div>
+          <div class="ecosystem-feat">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Snabba däckbyten &amp; däckhotell
+          </div>
+          <div class="ecosystem-feat">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Originaldelar &amp; OEM-godkända reservdelar
+          </div>
+          <div class="ecosystem-feat">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Påminnelser om service, byten &amp; kontroller
+          </div>
+        </div>
+
+        <a href="#medlem" class="btn btn-primary">
+          Bli BLD-medlem
+          <span class="arrow">→</span>
+        </a>
+      </div>
+
+      <div class="ecosystem-visual reveal">
+        <div class="ecosystem-img">
+          <img src="https://images.leadconnectorhq.com/image/f_webp/q_80/r_1200/u_https://assets.cdn.filesafe.space/AQMCInrv6MSypZTc0JES/media/24662b47-6826-41e1-a865-249e0b669a0a.jpeg" alt="Verkstad" loading="lazy">
+        </div>
+        <div class="ecosystem-img">
+          <img src="https://images.leadconnectorhq.com/image/f_webp/q_80/r_1200/u_https://assets.cdn.filesafe.space/AQMCInrv6MSypZTc0JES/media/a4776ae6-670c-435b-bc78-70df0fe9c494.jpeg" alt="Däckservice" loading="lazy">
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ANLÄGGNING -->
-<section style="padding-top:0">
-  <div class="section-inner">
-    <div class="section-label anim">Anläggning</div>
-    <h2 class="section-title anim anim-d1">Välkommen till oss.</h2>
-    <p class="section-desc anim anim-d2">Bilhall, verkstad och däckservice på Hantverkarvägen 22 i Handen.</p>
+<!-- ============ FACILITY ============ -->
+<section class="facility" id="medlem">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="section-eyebrow">Vår anläggning</span>
+      <h2 class="section-title">Tre delar, <span class="blue">ett team.</span></h2>
+      <p class="section-sub">Allt under samma tak i Handen, Haninge. Klicka för att se vad som finns på respektive avdelning.</p>
+    </div>
 
     <div class="facility-grid">
-      <div class="facility-card anim anim-d3">
-        <img src="https://images.leadconnectorhq.com/image/f_webp/q_80/r_1200/u_https://assets.cdn.filesafe.space/AQMCInrv6MSypZTc0JES/media/6703ebd5a3d8cffe6260c4db.png" alt="Bilcenter">
-        <span>Bilcenter</span>
+      <a href="#bilar" class="facility-card reveal">
+        <img src="https://images.leadconnectorhq.com/image/f_webp/q_80/r_1200/u_https://assets.cdn.filesafe.space/AQMCInrv6MSypZTc0JES/media/6703ebd5a3d8cffe6260c4db.png" alt="Bilcenter" loading="lazy">
+        <div class="facility-content">
+          <span class="facility-num">01 / Försäljning</span>
+          <h3 class="facility-title">Bilcenter</h3>
+          <p class="facility-text">Brett urval av kontrollerade bilar. Provkör hos oss eller boka tid online.</p>
+          <span class="facility-arrow">
+            Se bilarna
+            <svg width="12" height="10" viewBox="0 0 14 10" fill="none"><path d="M1 5h12m0 0L9 1m4 4L9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+        </div>
+      </a>
+
+      <a href="#tjanster" class="facility-card reveal">
+        <img src="https://images.leadconnectorhq.com/image/f_webp/q_80/r_1200/u_https://assets.cdn.filesafe.space/AQMCInrv6MSypZTc0JES/media/6703ebb59c70da5cbf5c356a.png" alt="Däckservice" loading="lazy">
+        <div class="facility-content">
+          <span class="facility-num">02 / Verkstad</span>
+          <h3 class="facility-title">Däckservice</h3>
+          <p class="facility-text">Däckbyten, däckhotell, balansering och säkerhetskontroller. Snabbt och tryggt.</p>
+          <span class="facility-arrow">
+            Boka tid
+            <svg width="12" height="10" viewBox="0 0 14 10" fill="none"><path d="M1 5h12m0 0L9 1m4 4L9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+        </div>
+      </a>
+
+      <a href="#medlem" class="facility-card reveal">
+        <img src="https://images.leadconnectorhq.com/image/f_webp/q_80/r_1200/u_https://assets.cdn.filesafe.space/AQMCInrv6MSypZTc0JES/media/6703ed9335e6b83784ec2748.png" alt="BLD Medlem" loading="lazy">
+        <div class="facility-content">
+          <span class="facility-num">03 / Medlemsklubb</span>
+          <h3 class="facility-title">BLD Medlem</h3>
+          <p class="facility-text">Exklusiva förmåner, regelbundna erbjudanden och påminnelser för bilägaren.</p>
+          <span class="facility-arrow">
+            Bli medlem
+            <svg width="12" height="10" viewBox="0 0 14 10" fill="none"><path d="M1 5h12m0 0L9 1m4 4L9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VALUATION CTA ============ -->
+<section class="value-cta" id="salj">
+  <div class="container">
+    <div class="value-grid">
+      <div class="reveal">
+        <span class="section-eyebrow" style="color:rgba(255,255,255,0.8)">Sälj eller byt in din bil</span>
+        <h2>
+          Värdera din bil <span class="light">på under 60 sekunder.</span>
+        </h2>
+        <p class="value-cta-text">
+          Vi köper och tar in bilar till inbyte varje vecka. Få en transparent och konkurrenskraftig värdering &mdash; använd den som delbetalning eller få betalt direkt.
+        </p>
+        <a href="#kontakt" class="btn btn-primary">
+          Värdera nu
+          <span class="arrow">→</span>
+        </a>
       </div>
-      <div class="facility-card anim anim-d4">
-        <img src="https://images.leadconnectorhq.com/image/f_webp/q_80/r_1200/u_https://assets.cdn.filesafe.space/AQMCInrv6MSypZTc0JES/media/6703ebb59c70da5cbf5c356a.png" alt="Däckservice">
-        <span>Däckservice</span>
-      </div>
-      <div class="facility-card anim anim-d5">
-        <img src="https://images.leadconnectorhq.com/image/f_webp/q_80/r_1200/u_https://assets.cdn.filesafe.space/AQMCInrv6MSypZTc0JES/media/6703ed9335e6b83784ec2748.png" alt="Medlemsklubb">
-        <span>BLD Medlem</span>
+
+      <div class="value-steps reveal">
+        <div class="value-step">
+          <div class="value-step-num">1</div>
+          <div class="value-step-text">
+            <strong>Skicka in info</strong>
+            <span>Reggnummer, miltal och bilens skick.</span>
+          </div>
+        </div>
+        <div class="value-step">
+          <div class="value-step-num">2</div>
+          <div class="value-step-text">
+            <strong>Få en värdering</strong>
+            <span>Transparent och rättvis. Inga dolda avdrag.</span>
+          </div>
+        </div>
+        <div class="value-step">
+          <div class="value-step-num">3</div>
+          <div class="value-step-text">
+            <strong>Vi sköter pappren</strong>
+            <span>Betalning och ägarbyte ordnar vi åt dig.</span>
+          </div>
+        </div>
+        <div class="value-step">
+          <div class="value-step-num">4</div>
+          <div class="value-step-text">
+            <strong>Klar.</strong>
+            <span>Eller välj en ny bil och dra av inbytet.</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- RECENSIONER -->
-<section id="recensioner" style="background:var(--surface)">
-  <div class="section-inner">
-    <div class="section-label anim">Recensioner</div>
-    <h2 class="section-title anim anim-d1">Vad våra kunder säger.</h2>
+<!-- ============ REVIEWS ============ -->
+<section class="reviews">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="section-eyebrow">Kundrecensioner</span>
+      <h2 class="section-title">Se vad andra <span class="blue">tycker.</span></h2>
+      <div class="reviews-rating">
+        <div class="stars">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <div class="reviews-rating-text">4.8/5 <span>på Google</span></div>
+      </div>
+    </div>
 
     <div class="reviews-grid">
-      <div class="review-card anim anim-d2">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">Jättetrevliga säljare, seriösa och ärliga. Samt ett supertrevligt bemötande. Supernöjd med bilköpet!</p>
-        <div class="review-author">Neira</div>
-        <div class="review-source">Google Review</div>
+      <article class="review-card reveal">
+        <p class="review-quote">Jätte trevliga säljare, seriösa och ärliga. Samt ett super trevligt bemötande. Supernöjd med bilköpet!</p>
+        <div class="review-meta">
+          <div class="review-avatar">N</div>
+          <div>
+            <div class="review-name">Neira</div>
+            <div class="review-source">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+              Google Review
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="review-card reveal">
+        <p class="review-quote">Otroligt bra service och fantastiska säljare, lyhörda, snälla och lugna. Stod för att bilen skulle vara nybesiktad vid hämtning och hjälpsamma. En bilfirma som verkligen går att lita på, rekommenderar starkt!</p>
+        <div class="review-meta">
+          <div class="review-avatar">S</div>
+          <div>
+            <div class="review-name">Sara</div>
+            <div class="review-source">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+              Google Review
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="faq" id="faq">
+  <div class="container">
+    <div class="faq-grid">
+      <div class="reveal">
+        <span class="section-eyebrow">Vanliga frågor</span>
+        <h2 class="section-title">Frågor &amp; <span class="blue">svar.</span></h2>
+        <p class="section-sub">De vanligaste frågorna vi får om köp, sälj, inbyte och verkstad. Hittar du inte svaret? Ring oss på 08-408 888 07.</p>
       </div>
-      <div class="review-card anim anim-d3">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">Otroligt bra service och fantastiska säljare. Lyhörda, snälla och lugna. En bilfirma som verkligen går att lita på, rekommenderar starkt!</p>
-        <div class="review-author">Sara</div>
-        <div class="review-source">Google Review</div>
+
+      <div class="faq-list reveal">
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">
+            Hur går det till att köpa en bil hos BLD Bil?
+            <span class="faq-icon"></span>
+          </button>
+          <div class="faq-a">
+            <div class="faq-a-inner">
+              Att köpa bil hos oss är enkelt. Börja med att se vårt utbud online eller besök oss i bilhallen. Våra säljare följer dig genom hela processen, från val av bil till eventuellt inbyte och finansiering. Vi erbjuder provkörningar och anpassade lösningar så att du känner dig trygg innan köpet går igenom.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">
+            Kan jag sälja min nuvarande bil till er?
+            <span class="faq-icon"></span>
+          </button>
+          <div class="faq-a">
+            <div class="faq-a-inner">
+              Ja, vi köper gärna din bil. Vi erbjuder en snabb och rättvis värdering, och om du tackar ja hanterar vi allt från betalning till ägarbyte. Du får betalningen direkt och vi sköter det administrativa. Värdet kan också användas som delbetalning vid köp av en ny bil hos oss.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">
+            Hur fungerar inbyte av bil?
+            <span class="faq-icon"></span>
+          </button>
+          <div class="faq-a">
+            <div class="faq-a-inner">
+              Vi gör en värdering baserad på bilens skick, ålder och marknadsvärde. Inbytesvärdet dras sedan av priset på den nya bilen, vilket gör det både enklare och billigare att byta. Du slipper sälja din gamla bil privat och kan fokusera på att välja din nya.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">
+            Varför ska jag välja BLD Bil?
+            <span class="faq-icon"></span>
+          </button>
+          <div class="faq-a">
+            <div class="faq-a-inner">
+              Hos oss står kunden i centrum. Med över 10 år i branschen hittar vi rätt bil utifrån dina behov och din budget. Vi har konkurrenskraftiga finansieringsalternativ, en fullserviceverkstad under samma tak och en kundklubb med exklusiva förmåner. En helhetslösning &mdash; från köp till underhåll &mdash; med en partner du kan lita på.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">
+            Vilka finansalternativ erbjuder ni?
+            <span class="faq-icon"></span>
+          </button>
+          <div class="faq-a">
+            <div class="faq-a-inner">
+              Vi samarbetar med flera banker och finansinstitut. Du kan välja mellan leasing, avbetalning och andra finansieringslösningar. Kontakta oss så går vi igenom vilket alternativ som passar dig bäst.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">
+            Hur går jag med i BLD Klubben?
+            <span class="faq-icon"></span>
+          </button>
+          <div class="faq-a">
+            <div class="faq-a-inner">
+              Det är enkelt. Registrera dig direkt på vår hemsida eller besök oss i butiken. Som medlem får du regelbundna erbjudanden, verkstadstjänster, påminnelser om service och rabatter på däckbyten. Fri lånebil vid service ingår också.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">
+            Vad ingår i verkstadstjänsterna?
+            <span class="faq-icon"></span>
+          </button>
+          <div class="faq-a">
+            <div class="faq-a-inner">
+              Allt från regelbunden service, reparationer och felsökning till däckbyten och bromsjusteringar. Våra mekaniker hanterar även större reparationer som motor- och växellådsarbeten. Vi använder originaldelar eller OEM-godkända reservdelar och erbjuder diagnostik för att identifiera problem tidigt. Däckhotell ingår också.
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- MEDLEMSKAP -->
-<section id="medlem">
-  <div class="section-inner">
-    <div class="section-label anim">Medlemskap</div>
-    <h2 class="section-title anim anim-d1">BLD Klubben.</h2>
-    <p class="section-desc anim anim-d2">Att äga bil ska vara enkelt. Bli medlem och få förmåner som gör skillnad.</p>
-
-    <div class="member-box anim anim-d3">
-      <div>
-        <h3 style="font-size:22px;font-weight:700;color:var(--white);margin-bottom:8px">Förmåner som medlem</h3>
-        <p style="font-size:14px;color:var(--text-dim);line-height:1.6">Som medlem i BLD Klubben får du tillgång till erbjudanden, påminnelser och tjänster som förenklar ditt bilägande.</p>
-        <ul class="member-benefits">
-          <li>Rabatt på däckbyten och service</li>
-          <li>Påminnelser inför däckbyten och kontroller</li>
-          <li>Lånebil vid service</li>
-          <li>Exklusiva erbjudanden och kampanjer</li>
-        </ul>
-        <a href="tel:08-40888807" class="btn-primary" style="margin-top:28px;display:inline-flex">Bli medlem →</a>
-      </div>
-      <img src="https://images.leadconnectorhq.com/image/f_webp/q_80/r_1200/u_https://assets.cdn.filesafe.space/AQMCInrv6MSypZTc0JES/media/6703ed9335e6b83784ec2748.png" alt="BLD Medlem" class="member-img">
+<!-- ============ CONTACT ============ -->
+<section class="contact" id="kontakt">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="section-eyebrow" style="color:var(--blue-3)">Kontakta oss</span>
+      <h2 class="section-title" style="color:var(--white)">
+        Välkommen till <span style="color:var(--blue-3)">Handen.</span>
+      </h2>
+      <p class="section-sub" style="color:rgba(255,255,255,0.65);max-width:540px">
+        Boka tid för provkörning, värdering eller verkstad. Eller swisha förbi när du är i området &mdash; vi finns på Hantverkarvägen 22.
+      </p>
     </div>
-  </div>
-</section>
-
-<!-- VÄRDERA -->
-<section id="vardera" class="form-section">
-  <div class="section-inner">
-    <div class="section-label anim">Sälj din bil</div>
-    <h2 class="section-title anim anim-d1">Värdera din bil.</h2>
-    <p class="section-desc anim anim-d2">Fyll i tre fält så återkommer vi med en värdering inom 24 timmar.</p>
-
-    <div class="form-grid">
-      <div class="form-card anim anim-d3">
-        <h3>Snabb värdering</h3>
-        <p>Vi kontaktar dig per telefon med en värdering baserad på bilens marknadsvärde.</p>
-        <div class="form-field">
-          <label>Registreringsnummer</label>
-          <input type="text" placeholder="ABC 123">
-        </div>
-        <div class="form-field">
-          <label>Ditt namn</label>
-          <input type="text" placeholder="Förnamn Efternamn">
-        </div>
-        <div class="form-field">
-          <label>Mobilnummer</label>
-          <input type="tel" placeholder="07X-XXX XX XX">
-        </div>
-        <button class="form-submit">Skicka värdering</button>
-      </div>
-      <div class="form-trust anim anim-d4">
-        <div class="form-trust-item">
-          <div class="form-trust-icon">⚡</div>
-          <div>
-            <h4>Svar inom 24 timmar</h4>
-            <p>Vi ringer dig med en värdering baserad på bilens skick och marknadsvärde.</p>
-          </div>
-        </div>
-        <div class="form-trust-item">
-          <div class="form-trust-icon">💰</div>
-          <div>
-            <h4>Konkurrenskraftigt pris</h4>
-            <p>Vi erbjuder transparenta och rättvisa inbytespriser. Inget krångel.</p>
-          </div>
-        </div>
-        <div class="form-trust-item">
-          <div class="form-trust-icon">🚗</div>
-          <div>
-            <h4>Enkel process</h4>
-            <p>Vi hanterar allt pappersarbete — betalning, ägarbyte och avregistrering.</p>
-          </div>
-        </div>
-        <div class="form-trust-item">
-          <div class="form-trust-icon">🔄</div>
-          <div>
-            <h4>Inbyte möjligt</h4>
-            <p>Använd värdet på din bil som delbetalning för en ny bil från vårt lager.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FAQ -->
-<section id="faq">
-  <div class="section-inner">
-    <div class="section-label anim">Vanliga frågor</div>
-    <h2 class="section-title anim anim-d1">FAQ.</h2>
-
-    <div class="faq-list">
-      <div class="faq-item anim anim-d2">
-        <button class="faq-q"><h3>Hur köper jag en bil hos BLD Bil?</h3><span>+</span></button>
-        <div class="faq-a"><p>Se vårt utbud online eller besök oss i bilhallen. Våra säljare hjälper dig med val av bil, eventuellt inbyte och finansiering. Vi erbjuder provkörningar och anpassade lösningar.</p></div>
-      </div>
-      <div class="faq-item anim anim-d3">
-        <button class="faq-q"><h3>Kan jag sälja min bil till er?</h3><span>+</span></button>
-        <div class="faq-a"><p>Ja. Fyll i formuläret ovan med registreringsnummer och telefonnummer så ringer vi dig med en värdering. Vi hanterar betalning och ägarbyte.</p></div>
-      </div>
-      <div class="faq-item anim anim-d4">
-        <button class="faq-q"><h3>Hur fungerar inbyte?</h3><span>+</span></button>
-        <div class="faq-a"><p>Vi värderar din bil baserat på skick, ålder och marknadsvärde. Inbytesvärdet dras av från priset på din nya bil — så slipper du sälja privat.</p></div>
-      </div>
-      <div class="faq-item anim anim-d5">
-        <button class="faq-q"><h3>Vilka finansalternativ erbjuder ni?</h3><span>+</span></button>
-        <div class="faq-a"><p>Vi samarbetar med flera banker och erbjuder leasing, avbetalning och andra finansieringslösningar. Ring oss så hittar vi det som passar dig bäst.</p></div>
-      </div>
-      <div class="faq-item anim anim-d6">
-        <button class="faq-q"><h3>Vad ingår i BLD Klubben?</h3><span>+</span></button>
-        <div class="faq-a"><p>Rabatt på däckbyten och service, påminnelser inför kontroller, lånebil vid service och exklusiva erbjudanden. Du kan registrera dig på hemsidan eller hos oss.</p></div>
-      </div>
-      <div class="faq-item anim anim-d7">
-        <button class="faq-q"><h3>Vad ingår i verkstadstjänsterna?</h3><span>+</span></button>
-        <div class="faq-a"><p>Service, reparationer, felsökning, däckbyten, balansering och bromsjusteringar. Vi erbjuder även däckhotell för förvaring mellan säsongerna.</p></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- KONTAKT -->
-<section id="kontakt" style="background:var(--surface)">
-  <div class="section-inner">
-    <div class="section-label anim">Kontakt</div>
-    <h2 class="section-title anim anim-d1">Hör av er.</h2>
 
     <div class="contact-grid">
-      <div class="contact-info anim anim-d2">
-        <div class="contact-item">
-          <h4>Telefon</h4>
-          <a href="tel:08-40888807">08-408 888 07</a>
+      <div class="contact-info reveal">
+        <div class="contact-block">
+          <span class="contact-label">Telefon</span>
+          <a href="tel:0840888807" class="contact-value">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.33 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            08-408 888 07
+          </a>
         </div>
-        <div class="contact-item">
-          <h4>E-post</h4>
-          <a href="mailto:info@bldbil.se">info@bldbil.se</a>
+
+        <div class="contact-block">
+          <span class="contact-label">E-post</span>
+          <a href="mailto:info@bldbil.se" class="contact-value">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke-linecap="round" stroke-linejoin="round"/><polyline points="22,6 12,13 2,6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            info@bldbil.se
+          </a>
         </div>
-        <div class="contact-item">
-          <h4>Adress</h4>
-          <p>Hantverkarvägen 22<br>136 44 Handen</p>
+
+        <div class="contact-block">
+          <span class="contact-label">Adress</span>
+          <a href="https://www.google.com/maps/dir//bld+bil+ab" target="_blank" rel="noopener" class="contact-value">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="10" r="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Hantverkarvägen 22, Handen
+          </a>
         </div>
-        <div class="contact-item">
-          <h4>Öppettider</h4>
-          <div class="contact-hours">
-            <span>Måndag – Torsdag</span><span>10:00 – 18:00</span>
-            <span>Fredag</span><span>10:00 – 17:00</span>
-            <span>Lördag</span><span>11:00 – 16:00</span>
-            <span>Söndag</span><span>Stängt</span>
-          </div>
+
+        <div class="contact-block">
+          <span class="contact-label">Öppettider</span>
+          <dl class="hours-grid">
+            <dt>Måndag &mdash; Torsdag</dt>
+            <dd>10:00 &mdash; 18:00</dd>
+            <dt>Fredag</dt>
+            <dd>10:00 &mdash; 17:00</dd>
+            <dt>Lördag</dt>
+            <dd>11:00 &mdash; 16:00</dd>
+            <dt>Söndag</dt>
+            <dd class="closed">Stängt</dd>
+          </dl>
         </div>
+
+        <a href="tel:0840888807" class="btn btn-primary" style="align-self:flex-start;margin-top:8px;">
+          Ring oss nu
+          <span class="arrow">→</span>
+        </a>
       </div>
-      <div class="contact-map anim anim-d3">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2040.5!2d18.138!3d59.165!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x465f7c80724527a5%3A0xb820c5dd351d852b!2sBLD%20Bil%20AB!5e0!3m2!1ssv!2sse!4v1" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+      <div class="contact-map reveal">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2034.7!2d18.137!3d59.169!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x465f9bec2a3eaac9%3A0x282c1e72237ddc27!2sBLD%20Bil%20AB!5e0!3m2!1sen!2sse!4v1700000000000" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
       </div>
     </div>
   </div>
 </section>
 
-<footer>BLD Bil AB · Hantverkarvägen 22, 136 44 Handen · 2026</footer>
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="https://assets.cdn.filesafe.space/AQMCInrv6MSypZTc0JES/media/66c88c9328818f062fb9d35a.png" alt="BLD Bil">
+        <p>Din lokala &amp; trygga bilhandlare i Haninge sedan 2013. Köp, sälj, finansiering, service och däck &mdash; allt på en plats.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Köp &amp; sälj</h4>
+        <ul>
+          <li><a href="#bilar">Köp bil</a></li>
+          <li><a href="#salj">Sälj bil</a></li>
+          <li><a href="#salj">Värdera bil</a></li>
+          <li><a href="#salj">Inbyte</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Service</h4>
+        <ul>
+          <li><a href="#tjanster">Däckservice</a></li>
+          <li><a href="#tjanster">Verkstad</a></li>
+          <li><a href="#tjanster">Däckhotell</a></li>
+          <li><a href="#medlem">BLD Medlem</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Kontakt</h4>
+        <ul>
+          <li><a href="tel:0840888807">08-408 888 07</a></li>
+          <li><a href="mailto:info@bldbil.se">info@bldbil.se</a></li>
+          <li><a href="#kontakt">Hantverkarvägen 22</a></li>
+          <li><a href="#kontakt">136 44 Handen</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2026 BLD Bil AB. Alla rättigheter förbehållna.</span>
+      <span>Org.nr — &middot; Auktoriserad bilhandlare</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Mobile sticky CTA -->
+<div class="mobile-cta">
+  <a href="tel:0840888807" class="btn btn-ghost" style="background:var(--ice);color:var(--ink);border-color:var(--line)">Ring</a>
+  <a href="#bilar" class="btn btn-primary">Se bilar →</a>
+</div>
 
 <script>
-// Nav scroll effect
-const nav = document.getElementById('nav');
-window.addEventListener('scroll', () => {
-  nav.classList.toggle('scrolled', window.scrollY > 50);
-});
+// Header scroll
+const header = document.getElementById('header');
+const scrollHandler = () => {
+  if (window.scrollY > 40) header.classList.add('scrolled');
+  else header.classList.remove('scrolled');
+};
+window.addEventListener('scroll', scrollHandler, { passive: true });
 
 // Mobile menu
 const menuBtn = document.getElementById('menuBtn');
-const mobileMenu = document.getElementById('mobileMenu');
-const navEl = document.getElementById('nav');
+const drawer = document.getElementById('drawer');
 menuBtn.addEventListener('click', () => {
-  menuBtn.classList.toggle('active');
-  mobileMenu.classList.toggle('open');
-  navEl.classList.toggle('menu-open');
-  document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+  const open = drawer.classList.toggle('open');
+  menuBtn.classList.toggle('open');
+  menuBtn.setAttribute('aria-expanded', open);
+  drawer.setAttribute('aria-hidden', !open);
+  document.body.style.overflow = open ? 'hidden' : '';
 });
-mobileMenu.querySelectorAll('a').forEach(a => {
+drawer.querySelectorAll('a').forEach(a => {
   a.addEventListener('click', () => {
-    menuBtn.classList.remove('active');
-    mobileMenu.classList.remove('open');
-    navEl.classList.remove('menu-open');
+    drawer.classList.remove('open');
+    menuBtn.classList.remove('open');
+    menuBtn.setAttribute('aria-expanded', 'false');
+    drawer.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
   });
 });
 
 // FAQ accordion
-document.querySelectorAll('.faq-q').forEach(btn => {
+document.querySelectorAll('.faq-item').forEach(item => {
+  const btn = item.querySelector('.faq-q');
   btn.addEventListener('click', () => {
-    const item = btn.parentElement;
-    const wasOpen = item.classList.contains('open');
-    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
-    if (!wasOpen) item.classList.add('open');
+    const isOpen = item.classList.toggle('open');
+    btn.setAttribute('aria-expanded', isOpen);
   });
 });
 
 // Scroll reveal
-const revealObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
+const io = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
     if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-      revealObserver.unobserve(entry.target);
+      setTimeout(() => entry.target.classList.add('in'), i * 60);
+      io.unobserve(entry.target);
     }
   });
-}, { threshold: 0.1 });
-document.querySelectorAll('.anim').forEach(el => revealObserver.observe(el));
+}, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+// Initial header check
+scrollHandler();
 </script>
 
 </body>
