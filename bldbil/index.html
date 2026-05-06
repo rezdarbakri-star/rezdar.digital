@@ -52,13 +52,13 @@ body::after{
 /* ======= NAV ======= */
 nav{
   position:fixed;top:0;left:0;right:0;z-index:200;
-  padding:16px 32px;padding-top:calc(16px + env(safe-area-inset-top,0px));
-  background:rgba(7,7,9,0.55);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);
+  padding:16px 32px;
+  background:var(--bg);
   border-bottom:1px solid transparent;
-  transition:border-color 0.3s,background 0.3s;
+  transition:border-color 0.3s;
 }
-nav.scrolled{border-color:rgba(255,255,255,0.06);background:rgba(7,7,9,0.65)}
-nav.menu-open{background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;border-color:transparent}
+nav.scrolled{border-color:var(--border)}
+nav.menu-open{background:var(--bg);border-color:transparent}
 .nav-inner{max-width:var(--max);margin:0 auto;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:101}
 .nav-logo{height:36px;width:auto;filter:brightness(0) invert(1)}
 .nav-links{display:flex;gap:32px;align-items:center}
@@ -115,10 +115,10 @@ nav.menu-open{background:transparent;backdrop-filter:none;-webkit-backdrop-filte
 @media(max-width:800px){
   .nav-links{display:none}
   .nav-menu-btn{display:block}
-  nav{padding:14px 20px;padding-top:calc(14px + env(safe-area-inset-top,0px))}
+  nav{padding:14px 20px}
   .hero{min-height:auto;height:100svh;height:100vh;padding:0 20px 40px;align-items:flex-end}
   .hero-bg::after{
-    background:linear-gradient(180deg,rgba(7,7,9,0.05) 0%,rgba(7,7,9,0.55) 25%,rgba(7,7,9,0.85) 50%,rgba(7,7,9,0.97) 80%,rgba(7,7,9,1) 100%);
+    background:linear-gradient(180deg,rgba(7,7,9,0.3) 0%,rgba(7,7,9,0.7) 30%,rgba(7,7,9,0.92) 60%,rgba(7,7,9,1) 100%);
   }
   .hero h1{font-size:34px;letter-spacing:-1.5px;margin-bottom:14px;text-shadow:0 2px 20px rgba(0,0,0,0.5)}
   .hero p{font-size:15px;margin-bottom:28px;color:rgba(220,220,230,0.9);max-width:100%;text-shadow:0 1px 10px rgba(0,0,0,0.6)}
@@ -160,7 +160,7 @@ nav.menu-open{background:transparent;backdrop-filter:none;-webkit-backdrop-filte
 }
 .hero-bg::after{
   content:'';position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(7,7,9,0.05) 0%,rgba(7,7,9,0.35) 30%,rgba(7,7,9,0.7) 60%,rgba(7,7,9,0.95) 100%);
+  background:linear-gradient(180deg,rgba(7,7,9,0.2) 0%,rgba(7,7,9,0.5) 40%,rgba(7,7,9,0.85) 70%,rgba(7,7,9,0.97) 100%);
 }
 .hero-content{position:relative;z-index:2;max-width:var(--max);margin:0 auto;width:100%}
 .hero-label{
