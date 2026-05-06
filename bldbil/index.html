@@ -203,6 +203,49 @@ section{padding:100px 32px}
 .section-title{font-size:clamp(28px,4vw,44px);font-weight:700;color:var(--white);letter-spacing:-1.5px;line-height:1.1;margin-bottom:16px}
 .section-desc{font-size:16px;color:var(--text-dim);max-width:520px;line-height:1.6;font-weight:300}
 
+/* ======= CAR LISTINGS ======= */
+.cars-section{background:var(--surface)}
+.cars-header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;margin-bottom:32px}
+.cars-header .section-desc{margin-bottom:0}
+.cars-link{
+  font-size:14px;font-weight:600;color:var(--accent);text-decoration:none;
+  display:inline-flex;align-items:center;gap:6px;transition:gap 0.3s;flex-shrink:0;
+}
+.cars-link:hover{gap:10px}
+.cars-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:900px){.cars-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:550px){.cars-grid{grid-template-columns:1fr}}
+.car-card{
+  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);
+  overflow:hidden;transition:border-color 0.4s,transform 0.4s;
+}
+.car-card:hover{border-color:var(--border-light);transform:translateY(-4px)}
+.car-img{
+  width:100%;aspect-ratio:16/10;object-fit:cover;display:block;
+  background:var(--surface3);
+}
+.car-img-placeholder{
+  width:100%;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;
+  background:var(--surface3);color:var(--text-muted);font-size:32px;
+}
+.car-body{padding:20px}
+.car-title{font-size:15px;font-weight:700;color:var(--white);margin-bottom:4px;line-height:1.3}
+.car-subtitle{font-size:12px;color:var(--text-dim);margin-bottom:14px}
+.car-specs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.car-spec{
+  font-size:11px;font-family:var(--mono);color:var(--text-dim);
+  background:rgba(255,255,255,0.04);padding:4px 8px;border-radius:6px;
+  letter-spacing:0.3px;
+}
+.car-footer{display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid var(--border)}
+.car-price{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--white)}
+.car-price span{font-size:12px;color:var(--text-dim);font-weight:400}
+.car-cta{
+  font-size:12px;font-weight:600;color:var(--accent);text-decoration:none;
+  display:inline-flex;align-items:center;gap:4px;transition:gap 0.3s;
+}
+.car-cta:hover{gap:8px}
+
 /* ======= SERVICES ======= */
 .services-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:48px}
 @media(max-width:700px){.services-grid{grid-template-columns:1fr}}
@@ -355,6 +398,7 @@ footer{
   <div class="nav-inner">
     <img src="https://assets.cdn.filesafe.space/AQMCInrv6MSypZTc0JES/media/66c88c9328818f062fb9d35a.png" alt="BLD Bil" class="nav-logo">
     <div class="nav-links" id="navLinks">
+      <a href="#bilar">Bilar</a>
       <a href="#tjanster">Tjänster</a>
       <a href="#recensioner">Recensioner</a>
       <a href="#vardera">Värdera bil</a>
@@ -370,14 +414,15 @@ footer{
 
 <!-- MOBILE MENU OVERLAY -->
 <div class="mobile-overlay" id="mobileMenu">
-  <a href="#tjanster" style="transition-delay:0.05s">Tjänster</a>
-  <a href="#recensioner" style="transition-delay:0.1s">Recensioner</a>
-  <a href="#medlem" style="transition-delay:0.15s">Medlemskap</a>
-  <a href="#vardera" style="transition-delay:0.2s">Värdera bil</a>
-  <div class="mob-divider" style="transition-delay:0.22s"></div>
-  <a href="#faq" style="transition-delay:0.25s">FAQ</a>
-  <a href="#kontakt" style="transition-delay:0.3s">Kontakt</a>
-  <a href="tel:08-40888807" class="mob-cta" style="transition-delay:0.35s">Ring oss</a>
+  <a href="#bilar" style="transition-delay:0.05s">Bilar</a>
+  <a href="#tjanster" style="transition-delay:0.1s">Tjänster</a>
+  <a href="#recensioner" style="transition-delay:0.15s">Recensioner</a>
+  <a href="#medlem" style="transition-delay:0.2s">Medlemskap</a>
+  <a href="#vardera" style="transition-delay:0.25s">Värdera bil</a>
+  <div class="mob-divider" style="transition-delay:0.27s"></div>
+  <a href="#faq" style="transition-delay:0.3s">FAQ</a>
+  <a href="#kontakt" style="transition-delay:0.35s">Kontakt</a>
+  <a href="tel:08-40888807" class="mob-cta" style="transition-delay:0.4s">Ring oss</a>
   <span class="mob-label">BLD Bil AB — Haninge</span>
 </div>
 
@@ -390,7 +435,7 @@ footer{
     <p class="anim anim-d2">Köp, sälj, serva och förvara. Allt du behöver för ditt bilägande under samma tak — sedan över 10 år tillbaka.</p>
     <div class="hero-actions anim anim-d3">
       <a href="#vardera" class="btn-primary">Värdera din bil →</a>
-      <a href="https://bldbil.se/kopabil" class="btn-secondary">Se våra bilar</a>
+      <a href="#bilar" class="btn-secondary">Se våra bilar</a>
     </div>
     <div class="stats-bar anim anim-d4">
       <div class="stat">
@@ -405,6 +450,75 @@ footer{
         <div class="stat-num">Handen</div>
         <div class="stat-label">Haninge</div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- BILAR I LAGER -->
+<section class="cars-section" id="bilar">
+  <div class="section-inner">
+    <div class="section-label anim">Lager</div>
+    <div class="cars-header">
+      <div>
+        <h2 class="section-title anim anim-d1">Bilar inne just nu.</h2>
+        <p class="section-desc anim anim-d2">Synkas automatiskt med Blocket. Alltid uppdaterat.</p>
+      </div>
+      <a href="https://bldbil.se/kopabil" class="cars-link anim anim-d2">Se alla bilar →</a>
+    </div>
+
+    <div class="cars-grid">
+
+      <div class="car-card anim anim-d3">
+        <div class="car-img-placeholder">🚗</div>
+        <div class="car-body">
+          <div class="car-title">Audi A4 Avant 2.0 TDI</div>
+          <div class="car-subtitle">2021 · Automatisk · Diesel</div>
+          <div class="car-specs">
+            <span class="car-spec">45 200 km</span>
+            <span class="car-spec">190 hk</span>
+            <span class="car-spec">Quattro</span>
+          </div>
+          <div class="car-footer">
+            <div class="car-price">289 900 <span>kr</span></div>
+            <a href="#" class="car-cta">Läs mer →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="car-card anim anim-d4">
+        <div class="car-img-placeholder">🚗</div>
+        <div class="car-body">
+          <div class="car-title">BMW 320d xDrive Touring</div>
+          <div class="car-subtitle">2020 · Automatisk · Diesel</div>
+          <div class="car-specs">
+            <span class="car-spec">62 100 km</span>
+            <span class="car-spec">190 hk</span>
+            <span class="car-spec">M Sport</span>
+          </div>
+          <div class="car-footer">
+            <div class="car-price">319 900 <span>kr</span></div>
+            <a href="#" class="car-cta">Läs mer →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="car-card anim anim-d5">
+        <div class="car-img-placeholder">🚗</div>
+        <div class="car-body">
+          <div class="car-title">Volvo XC60 T6 AWD</div>
+          <div class="car-subtitle">2022 · Automatisk · Bensin</div>
+          <div class="car-specs">
+            <span class="car-spec">31 800 km</span>
+            <span class="car-spec">253 hk</span>
+            <span class="car-spec">Inscription</span>
+          </div>
+          <div class="car-footer">
+            <div class="car-price">429 900 <span>kr</span></div>
+            <a href="#" class="car-cta">Läs mer →</a>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
