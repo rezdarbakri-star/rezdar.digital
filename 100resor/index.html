@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>100WILD by Rezdar — Planera ditt äventyr</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f0ea;
+    --bg-warm: #ece6db;
+    --card: #faf8f4;
+    --dark: #1a1a16;
+    --bark: #2c2a22;
+    --forest: #3d5a3e;
+    --forest-light: #4e7350;
+    --moss: #6b8f5e;
+    --sage: #8fa882;
+    --sand: #c4a96a;
+    --clay: #b07a4a;
+    --earth: #8b6d4c;
+    --stone: #7a7468;
+    --muted: #9a9488;
+    --light-text: #5c5850;
+    --white: #fefcf8;
+    --border: rgba(26,26,22,0.08);
+    --gold: #b8963e;
+    --gold-light: #d4b060;
+    --gold-bg: #faf6ee;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; overflow-x: hidden; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--dark);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 9999;
+  }
+
+  /* ============ NAV ============ */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 1.2rem 2.5rem;
+    display: flex; justify-content: space-between; align-items: center;
+    transition: all 0.4s;
+  }
+  nav.scrolled {
+    background: rgba(244,240,234,0.92);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 1px 20px rgba(0,0,0,0.04);
+  }
+
+  .nav-logo { display: flex; align-items: baseline; gap: 0.15rem; text-decoration: none; }
+  .nav-logo-100 { font-family: 'Instrument Sans', sans-serif; font-weight: 700; font-size: 1.3rem; color: var(--dark); }
+  .nav-logo-wild { font-family: 'Playfair Display', serif; font-weight: 400; font-style: italic; font-size: 1.3rem; color: var(--forest); }
+  .nav-by { font-size: 0.7rem; font-weight: 400; color: var(--muted); margin-left: 0.6rem; }
+
+  .nav-links { display: flex; gap: 2.2rem; list-style: none; }
+  .nav-links a { font-size: 0.82rem; font-weight: 500; color: var(--light-text); text-decoration: none; transition: color 0.3s; }
+  .nav-links a:hover { color: var(--forest); }
+
+  .nav-cta {
+    font-size: 0.8rem; font-weight: 600;
+    padding: 0.6rem 1.5rem; background: var(--forest); color: var(--white);
+    border: none; border-radius: 100px; text-decoration: none; cursor: pointer; transition: all 0.3s;
+  }
+  .nav-cta:hover { background: var(--forest-light); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(61,90,62,0.25); }
+
+  .mobile-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; z-index: 200; }
+  .mobile-toggle span { width: 22px; height: 1.5px; background: var(--dark); }
+
+  /* ============ HERO ============ */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center;
+    padding: 8rem 2rem 7rem;
+    position: relative; overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 80%, rgba(107,143,94,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(196,169,106,0.06) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .hero-content { position: relative; z-index: 2; max-width: 750px; }
+
+  .hero-eyebrow {
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--forest); margin-bottom: 2rem;
+    display: flex; align-items: center; justify-content: center; gap: 1rem;
+  }
+  .hero-eyebrow .line { width: 32px; height: 1px; background: var(--moss); }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif; font-weight: 400;
+    font-size: clamp(3.2rem, 8vw, 6.5rem); line-height: 1.05; letter-spacing: -0.02em;
+    color: var(--dark); margin-bottom: 0.3rem;
+  }
+  .hero h1 .num { font-family: 'Instrument Sans', sans-serif; font-weight: 700; color: var(--forest); }
+  .hero h1 em { font-style: italic; color: var(--forest); }
+
+  .hero-sub {
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: clamp(1.1rem, 2.5vw, 1.45rem); color: var(--stone);
+    margin-bottom: 1.8rem;
+  }
+
+  .hero-desc {
+    font-size: 1.05rem; font-weight: 300; line-height: 1.8;
+    color: var(--light-text); max-width: 530px; margin: 0 auto 2.5rem;
+  }
+
+  .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+  .btn-forest {
+    font-weight: 600; font-size: 0.9rem;
+    padding: 1rem 2.5rem; background: var(--forest); color: var(--white);
+    border: none; border-radius: 100px; cursor: pointer; text-decoration: none;
+    transition: all 0.35s; display: inline-flex; align-items: center; gap: 0.6rem;
+  }
+  .btn-forest:hover { background: var(--forest-light); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(61,90,62,0.25); }
+
+  .btn-ghost {
+    font-weight: 500; font-size: 0.9rem;
+    padding: 1rem 2.5rem; background: transparent; color: var(--dark);
+    border: 1.5px solid var(--border); border-radius: 100px; cursor: pointer;
+    text-decoration: none; transition: all 0.3s;
+  }
+  .btn-ghost:hover { border-color: var(--forest); color: var(--forest); }
+
+  .hero-scroll {
+    position: absolute; bottom: 1.2rem; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    animation: gentleBob 3s ease-in-out infinite;
+  }
+  .hero-scroll span { font-size: 0.6rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+  .hero-scroll .scroll-dot { width: 1px; height: 32px; background: linear-gradient(to bottom, var(--moss), transparent); }
+
+  @keyframes gentleBob {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(6px); }
+  }
+
+  /* ============ ABOUT STRIP ============ */
+  .about-strip {
+    padding: 4.5rem 2.5rem;
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .about-strip-inner {
+    max-width: 800px; margin: 0 auto; text-align: center;
+  }
+
+  .about-strip-inner .tag {
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.25em;
+    text-transform: uppercase; color: var(--forest); margin-bottom: 1.2rem;
+  }
+
+  .about-strip-inner h2 {
+    font-family: 'Playfair Display', serif; font-weight: 400;
+    font-size: clamp(1.6rem, 3.5vw, 2.2rem); line-height: 1.35;
+    color: var(--dark); margin-bottom: 1.5rem;
+  }
+
+  .about-strip-inner h2 em { font-style: italic; color: var(--forest); }
+
+  .about-strip-inner p {
+    font-weight: 300; font-size: 1rem; line-height: 1.8; color: var(--stone);
+    max-width: 600px; margin: 0 auto 2rem;
+  }
+
+  .cred-row {
+    display: flex; justify-content: center; gap: 0.6rem; flex-wrap: wrap;
+    margin-top: 1.5rem;
+  }
+
+  .cred-pill {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 0.78rem; font-weight: 400; color: var(--light-text);
+  }
+
+  .cred-pill .ico { font-size: 0.9rem; }
+
+  /* ============ DESTINATIONS ============ */
+  .destinations {
+    padding: 5rem 2.5rem;
+    background: var(--bg);
+  }
+
+  .dest-header {
+    text-align: center; max-width: 550px; margin: 0 auto 3rem;
+  }
+
+  .dest-header .tag { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--forest); margin-bottom: 1rem; }
+  .dest-header h2 { font-family: 'Playfair Display', serif; font-weight: 400; font-size: clamp(1.8rem, 3.5vw, 2.5rem); color: var(--dark); line-height: 1.15; margin-bottom: 0.8rem; }
+  .dest-header p { font-weight: 300; font-size: 0.95rem; color: var(--stone); line-height: 1.7; }
+
+  .dest-grid {
+    max-width: 1000px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;
+  }
+
+  .dest-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.8rem;
+    transition: all 0.3s;
+  }
+
+  .dest-card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.06); }
+
+  .dest-emoji { font-size: 2rem; margin-bottom: 0.8rem; }
+  .dest-name { font-family: 'Playfair Display', serif; font-weight: 400; font-size: 1.25rem; color: var(--dark); margin-bottom: 0.3rem; }
+  .dest-sub { font-size: 0.8rem; font-weight: 300; color: var(--stone); line-height: 1.6; }
+
+  /* ============ PRICING / PRODUCTS ============ */
+  .pricing {
+    padding: 6rem 2.5rem;
+    background: var(--white);
+    border-top: 1px solid var(--border);
+  }
+
+  .pricing-header {
+    text-align: center; max-width: 550px; margin: 0 auto 3.5rem;
+  }
+
+  .pricing-header .tag { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--forest); margin-bottom: 1rem; }
+  .pricing-header h2 { font-family: 'Playfair Display', serif; font-weight: 400; font-size: clamp(2rem, 4vw, 2.8rem); color: var(--dark); line-height: 1.1; margin-bottom: 0.8rem; }
+  .pricing-header p { font-weight: 300; font-size: 1rem; color: var(--stone); line-height: 1.7; }
+
+  .pricing-grid {
+    max-width: 950px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+    align-items: start;
+  }
+
+  .price-card {
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    transition: all 0.35s;
+  }
+
+  .price-card:hover { transform: translateY(-4px); }
+
+  /* Main product */
+  .price-card.main {
+    background: var(--white);
+    border: 2px solid var(--forest);
+    box-shadow: 0 4px 20px rgba(61,90,62,0.08);
+  }
+
+  .price-card.main:hover { box-shadow: 0 12px 40px rgba(61,90,62,0.15); }
+
+  .price-card-badge {
+    background: var(--forest); color: var(--white);
+    text-align: center; padding: 0.5rem;
+    font-size: 0.65rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase;
+  }
+
+  .price-card-body { padding: 2.5rem; }
+
+  .price-card .ico-big { font-size: 2.2rem; margin-bottom: 1rem; }
+
+  .price-card h3 {
+    font-family: 'Playfair Display', serif; font-weight: 400;
+    font-size: 1.5rem; color: var(--dark); margin-bottom: 0.5rem; line-height: 1.25;
+  }
+
+  .price-card .desc {
+    font-weight: 300; font-size: 0.9rem; line-height: 1.7;
+    color: var(--stone); margin-bottom: 1.5rem;
+  }
+
+  .price-includes { list-style: none; margin-bottom: 2rem; }
+  .price-includes li {
+    font-size: 0.88rem; font-weight: 400; color: var(--light-text);
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .price-includes li .check { color: var(--moss); font-weight: 600; }
+
+  .price-cta {
+    width: 100%; font-weight: 600; font-size: 0.9rem;
+    padding: 0.9rem; background: var(--forest); color: var(--white);
+    border: none; border-radius: 100px; cursor: pointer;
+    transition: all 0.3s; text-align: center; display: block; text-decoration: none;
+  }
+  .price-cta:hover { background: var(--forest-light); }
+
+  /* Premium product */
+  .price-card.premium {
+    background: var(--bark);
+    border: 2px solid var(--gold);
+    color: var(--bg);
+  }
+
+  .price-card.premium:hover { box-shadow: 0 12px 40px rgba(184,150,62,0.2); }
+
+  .price-card.premium .price-card-badge {
+    background: var(--gold);
+    color: var(--dark);
+  }
+
+  .price-card.premium h3 { color: var(--bg); }
+  .price-card.premium .desc { color: rgba(244,240,234,0.6); }
+
+  .price-card.premium .price-includes li {
+    color: rgba(244,240,234,0.75);
+    border-bottom-color: rgba(244,240,234,0.08);
+  }
+  .price-card.premium .price-includes li .check { color: var(--gold-light); }
+
+  .price-cta-gold {
+    width: 100%; font-weight: 600; font-size: 0.9rem;
+    padding: 0.9rem; background: var(--gold); color: var(--dark);
+    border: none; border-radius: 100px; cursor: pointer;
+    transition: all 0.3s; text-align: center; display: block; text-decoration: none;
+  }
+  .price-cta-gold:hover { background: var(--gold-light); }
+
+  .spots-left {
+    text-align: center; margin-top: 0.8rem;
+    font-size: 0.72rem; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .price-card.premium .spots-left { color: var(--gold-light); }
+
+  /* ============ UPCOMING PREMIUM TRIPS ============ */
+  .upcoming {
+    padding: 5rem 2.5rem;
+    background: var(--bark);
+    border-top: 2px solid var(--gold);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .upcoming::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(184,150,62,0.08), transparent 60%);
+    pointer-events: none;
+  }
+
+  .upcoming-inner { max-width: 900px; margin: 0 auto; position: relative; z-index: 2; }
+
+  .upcoming-header { text-align: center; margin-bottom: 3rem; }
+  .upcoming-header .tag { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
+  .upcoming-header h2 { font-family: 'Playfair Display', serif; font-weight: 400; font-size: clamp(1.8rem, 3.5vw, 2.5rem); color: var(--bg); line-height: 1.15; margin-bottom: 0.8rem; }
+  .upcoming-header p { font-weight: 300; font-size: 0.95rem; color: rgba(244,240,234,0.5); line-height: 1.7; }
+
+  .trip-list { display: flex; flex-direction: column; gap: 1rem; }
+
+  .trip-row {
+    display: grid;
+    grid-template-columns: 120px 1fr auto;
+    align-items: center;
+    background: rgba(244,240,234,0.04);
+    border: 1px solid rgba(184,150,62,0.15);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+
+  .trip-row:hover {
+    border-color: rgba(184,150,62,0.35);
+    background: rgba(244,240,234,0.06);
+  }
+
+  .trip-row-date {
+    padding: 1.2rem;
+    text-align: center;
+    border-right: 1px solid rgba(184,150,62,0.1);
+  }
+
+  .trip-row-date .month {
+    font-family: 'Instrument Sans', sans-serif; font-weight: 700;
+    font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--gold); opacity: 0.8;
+  }
+  .trip-row-date .days {
+    font-family: 'Instrument Sans', sans-serif; font-weight: 700;
+    font-size: 1.5rem; color: var(--bg); line-height: 1.1;
+  }
+  .trip-row-date .year { font-size: 0.65rem; color: rgba(244,240,234,0.35); }
+
+  .trip-row-info { padding: 1.2rem 1.5rem; }
+  .trip-row-loc {
+    font-size: 0.6rem; font-weight: 600; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--gold); margin-bottom: 0.2rem;
+  }
+  .trip-row-title {
+    font-family: 'Playfair Display', serif; font-weight: 400;
+    font-size: 1.15rem; color: var(--bg); margin-bottom: 0.3rem;
+  }
+  .trip-row-desc { font-size: 0.8rem; font-weight: 300; color: rgba(244,240,234,0.5); }
+
+  .trip-row-action { padding: 1.2rem 1.5rem; text-align: center; }
+  .trip-row-spots {
+    font-family: 'Instrument Sans', sans-serif; font-weight: 700;
+    font-size: 1.2rem; color: var(--gold); line-height: 1;
+  }
+  .trip-row-spots-label {
+    font-size: 0.55rem; font-weight: 500; letter-spacing: 0.15em;
+    text-transform: uppercase; color: rgba(244,240,234,0.35);
+  }
+
+  .trip-row-btn {
+    font-size: 0.7rem; font-weight: 600;
+    padding: 0.4rem 1.1rem; background: var(--gold); color: var(--dark);
+    border: none; border-radius: 100px; cursor: pointer;
+    transition: all 0.3s; margin-top: 0.5rem; text-decoration: none; display: inline-block;
+  }
+  .trip-row-btn:hover { background: var(--gold-light); }
+
+  /* ============ HOW IT WORKS ============ */
+  .how {
+    padding: 5rem 2.5rem;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+  }
+
+  .how-inner { max-width: 800px; margin: 0 auto; }
+  .how-header { text-align: center; margin-bottom: 3rem; }
+  .how-header .tag { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--forest); margin-bottom: 1rem; }
+  .how-header h2 { font-family: 'Playfair Display', serif; font-weight: 400; font-size: clamp(1.8rem, 3.5vw, 2.5rem); color: var(--dark); line-height: 1.1; }
+
+  .how-cols {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
+  }
+
+  .how-col h3 {
+    font-family: 'Instrument Sans', sans-serif; font-weight: 700;
+    font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase;
+    margin-bottom: 1.2rem; padding-bottom: 0.8rem;
+    border-bottom: 2px solid;
+  }
+
+  .how-col.advisory h3 { color: var(--forest); border-color: var(--forest); }
+  .how-col.premium-col h3 { color: var(--gold); border-color: var(--gold); }
+
+  .how-step {
+    display: flex; gap: 1rem; margin-bottom: 1.2rem;
+  }
+
+  .how-step-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Instrument Sans', sans-serif; font-weight: 700;
+    font-size: 0.75rem; flex-shrink: 0;
+  }
+
+  .how-col.advisory .how-step-num { background: rgba(61,90,62,0.1); color: var(--forest); }
+  .how-col.premium-col .how-step-num { background: rgba(184,150,62,0.1); color: var(--gold); }
+
+  .how-step p { font-weight: 300; font-size: 0.88rem; line-height: 1.6; color: var(--stone); }
+
+  /* ============ DISCLAIMER ============ */
+  .disclaimer {
+    padding: 2rem 2.5rem;
+    background: var(--bg-warm);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .disclaimer-inner {
+    max-width: 750px; margin: 0 auto;
+    display: flex; gap: 1.2rem; align-items: flex-start;
+  }
+
+  .disclaimer-icon {
+    width: 36px; height: 36px;
+    background: rgba(61,90,62,0.08); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem; flex-shrink: 0;
+  }
+
+  .disclaimer p { font-size: 0.85rem; font-weight: 300; line-height: 1.7; color: var(--stone); }
+  .disclaimer strong { font-weight: 500; color: var(--dark); }
+
+  /* ============ BOOKING ============ */
+  .booking {
+    padding: 6rem 2.5rem;
+    background: var(--white);
+    border-top: 1px solid var(--border);
+  }
+
+  .booking-inner { max-width: 650px; margin: 0 auto; }
+  .booking .tag { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--forest); margin-bottom: 1rem; }
+  .booking h2 { font-family: 'Playfair Display', serif; font-weight: 400; font-size: clamp(2rem, 4vw, 2.8rem); color: var(--dark); line-height: 1.15; margin-bottom: 1rem; }
+  .booking-intro { font-weight: 300; font-size: 1rem; line-height: 1.8; color: var(--stone); margin-bottom: 2.5rem; }
+
+  .form-group { margin-bottom: 1.3rem; }
+  .form-label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--dark); display: block; margin-bottom: 0.4rem; }
+
+  .form-input, .form-textarea, .form-select {
+    width: 100%; font-family: 'DM Sans', sans-serif; font-weight: 400; font-size: 0.95rem;
+    padding: 0.9rem 1.1rem; background: var(--bg); border: 1.5px solid var(--border);
+    border-radius: 8px; color: var(--dark); outline: none; transition: all 0.3s;
+  }
+  .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--moss); box-shadow: 0 0 0 3px rgba(107,143,94,0.1); }
+  .form-input::placeholder, .form-textarea::placeholder { color: var(--muted); }
+  .form-select { appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239a9488' fill='none' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1.1rem center; }
+  .form-textarea { min-height: 110px; resize: vertical; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.3rem; }
+
+  .btn-submit {
+    width: 100%; font-weight: 600; font-size: 0.95rem;
+    padding: 1rem; background: var(--forest); color: var(--white); border: none;
+    border-radius: 100px; cursor: pointer; transition: all 0.35s;
+    display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+    margin-top: 1.5rem;
+  }
+  .btn-submit:hover { background: var(--forest-light); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(61,90,62,0.25); }
+
+  /* ============ SOCIAL ============ */
+  .social-bar {
+    display: flex; justify-content: center; gap: 3.5rem; flex-wrap: wrap;
+    padding: 3.5rem 2.5rem; background: var(--bg);
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  }
+  .social-item { text-align: center; }
+  .social-item .platform { font-size: 0.6rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.3rem; }
+  .social-item .count { font-family: 'Instrument Sans', sans-serif; font-weight: 700; font-size: 1.8rem; color: var(--dark); }
+  .social-item .count-suffix { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 400; color: var(--forest); }
+
+  /* ============ FOOTER ============ */
+  footer { padding: 3rem 2.5rem 2rem; background: var(--bg); }
+  .footer-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; }
+  .footer-brand { display: flex; align-items: baseline; gap: 0.15rem; }
+  .footer-brand .f100 { font-family: 'Instrument Sans', sans-serif; font-weight: 700; font-size: 1rem; color: var(--dark); }
+  .footer-brand .fwild { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 400; font-size: 1rem; color: var(--forest); }
+  .footer-note { font-size: 0.72rem; font-weight: 300; color: var(--muted); text-align: center; }
+  .footer-links { display: flex; gap: 1.8rem; }
+  .footer-links a { font-size: 0.82rem; font-weight: 400; color: var(--stone); text-decoration: none; transition: color 0.3s; }
+  .footer-links a:hover { color: var(--forest); }
+
+  /* ============ REVEAL ============ */
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-d1 { transition-delay: 0.08s; }
+  .reveal-d2 { transition-delay: 0.16s; }
+  .reveal-d3 { transition-delay: 0.24s; }
+  .reveal-d4 { transition-delay: 0.32s; }
+
+  /* ============ MOBILE ============ */
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links, .nav-cta { display: none; }
+    .nav-links.open { display: flex; position: fixed; inset: 0; background: rgba(244,240,234,0.98); flex-direction: column; justify-content: center; align-items: center; gap: 2rem; z-index: 150; }
+    .nav-links.open a { font-size: 1.2rem; color: var(--dark); }
+    .mobile-toggle { display: flex; }
+
+    .hero { padding: 7rem 1.5rem 6rem; min-height: 90vh; }
+    .about-strip, .destinations, .pricing, .how, .booking, .upcoming { padding: 4rem 1.5rem; }
+
+    .pricing-grid { grid-template-columns: 1fr; }
+    .how-cols { grid-template-columns: 1fr; }
+    .dest-grid { grid-template-columns: 1fr 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+
+    .trip-row { grid-template-columns: 1fr; }
+    .trip-row-date { border-right: none; border-bottom: 1px solid rgba(184,150,62,0.1); flex-direction: row; display: flex; gap: 0.6rem; align-items: baseline; justify-content: center; padding: 0.8rem; }
+    .trip-row-action { flex-direction: row; gap: 1rem; align-items: center; border-top: 1px solid rgba(184,150,62,0.1); }
+
+    .footer-inner { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">
+    <span class="nav-logo-100">100</span><span class="nav-logo-wild">WILD</span>
+    <span class="nav-by">by Rezdar</span>
+  </a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#about" onclick="closeMenu()">Om 100WILD</a></li>
+    <li><a href="#pricing" onclick="closeMenu()">Vad jag erbjuder</a></li>
+    <li><a href="#upcoming" onclick="closeMenu()">Kommande resor</a></li>
+    <li><a href="#booking" onclick="closeMenu()">Kom igång</a></li>
+  </ul>
+  <a href="#booking" class="nav-cta">Kom igång</a>
+  <div class="mobile-toggle" id="menuToggle" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow reveal">
+      <span class="line"></span> by Rezdar <span class="line"></span>
+    </div>
+    <h1 class="reveal reveal-d1"><span class="num">100</span><em>WILD</em></h1>
+    <p class="hero-sub reveal reveal-d2">Ditt äventyr. Min erfarenhet.</p>
+    <p class="hero-desc reveal reveal-d3">
+      Du drömmer om Amazonas, Sahara eller Uganda — jag har varit där. Låt mig hjälpa dig planera resan, eller häng med mig nästa gång jag åker.
+    </p>
+    <div class="hero-actions reveal reveal-d4">
+      <a href="#pricing" class="btn-forest">Se vad jag erbjuder →</a>
+      <a href="#upcoming" class="btn-ghost">Kommande resor</a>
+    </div>
+  </div>
+  <div class="hero-scroll"><span>Utforska</span><div class="scroll-dot"></div></div>
+</section>
+
+<!-- ABOUT -->
+<section class="about-strip" id="about">
+  <div class="about-strip-inner">
+    <div class="tag reveal">Om 100WILD</div>
+    <h2 class="reveal reveal-d1">10 år av äventyr — nu delar jag med mig <em>av allt</em></h2>
+    <p class="reveal reveal-d2">
+      I 10 år har jag rest till världens mest fascinerande platser och dokumenterat det för 750 000 följare. Nu delar jag med mig av kontakterna, kunskapen och erfarenheterna — så att du kan göra samma resa, eller hänga med nästa gång.
+    </p>
+    <div class="cred-row reveal reveal-d3">
+      <div class="cred-pill"><span class="ico">🦍</span> Uganda & Rwanda</div>
+      <div class="cred-pill"><span class="ico">🦁</span> Tanzania</div>
+      <div class="cred-pill"><span class="ico">🏜️</span> Sahara</div>
+      <div class="cred-pill"><span class="ico">🌴</span> Amazonas</div>
+      <div class="cred-pill"><span class="ico">🏝️</span> Papua</div>
+      <div class="cred-pill"><span class="ico">🐻‍❄️</span> Svalbard</div>
+      <div class="cred-pill"><span class="ico">🕌</span> Saudi & Oman</div>
+      <div class="cred-pill"><span class="ico">⛰️</span> Kurdistan</div>
+    </div>
+  </div>
+</section>
+
+<!-- DESTINATIONS -->
+<section class="destinations" id="destinations">
+  <div class="dest-header">
+    <div class="tag reveal">Destinationer</div>
+    <h2 class="reveal reveal-d1">Platser jag kan hjälpa dig med</h2>
+    <p class="reveal reveal-d2">Jag har kontakter, erfarenhet och detaljerad kunskap om dessa platser.</p>
+  </div>
+  <div class="dest-grid">
+    <div class="dest-card reveal">
+      <div class="dest-emoji">🦍</div>
+      <div class="dest-name">Uganda</div>
+      <div class="dest-sub">Gorilla-trekking, permits, savann och lokala kontakter.</div>
+    </div>
+    <div class="dest-card reveal reveal-d1">
+      <div class="dest-emoji">🦍</div>
+      <div class="dest-name">Rwanda</div>
+      <div class="dest-sub">Gorillor, vulkaner och en av Afrikas mest fascinerande länder.</div>
+    </div>
+    <div class="dest-card reveal reveal-d2">
+      <div class="dest-emoji">🦁</div>
+      <div class="dest-name">Tanzania</div>
+      <div class="dest-sub">Safari, Serengeti, Kilimanjaro och vilda djur i världsklass.</div>
+    </div>
+    <div class="dest-card reveal reveal-d3">
+      <div class="dest-emoji">🏜️</div>
+      <div class="dest-name">Sahara</div>
+      <div class="dest-sub">Ökenvandring, kamelexpeditioner och nätter under stjärnorna.</div>
+    </div>
+    <div class="dest-card reveal">
+      <div class="dest-emoji">🌴</div>
+      <div class="dest-name">Amazonas</div>
+      <div class="dest-sub">Djungelöverlevnad, lokala guider och expedition i regnskogen.</div>
+    </div>
+    <div class="dest-card reveal reveal-d1">
+      <div class="dest-emoji">🏝️</div>
+      <div class="dest-name">Papua</div>
+      <div class="dest-sub">En av världens mest avlägsna och orörda platser. Stamfolk och djungel.</div>
+    </div>
+    <div class="dest-card reveal reveal-d2">
+      <div class="dest-emoji">🐻‍❄️</div>
+      <div class="dest-name">Svalbard</div>
+      <div class="dest-sub">Isbjörnar, glaciärer och arktiska expeditioner i midnattssol.</div>
+    </div>
+    <div class="dest-card reveal reveal-d3">
+      <div class="dest-emoji">🕌</div>
+      <div class="dest-name">Saudi</div>
+      <div class="dest-sub">Öken, historia och ett land som precis öppnat upp för äventyrare.</div>
+    </div>
+    <div class="dest-card reveal">
+      <div class="dest-emoji">🏔️</div>
+      <div class="dest-name">Oman</div>
+      <div class="dest-sub">Wadis, berg och öken — Mellanösterns dolda äventyrspärla.</div>
+    </div>
+    <div class="dest-card reveal reveal-d1">
+      <div class="dest-emoji">⛰️</div>
+      <div class="dest-name">Kurdistan</div>
+      <div class="dest-sub">Berg, kultur, historia och en av Mellanösterns mest gästfria regioner.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="pricing-header">
+    <div class="tag reveal">Vad jag erbjuder</div>
+    <h2 class="reveal reveal-d1">Välj din <em>nivå</em></h2>
+    <p class="reveal reveal-d2">Oavsett om du vill planera själv eller resa med mig — jag hjälper dig dit.</p>
+  </div>
+
+  <div class="pricing-grid">
+    <!-- MAIN: Advisory -->
+    <div class="price-card main reveal">
+      <div class="price-card-badge">Mest populär</div>
+      <div class="price-card-body">
+        <div class="ico-big">💬</div>
+        <h3>Planera med Rezdar</h3>
+        <p class="desc">Jag hjälper dig planera din egen resa med mina kontakter, erfarenheter och detaljerad rådgivning. Du kör resan själv — men med allt du behöver.</p>
+        <ul class="price-includes">
+          <li><span class="check">✓</span> Videomöte — vi går igenom allt</li>
+          <li><span class="check">✓</span> Mina lokala kontakter och guider</li>
+          <li><span class="check">✓</span> Detaljerad rutt och planering</li>
+          <li><span class="check">✓</span> Tips på flyg, boende och packning</li>
+          <li><span class="check">✓</span> Support via meddelanden under resan</li>
+        </ul>
+        <a href="#booking" class="price-cta">Kom igång →</a>
+      </div>
+    </div>
+
+    <!-- PREMIUM: Travel with me -->
+    <div class="price-card premium reveal reveal-d1">
+      <div class="price-card-badge">✦ &nbsp;Begränsade platser</div>
+      <div class="price-card-body">
+        <div class="ico-big">🌍</div>
+        <h3>Res med Rezdar</h3>
+        <p class="desc">Häng med mig på en av mina resor. Vi planerar ihop, reser ihop och upplever allt tillsammans. Jag är din rådgivare och trygga punkt.</p>
+        <ul class="price-includes">
+          <li><span class="check">✓</span> Allt i "Planera med Rezdar"</li>
+          <li><span class="check">✓</span> Min närvaro hela resan</li>
+          <li><span class="check">✓</span> Vi planerar och reser ihop</li>
+          <li><span class="check">✓</span> Liten grupp — max 4–6 personer</li>
+          <li><span class="check">✓</span> Tillgång till mina lokala guider på plats</li>
+        </ul>
+        <a href="#upcoming" class="price-cta-gold">Se kommande resor ↓</a>
+        <div class="spots-left">Begränsade platser per resa</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- UPCOMING PREMIUM TRIPS -->
+<section class="upcoming" id="upcoming">
+  <div class="upcoming-inner">
+    <div class="upcoming-header">
+      <div class="tag reveal">✦ Res med Rezdar</div>
+      <h2 class="reveal reveal-d1">Kommande <em>resor</em></h2>
+      <p class="reveal reveal-d2">Begränsade platser. Vi planerar ihop, reser ihop och upplever ihop.</p>
+    </div>
+
+    <div class="trip-list">
+      <div class="trip-row reveal">
+        <div class="trip-row-date">
+          <div class="month">Sep</div>
+          <div class="days">5–20</div>
+          <div class="year">2026</div>
+        </div>
+        <div class="trip-row-info">
+          <div class="trip-row-loc">Brasilien · Manaus · Amazonas</div>
+          <div class="trip-row-title">Djungelöverlevnad i Amazonas</div>
+          <div class="trip-row-desc">15 dagar. Djungel, överlevnad och äventyr med lokala guider.</div>
+        </div>
+        <div class="trip-row-action">
+          <div class="trip-row-spots">4</div>
+          <div class="trip-row-spots-label">Platser</div>
+          <a href="#booking" class="trip-row-btn">Häng med</a>
+        </div>
+      </div>
+
+      <div class="trip-row reveal reveal-d1">
+        <div class="trip-row-date">
+          <div class="month">Nov</div>
+          <div class="days">8–18</div>
+          <div class="year">2026</div>
+        </div>
+        <div class="trip-row-info">
+          <div class="trip-row-loc">Uganda · Bwindi</div>
+          <div class="trip-row-title">Gorilla-trekking i Uganda</div>
+          <div class="trip-row-desc">10 dagar. Gorillor, savann och riktigt äventyr.</div>
+        </div>
+        <div class="trip-row-action">
+          <div class="trip-row-spots">6</div>
+          <div class="trip-row-spots-label">Platser</div>
+          <a href="#booking" class="trip-row-btn">Häng med</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="how-inner">
+    <div class="how-header">
+      <div class="tag reveal">Så funkar det</div>
+      <h2 class="reveal reveal-d1">Två sätt att <em>komma igång</em></h2>
+    </div>
+
+    <div class="how-cols">
+      <div class="how-col advisory reveal">
+        <h3>💬 Planera med Rezdar</h3>
+        <div class="how-step">
+          <div class="how-step-num">1</div>
+          <p>Du anmäler dig och berättar vart du vill resa.</p>
+        </div>
+        <div class="how-step">
+          <div class="how-step-num">2</div>
+          <p>Vi tar ett videomöte och jag ger dig hela planen — kontakter, rutt, tips.</p>
+        </div>
+        <div class="how-step">
+          <div class="how-step-num">3</div>
+          <p>Du bokar allt själv och kör din resa. Jag finns på meddelande om du behöver hjälp.</p>
+        </div>
+      </div>
+
+      <div class="how-col premium-col reveal reveal-d1">
+        <h3>✦ Res med Rezdar</h3>
+        <div class="how-step">
+          <div class="how-step-num">1</div>
+          <p>Du anmäler dig till en av mina kommande resor.</p>
+        </div>
+        <div class="how-step">
+          <div class="how-step-num">2</div>
+          <p>Vi planerar resan ihop. Du bokar dina egna flyg, boende och aktiviteter.</p>
+        </div>
+        <div class="how-step">
+          <div class="how-step-num">3</div>
+          <p>Vi reser ihop och upplever allting tillsammans.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DISCLAIMER -->
+<div class="disclaimer">
+  <div class="disclaimer-inner reveal">
+    <div class="disclaimer-icon">ℹ️</div>
+    <p><strong>Bra att veta:</strong> 100WILD är ingen resebyrå. Oavsett vilken tjänst du väljer bokar och betalar du dina flyg, boende, försäkringar och lokala aktiviteter själv — direkt till flygbolag, hotell och lokala operatörer. Det jag erbjuder är min erfarenhet, rådgivning och närvaro.</p>
+  </div>
+</div>
+
+<!-- BOOKING -->
+<section class="booking" id="booking">
+  <div class="booking-inner">
+    <div class="tag reveal">Kom igång</div>
+    <h2 class="reveal reveal-d1">Vart vill du <em>åka?</em></h2>
+    <p class="booking-intro reveal reveal-d2">Berätta vad du är intresserad av så hör jag av mig — oavsett om du vill planera själv eller hänga med.</p>
+
+    <form id="bookingForm" onsubmit="handleSubmit(event)">
+      <div class="form-row reveal">
+        <div class="form-group">
+          <label class="form-label">Förnamn</label>
+          <input type="text" class="form-input" placeholder="Ditt förnamn" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Efternamn</label>
+          <input type="text" class="form-input" placeholder="Ditt efternamn" required>
+        </div>
+      </div>
+
+      <div class="form-row reveal">
+        <div class="form-group">
+          <label class="form-label">E-post</label>
+          <input type="email" class="form-input" placeholder="din@email.se" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Telefon</label>
+          <input type="tel" class="form-input" placeholder="+46 70 000 00 00">
+        </div>
+      </div>
+
+      <div class="form-group reveal">
+        <label class="form-label">Vad är du intresserad av?</label>
+        <select class="form-select" required>
+          <option value="" disabled selected>Välj</option>
+          <option>💬 Planera med Rezdar — jag vill göra resan själv</option>
+          <option>✦ Res med Rezdar — Amazonas, sep 2026</option>
+          <option>✦ Res med Rezdar — Uganda, nov 2026</option>
+          <option>✦ Res med Rezdar — kommande resa</option>
+          <option>Vet inte ännu — vill bara snacka</option>
+        </select>
+      </div>
+
+      <div class="form-group reveal">
+        <label class="form-label">Berätta mer</label>
+        <textarea class="form-textarea" placeholder="Vart drömmer du om att resa? Har du rest till liknande platser förut?"></textarea>
+      </div>
+
+      <button type="submit" class="btn-submit reveal">Skicka →</button>
+    </form>
+  </div>
+</section>
+
+<!-- SOCIAL -->
+<div class="social-bar">
+  <div class="social-item reveal"><div class="platform">YouTube</div><div class="count">214<span class="count-suffix">K</span></div></div>
+  <div class="social-item reveal reveal-d1"><div class="platform">TikTok</div><div class="count">486<span class="count-suffix">K</span></div></div>
+  <div class="social-item reveal reveal-d2"><div class="platform">Instagram</div><div class="count">79<span class="count-suffix">K</span></div></div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand"><span class="f100">100</span><span class="fwild">WILD</span></div>
+    <div class="footer-note">Ej researrangör · Du bokar din egen resa · © 2026 Rezdar Bakri</div>
+    <div class="footer-links">
+      <a href="https://www.youtube.com/c/Rezdar1" target="_blank">YouTube</a>
+      <a href="https://www.instagram.com/rezdar/" target="_blank">Instagram</a>
+      <a href="https://www.tiktok.com/@rezdar" target="_blank">TikTok</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('navbar');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 60));
+  function toggleMenu() { document.getElementById('navLinks').classList.toggle('open'); }
+  function closeMenu() { document.getElementById('navLinks').classList.remove('open'); }
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('.btn-submit');
+    btn.innerHTML = '✓ &nbsp;Tack! Jag hör av mig.';
+    btn.style.background = '#3d5a3e'; btn.disabled = true;
+    setTimeout(() => { btn.innerHTML = 'Skicka →'; btn.style.background = ''; btn.disabled = false; }, 4000);
+  }
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', function(e) { e.preventDefault(); const t = document.querySelector(this.getAttribute('href')); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+  });
+</script>
+
+</body>
+</html>
