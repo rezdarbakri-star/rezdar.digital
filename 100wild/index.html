@@ -230,13 +230,13 @@ const RARITY = {
 };
 
 const BRANDS_SV = [
-  { name: "RED BULL", color: "#e3000f", tagline: "PARTNER", status: "active",
+  { name: "RED BULL", color: "#e3000f", tagline: "Energi i fält", status: "active",
     points: [
-      "Partner i 100WILD-serien, inklusive Bardia (tiger, Nepal)",
+      "Varje avsnitt är en fysisk och mental utmaning — en naturlig matchning",
       "Integration i camp-setups, expeditionsstarter och recovery-moment",
       "Multi-platform: YouTube-avsnitt, TikTok-klipp, Instagram behind-the-scenes",
     ]},
-  { name: "REVOLUTIONRACE", color: "#4caf50", tagline: "PARTNER", status: "active",
+  { name: "REVOLUTIONRACE", color: "#4caf50", tagline: "Utrustning i fält", status: "active",
     points: [
       "Produkten syns i varje bildruta — inte som reklam, utan som utrustning som används",
       "Flermånaders samarbete, kläder testade i verkliga förhållanden",
@@ -245,13 +245,13 @@ const BRANDS_SV = [
 ];
 
 const BRANDS_EN = [
-  { name: "RED BULL", color: "#e3000f", tagline: "PARTNER", status: "active",
+  { name: "RED BULL", color: "#e3000f", tagline: "Fuel in the field", status: "active",
     points: [
-      "Partner in the 100WILD series, including Bardia (tiger, Nepal)",
+      "Every episode is a physical and mental challenge — a natural match",
       "Integration in camp setups, expedition starts and recovery moments",
       "Multi-platform: YouTube episodes, TikTok clips, Instagram behind-the-scenes",
     ]},
-  { name: "REVOLUTIONRACE", color: "#4caf50", tagline: "PARTNER", status: "active",
+  { name: "REVOLUTIONRACE", color: "#4caf50", tagline: "Gear in the field", status: "active",
     points: [
       "The product is visible in every frame — not as advertising, but as gear being used",
       "A multi-month collaboration, clothing tested in real conditions",
@@ -1090,13 +1090,8 @@ function App() {
       {/* ═══ 7. BRAND FIT ═══ */}
       <Section themeId="brand">
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <Tag><T sv="PARTNERS" en="PARTNERS" /></Tag>
           <div style={{ textAlign: "center", marginBottom: 50 }}>
             <div className="glitch" style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: "clamp(40px,8vw,90px)", color: "white", letterSpacing: 3, lineHeight: 0.9 }}><T sv="PARTNERS" en="PARTNERS" /></div>
-            <p style={{ fontSize: "clamp(13px,1.2vw,16px)", color: "rgba(255,255,255,.35)", marginTop: 16, maxWidth: 500, margin: "16px auto 0", lineHeight: 1.7 }}>
-              <T sv="Stora varumärken är med och sponsrar serien. Produkten syns i rätt kontext — naturligt, trovärdigt, i verkligheten."
-                 en="Major brands are partnering on the series. The product appears in the right context — naturally, credibly, in the real world." />
-            </p>
           </div>
 
           {/* Partner brands */}
@@ -1110,17 +1105,6 @@ function App() {
                 {/* Glowing top accent line */}
                 <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3,
                   background: `linear-gradient(90deg, transparent, ${b.color}, transparent)` }} />
-
-                {/* LOCKED IN badge */}
-                <div style={{ position: "absolute", top: 16, right: 16, display: "flex", alignItems: "center", gap: 5,
-                  padding: "5px 10px", borderRadius: 6,
-                  background: `${b.color}12`, border: `1px solid ${b.color}35`,
-                  animation: "badgePulse 3s ease infinite",
-                  boxShadow: `0 0 12px ${b.color}20`,
-                }}>
-                  <svg viewBox="0 0 24 24" width="10" height="10" fill={b.color}><path d="M12 1l3.09 6.26L22 8.27l-5 4.87 1.18 6.88L12 16.77l-6.18 3.25L7 13.14 2 8.27l6.91-1.01L12 1z"/></svg>
-                  <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: 2, color: b.color, fontWeight: 700 }}><T sv="PARTNER" en="PARTNER" /></span>
-                </div>
 
                 <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: "clamp(32px,5vw,48px)", color: b.color, letterSpacing: 3 }}>{b.name}</div>
                 <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: 3, color: "rgba(255,255,255,.2)", marginBottom: 20 }}>{b.tagline}</div>
