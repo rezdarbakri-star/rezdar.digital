@@ -121,7 +121,7 @@ const BIOMES_SHOWCASE_EN = [
 
 const EXPEDITIONS_SV = [
   { id: "pantanal", name: "PANTANAL", themeId: "amazon", color: "#4caf50", icon: "🐆",
-    photo: "images/amazon.jpg", grad: "linear-gradient(135deg, #0a1e0a, #2e5e2e)",
+    photo: "https://i.ibb.co/NgD6YxRR/latin-america-pantanal-capybara-family-emma-healey-gallery.jpg", grad: "linear-gradient(135deg, #0a1e0a, #2e5e2e)",
     status: "NÄSTA EXPEDITION", window: "Sep 2026",
     tagline: "Världens största våtmark.",
     frame: "Den tätaste rovdjurskoncentrationen på jorden, där land och vatten flyter ihop till en enda värld.",
@@ -134,7 +134,7 @@ const EXPEDITIONS_SV = [
     ],
     cost: "90 000 kr", slots: 2 },
   { id: "timor", name: "TIMOR-LESTE", themeId: "ocean", color: "#039be5", icon: "🐋",
-    photo: "images/ocean.jpg", grad: "linear-gradient(135deg, #04101f, #0b3a5c)",
+    photo: "https://i.ibb.co/JwWGJpFL/Freediving-with-Whales-in-Timor-Leste.jpg", grad: "linear-gradient(135deg, #04101f, #0b3a5c)",
     status: "PLANERAD", window: "Nov 2026",
     tagline: "Världens mest artrika hav.",
     frame: "De största djur som någonsin levt, gömda utanför ett av jordens minst besökta länder.",
@@ -150,7 +150,7 @@ const EXPEDITIONS_SV = [
 
 const EXPEDITIONS_EN = [
   { id: "pantanal", name: "PANTANAL", themeId: "amazon", color: "#4caf50", icon: "🐆",
-    photo: "images/amazon.jpg", grad: "linear-gradient(135deg, #0a1e0a, #2e5e2e)",
+    photo: "https://i.ibb.co/NgD6YxRR/latin-america-pantanal-capybara-family-emma-healey-gallery.jpg", grad: "linear-gradient(135deg, #0a1e0a, #2e5e2e)",
     status: "NEXT EXPEDITION", window: "Sep 2026",
     tagline: "The world's largest wetland.",
     frame: "The densest concentration of predators on Earth, where land and water blur into a single world.",
@@ -163,7 +163,7 @@ const EXPEDITIONS_EN = [
     ],
     cost: "90,000 kr", slots: 2 },
   { id: "timor", name: "TIMOR-LESTE", themeId: "ocean", color: "#039be5", icon: "🐋",
-    photo: "images/ocean.jpg", grad: "linear-gradient(135deg, #04101f, #0b3a5c)",
+    photo: "https://i.ibb.co/JwWGJpFL/Freediving-with-Whales-in-Timor-Leste.jpg", grad: "linear-gradient(135deg, #04101f, #0b3a5c)",
     status: "PLANNED", window: "Nov 2026",
     tagline: "The most biodiverse water on Earth.",
     frame: "The largest animals that have ever lived, hiding off one of the least-visited countries on the planet.",
@@ -576,6 +576,95 @@ function LangToggle({ lang, setLang }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   TRIP CAROUSEL
+   ═══════════════════════════════════════════════════════════════ */
+const TRIP_SLIDES = [
+  { src: "https://i.ibb.co/Fqg3v4hm/RB2.jpg",
+    sv: "Firar med Red Bulls lokala limited edition-smak Blueberry Blackcurrant efter en framgångsrik trek genom Bardias olika biomer och ett tigermöte.",
+    en: "Celebrating with Red Bull's local limited edition flavour Blueberry Blackcurrant after a successful trek through Bardia's biomes and a tiger encounter." },
+  { src: "https://i.ibb.co/tPJqxdVj/SAFARRI.jpg",
+    sv: "Rezdar lär sig navigera med en jeep, off-road jungle edition.",
+    en: "Rezdar learning to navigate a jeep, off-road jungle edition." },
+  { src: "https://i.ibb.co/1FMtJTH/SUN.jpg",
+    sv: "Vid solnedgången, varje kväll förvandlades solen och blev illröd. Mystiskt!",
+    en: "At sunset, every evening the sun transformed into a fiery red. Mysterious!" },
+  { src: "https://i.ibb.co/3m6PrTx7/TIGERSIGN.jpg",
+    sv: "Tigern är den ensamma härskaren här.",
+    en: "The tiger is the lone ruler here." },
+  { src: "https://i.ibb.co/1YG0Dyns/TREEHOUSE.jpg",
+    sv: "Overnight in a treehouse, vi fångade en tigerjakt på natten. Håll utkik!",
+    en: "Overnight in a treehouse, we caught a tiger hunt at night. Stay tuned!" },
+  { src: "https://i.ibb.co/HLS0Z2DF/CROCODILESIGN.jpg",
+    sv: "Äkta vildmark med Mugger-krokodiler som lurar i vattnet. Det gäller att vara på sin vakt!",
+    en: "Real wilderness with mugger crocodiles lurking in the water. You have to stay alert!" },
+  { src: "https://i.ibb.co/PGyLKRm7/RB.jpg",
+    sv: "Uppladdning inför varje expedition! Eller är Rezdar beroende av smaken? Den var otrolig!",
+    en: "Fuelling up before every expedition! Or is Rezdar addicted to the flavour? It was incredible!" },
+  { src: "https://i.ibb.co/MD7DKGWB/CAMPING.jpg",
+    sv: "Contemplating... var det här en bra idé?",
+    en: "Contemplating... was this a good idea?" },
+  { src: "https://i.ibb.co/rft8WfnZ/IMG-0066.jpg",
+    sv: "Tigerspår, vi är nära nu!",
+    en: "Tiger tracks, we're close now!" },
+  { src: "https://i.ibb.co/99GB1YL3/IMG-0079-2.jpg",
+    sv: "Krishna Shah, mannen som överlevde en tigerattack. Tigerspårare åt BBC och David Attenborough för serien \"Entangled Asia\".",
+    en: "Krishna Shah, the man who survived a tiger attack. Tiger tracker for BBC and David Attenborough on the series \"Entangled Asia\"." },
+];
+
+function TripCarousel() {
+  const { lang } = useLang();
+  const [i, setI] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const n = TRIP_SLIDES.length;
+  const go = (d) => setI((p) => (p + d + n) % n);
+  const goto = (idx) => setI(idx);
+
+  useEffect(() => {
+    if (paused) return;
+    const t = setInterval(() => setI((p) => (p + 1) % n), 4500);
+    return () => clearInterval(t);
+  }, [paused, n]);
+
+  const s = TRIP_SLIDES[i];
+  return (
+    <div onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+      <div style={{ position: "relative", borderRadius: 14, overflow: "hidden", border: "1px solid rgba(255,143,0,0.25)", background: "#120a04", aspectRatio: "16/10" }}>
+        {TRIP_SLIDES.map((sl, idx) => (
+          <img key={idx} src={sl.src} alt="" loading={idx === 0 ? "eager" : "lazy"}
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover",
+              opacity: idx === i ? 1 : 0, transition: "opacity 0.6s ease" }}
+            onError={e => { e.target.style.display = "none"; }} />
+        ))}
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18,10,4,0.92) 0%, transparent 45%)", pointerEvents: "none" }} />
+
+        {/* caption */}
+        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "18px 20px 16px" }}>
+          <p key={i} style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "clamp(13px,1.4vw,15px)", color: "rgba(255,255,255,.92)", lineHeight: 1.6, margin: 0, textShadow: "0 1px 8px rgba(0,0,0,0.5)", animation: "fadeUp 0.5s ease" }}>
+            {lang === "en" ? s.en : s.sv}
+          </p>
+        </div>
+
+        {/* arrows */}
+        <button onClick={() => go(-1)} aria-label="Previous" style={{ position: "absolute", top: "50%", left: 10, transform: "translateY(-50%)", width: 38, height: 38, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.2)", background: "rgba(18,10,4,0.55)", color: "white", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)" }}>‹</button>
+        <button onClick={() => go(1)} aria-label="Next" style={{ position: "absolute", top: "50%", right: 10, transform: "translateY(-50%)", width: 38, height: 38, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.2)", background: "rgba(18,10,4,0.55)", color: "white", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)" }}>›</button>
+
+        {/* counter */}
+        <div style={{ position: "absolute", top: 12, right: 14, fontFamily: "'Space Mono',monospace", fontSize: 10, letterSpacing: 1, color: "rgba(255,255,255,0.7)", background: "rgba(18,10,4,0.5)", padding: "3px 8px", borderRadius: 5, backdropFilter: "blur(4px)" }}>{i + 1} / {n}</div>
+      </div>
+
+      {/* dots */}
+      <div style={{ display: "flex", justifyContent: "center", gap: 7, marginTop: 12, flexWrap: "wrap" }}>
+        {TRIP_SLIDES.map((_, idx) => (
+          <button key={idx} onClick={() => goto(idx)} aria-label={`Go to ${idx + 1}`}
+            style={{ width: idx === i ? 22 : 8, height: 8, borderRadius: 4, border: "none", cursor: "pointer", padding: 0,
+              background: idx === i ? "#ff8f00" : "rgba(255,255,255,0.25)", transition: "all 0.3s ease" }} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
    MAIN APP
    ═══════════════════════════════════════════════════════════════ */
 function App() {
@@ -629,7 +718,7 @@ function App() {
         <Atmosphere themeId="hero" />
         <div style={{ textAlign: "center", position: "relative", zIndex: 2, padding: "40px 24px", maxWidth: 900 }}>
           <div className="hero-collab" style={{ fontFamily: "'Space Mono',monospace", fontSize: "clamp(9px,1.1vw,12px)", letterSpacing: 7, color: RED, marginBottom: 24, opacity: 0, animation: "fadeUp .8s ease .3s forwards" }}>
-            <T sv="EXPEDITIONSSERIE" en="EXPEDITION SERIES" />
+            <T sv="RED BULL × REVOLUTIONRACE × REZDAR" en="RED BULL × REVOLUTIONRACE × REZDAR" />
             <div style={{ width: 40, height: 2, background: RED, margin: "14px auto 0" }} />
           </div>
           <div style={{ fontFamily: "'Bebas Neue',sans-serif", lineHeight: .85, opacity: 0, animation: "fadeUp 1s ease .6s forwards" }}>
@@ -715,29 +804,11 @@ function App() {
                 ))}
               </div>
 
-              {/* photo collage from the trip */}
+              {/* photo carousel from the trip */}
               <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: 3, color: "rgba(255,255,255,.25)", margin: "22px 0 10px" }}>
                 <T sv="FRÅN RESAN" en="FROM THE TRIP" />
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 6 }} className="collage-grid">
-                {[
-                  "https://i.ibb.co/Fqg3v4hm/RB2.jpg",
-                  "https://i.ibb.co/tPJqxdVj/SAFARRI.jpg",
-                  "https://i.ibb.co/1FMtJTH/SUN.jpg",
-                  "https://i.ibb.co/HLS0Z2DF/CROCODILESIGN.jpg",
-                  "https://i.ibb.co/3m6PrTx7/TIGERSIGN.jpg",
-                  "https://i.ibb.co/1YG0Dyns/TREEHOUSE.jpg",
-                  "https://i.ibb.co/MD7DKGWB/CAMPING.jpg",
-                  "https://i.ibb.co/PGyLKRm7/RB.jpg",
-                  "https://i.ibb.co/rft8WfnZ/IMG-0066.jpg",
-                  "https://i.ibb.co/99GB1YL3/IMG-0079-2.jpg",
-                ].map((src, ci) => (
-                  <div key={ci} style={{ position: "relative", aspectRatio: "1", borderRadius: 8, overflow: "hidden", border: "1px solid rgba(255,143,0,0.2)", background: "#1a0f04" }}>
-                    <img src={src} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }}
-                      onError={e => { e.target.style.display = "none"; }} />
-                  </div>
-                ))}
-              </div>
+              <TripCarousel />
             </div>
           </Reveal>
         </div>
