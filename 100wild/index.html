@@ -137,8 +137,8 @@ const EXPEDITIONS_SV = [
     photo: "https://i.ibb.co/JwWGJpFL/Freediving-with-Whales-in-Timor-Leste.jpg", grad: "linear-gradient(135deg, #04101f, #0b3a5c)",
     status: "PLANERAD", window: "Nov 2026",
     tagline: "Världens mest artrika hav.",
-    frame: "De största djur som någonsin levt, gömda utanför ett av jordens minst besökta länder.",
-    desc: "Här fridyker jag längs en 3 000 meter djup undervattensvägg, öga mot öga med blåvalen, det största djur som någonsin existerat. I samma korridor simmar kaskeloten, enorma flockar av delfiner och så ligger världens rikaste rev.",
+    frame: "De största djur som någonsin levt gömmer sig utanför ett av jordens minst besökta länder.",
+    desc: "Här fridyker jag längs en 3 000 meter djup undervattensvägg, öga mot öga med blåvalen, det största djur som någonsin existerat. Korallrev, djuphav och migrationsstråk möts på samma plats. Det här är världens mest artrika hav.",
     targets: [
       { name: "Blåval", icon: "🐋", note: "Största djuret någonsin" },
       { name: "Kaskelot", icon: "🐳", note: "Största tandvalen" },
@@ -167,7 +167,7 @@ const EXPEDITIONS_EN = [
     status: "PLANNED", window: "Nov 2026",
     tagline: "The most biodiverse water on Earth.",
     frame: "The largest animals that have ever lived, hiding off one of the least-visited countries on the planet.",
-    desc: "Here I freedive along a 3,000-meter underwater wall, face to face with the blue whale, the largest animal that has ever existed. The same corridor holds sperm whales, huge pods of dolphins and the richest reef on Earth.",
+    desc: "Here I freedive along a 3,000-meter underwater wall, face to face with the blue whale, the largest animal that has ever existed. Coral reef, deep sea and migration routes meet in one place. This is the most biodiverse sea on Earth.",
     targets: [
       { name: "Blue Whale", icon: "🐋", note: "Largest animal ever" },
       { name: "Sperm Whale", icon: "🐳", note: "Largest toothed whale" },
@@ -775,7 +775,14 @@ function App() {
             <div style={{ position: "relative", aspectRatio: "21/9", background: "linear-gradient(135deg, #1a0f04, #4a2c0a)", overflow: "hidden" }}>
               <img src="https://i.ibb.co/Jw8Qz1mM/LOOKINGBACK.jpg" alt="Bardia tiger" style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }}
                 onError={e => { e.target.style.display = "none"; }} />
-              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18,10,4,0.96) 8%, rgba(18,10,4,0.3) 55%, transparent)" }} />
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18,10,4,0.98) 0%, rgba(18,10,4,0.85) 22%, rgba(18,10,4,0.35) 50%, rgba(18,10,4,0.15) 100%)" }} />
+
+              {/* photo credit */}
+              <div style={{ position: "absolute", top: 16, right: 16, display: "inline-flex", alignItems: "center", gap: 6,
+                padding: "5px 11px", borderRadius: 6, background: "rgba(0,0,0,0.45)", border: "1px solid rgba(255,255,255,0.18)",
+                fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: 1.5, color: "rgba(255,255,255,0.85)", backdropFilter: "blur(4px)" }}>
+                📷 <T sv="FOTO: REZDAR" en="PHOTO: REZDAR" />
+              </div>
 
               {/* RELEASED badge */}
               <div style={{ position: "absolute", top: 16, left: 16, display: "inline-flex", alignItems: "center", gap: 7,
@@ -786,8 +793,8 @@ function App() {
               </div>
 
               {/* title block */}
-              <div style={{ position: "absolute", bottom: 20, left: 24, right: 24 }}>
-                <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 10, letterSpacing: 3, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>EXPEDITION 01 · BARDIA, NEPAL</div>
+              <div style={{ position: "absolute", bottom: 20, left: 24, right: 24, textShadow: "0 2px 16px rgba(0,0,0,0.7)" }}>
+                <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 10, letterSpacing: 3, color: "rgba(255,255,255,.7)", marginBottom: 6 }}>EXPEDITION 01 · BARDIA, NEPAL</div>
                 <div className="glitch" style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: "clamp(48px,9vw,110px)", color: "white", letterSpacing: 2, lineHeight: 0.85 }}>TIGER ISLAND</div>
                 <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: "clamp(18px,2.6vw,30px)", color: "#ff8f00", letterSpacing: 3, marginTop: 4 }}>
                   <T sv="HÄR JAGAR TIGRAR MÄNNISKOR" en="WHERE TIGERS HUNT HUMANS" />
@@ -1133,8 +1140,8 @@ function App() {
           </div>
           <div style={{ width: 40, height: 3, background: RED, margin: "20px auto 0" }} />
           <p className="cta-desc" style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "clamp(13px,1.3vw,17px)", color: "rgba(232,228,223,.45)", marginTop: 28, lineHeight: 1.7, maxWidth: 420, margin: "28px auto 0" }}>
-            <T sv={<>Expeditionen är planerad. Publiken finns.<br/>Det enda som saknas är rätt partner.</>}
-               en={<>The expedition is planned. The audience is there.<br/>The only thing missing is the right partner.</>} />
+            <T sv={<>En titelpartner per expedition. När platsen är tagen är den tagen, och serien rullar vidare.</>}
+               en={<>One title partner per expedition. Once the slot is taken, it's taken, and the series moves on.</>} />
           </p>
         </div>
       </Section>
