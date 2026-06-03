@@ -587,6 +587,9 @@ const TRIP_SLIDES = [
   { src: "https://i.ibb.co/tPJqxdVj/SAFARRI.jpg",
     sv: "Rezdar lär sig navigera med en jeep, off-road jungle edition.",
     en: "Rezdar learning to navigate a jeep, off-road jungle edition." },
+  { src: "https://i.ibb.co/PGtwrNxx/RVRC.jpg",
+    sv: "I RevolutionRace Nordwand. Stretchig nog att slänga benen över motorcykeln, tålig nog att kasta sig ner i gräset och gruset.",
+    en: "In RevolutionRace Nordwand. Stretchy enough to swing onto the motorcycle, tough enough to throw yourself down in the grass and gravel." },
   { src: "https://i.ibb.co/1FMtJTH/SUN.jpg",
     sv: "Vid solnedgången, varje kväll förvandlas solen och blir illröd. Mystiskt!",
     en: "At sunset, every evening the sun transformed into a fiery red. Mysterious!" },
@@ -605,6 +608,9 @@ const TRIP_SLIDES = [
   { src: "https://i.ibb.co/MD7DKGWB/CAMPING.jpg",
     sv: "Contemplating... var det här en bra idé?",
     en: "Contemplating... was this a good idea?" },
+  { src: "https://i.ibb.co/jPn82dZT/RVRC-KEPS.jpg",
+    sv: "Känslan när tigern är på väg, gående rakt mot en.",
+    en: "The feeling when the tiger is on its way, walking straight toward you." },
   { src: "https://i.ibb.co/rft8WfnZ/IMG-0066.jpg",
     sv: "Tigerspår, vi är nära nu!",
     en: "Tiger tracks, we're close now!" },
@@ -612,6 +618,7 @@ const TRIP_SLIDES = [
     sv: "Krishna Shah, mannen som överlevde en tigerattack. Tigerspårare åt BBC och David Attenborough för serien \"Entangled Asia\".",
     en: "Krishna Shah, the man who survived a tiger attack. Tiger tracker for BBC and David Attenborough on the series \"Entangled Asia\"." },
 ];
+const TRIP_SLIDES_REV = [...TRIP_SLIDES].reverse();
 
 function TripCarousel() {
   const { lang } = useLang();
@@ -650,7 +657,7 @@ function TripCarousel() {
     <div onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} style={{ position: "relative" }}>
       <div ref={trackRef} onScroll={onScroll} className="trip-track" style={{ display: "flex", gap: 10, overflowX: "auto", scrollSnapType: "x mandatory",
         scrollbarWidth: "none", msOverflowStyle: "none", borderRadius: 14, WebkitOverflowScrolling: "touch" }}>
-        {TRIP_SLIDES.map((sl, idx) => (
+        {TRIP_SLIDES_REV.map((sl, idx) => (
           <div key={idx} className="trip-card" style={{ flex: "0 0 calc(50% - 5px)", scrollSnapAlign: "start" }}>
             <div style={{ position: "relative", aspectRatio: "4/5", borderRadius: 12, overflow: "hidden",
               border: "1px solid rgba(255,143,0,0.22)", background: "#1a0f04" }}>
@@ -674,7 +681,7 @@ function TripCarousel() {
 
       {/* dots */}
       <div style={{ display: "flex", justifyContent: "center", gap: 7, marginTop: 14, flexWrap: "wrap" }}>
-        {TRIP_SLIDES.map((_, idx) => (
+        {TRIP_SLIDES_REV.map((_, idx) => (
           <button key={idx} onClick={() => { setI(idx); scrollTo(idx); }} aria-label={`Go to ${idx + 1}`}
             style={{ width: idx === i ? 22 : 8, height: 8, borderRadius: 4, border: "none", cursor: "pointer", padding: 0,
               background: idx === i ? "#ff8f00" : "rgba(255,255,255,0.25)", transition: "all 0.3s ease" }} />
@@ -782,14 +789,6 @@ function App() {
                 padding: "5px 11px", borderRadius: 6, background: "rgba(0,0,0,0.45)", border: "1px solid rgba(255,255,255,0.18)",
                 fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: 1.5, color: "rgba(255,255,255,0.85)", backdropFilter: "blur(4px)" }}>
                 📷 <T sv="FOTO: REZDAR" en="PHOTO: REZDAR" />
-              </div>
-
-              {/* RELEASED badge */}
-              <div style={{ position: "absolute", top: 16, left: 16, display: "inline-flex", alignItems: "center", gap: 7,
-                padding: "6px 13px", borderRadius: 6, background: "rgba(255,143,0,0.18)", border: "1px solid rgba(255,143,0,0.5)",
-                fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: 2, color: "#ffb74d" }}>
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#4caf50", boxShadow: "0 0 8px #4caf50" }} />
-                <T sv="KLAR · PREMIÄR SNART" en="COMPLETE · PREMIERES SOON" />
               </div>
 
               {/* title block */}
