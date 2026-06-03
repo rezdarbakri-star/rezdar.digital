@@ -581,24 +581,33 @@ function LangToggle({ lang, setLang }) {
    TRIP CAROUSEL
    ═══════════════════════════════════════════════════════════════ */
 const TRIP_SLIDES = [
+  { src: "https://i.ibb.co/Jw8Qz1mM/LOOKINGBACK.jpg",
+    sv: "Drömmen är uppfylld, tigern är nu en del av kollektionen!",
+    en: "The dream is fulfilled, the tiger is now part of the collection!" },
   { src: "https://i.ibb.co/Fqg3v4hm/RB2.jpg",
     sv: "Firar med Red Bulls lokala limited edition-smak Blueberry Blackcurrant efter en framgångsrik trek genom Bardias olika biomer och ett tigermöte.",
     en: "Celebrating with Red Bull's local limited edition flavour Blueberry Blackcurrant after a successful trek through Bardia's biomes and a tiger encounter." },
-  { src: "https://i.ibb.co/tPJqxdVj/SAFARRI.jpg",
-    sv: "Rezdar lär sig navigera med en jeep, off-road jungle edition.",
-    en: "Rezdar learning to navigate a jeep, off-road jungle edition." },
   { src: "https://i.ibb.co/PGtwrNxx/RVRC.jpg",
     sv: "I RevolutionRace Nordwand. Stretchig nog att slänga benen över motorcykeln, tålig nog att kasta sig ner i gräset och gruset.",
     en: "In RevolutionRace Nordwand. Stretchy enough to swing onto the motorcycle, tough enough to throw yourself down in the grass and gravel." },
+  { src: "https://i.ibb.co/tPJqxdVj/SAFARRI.jpg",
+    sv: "Rezdar lär sig navigera med en jeep, off-road jungle edition.",
+    en: "Rezdar learning to navigate a jeep, off-road jungle edition." },
   { src: "https://i.ibb.co/1FMtJTH/SUN.jpg",
     sv: "Vid solnedgången, varje kväll förvandlas solen och blir illröd. Mystiskt!",
     en: "At sunset, every evening the sun transformed into a fiery red. Mysterious!" },
+  { src: "https://i.ibb.co/k6Bg5m32/WALK.jpg",
+    sv: "Trekking genom vildmarken. Närsomhelst kan vad som helst hända...",
+    en: "Trekking through the wilderness. At any moment, anything can happen..." },
   { src: "https://i.ibb.co/3m6PrTx7/TIGERSIGN.jpg",
     sv: "Tigern är den ensamma härskaren här.",
     en: "The tiger is the lone ruler here." },
   { src: "https://i.ibb.co/1YG0Dyns/TREEHOUSE.jpg",
     sv: "Overnight in a treehouse, vi fångade en tigerjakt på natten. Håll utkik!",
     en: "Overnight in a treehouse, we caught a tiger hunt at night. Stay tuned!" },
+  { src: "https://i.ibb.co/Y7hCN0nM/O-GAMOTO-GAV2.jpg",
+    sv: "Öga mot öga mot en tiger i det vilda, inget slår känslan.",
+    en: "Eye to eye with a tiger in the wild, nothing beats that feeling." },
   { src: "https://i.ibb.co/HLS0Z2DF/CROCODILESIGN.jpg",
     sv: "Äkta vildmark med Mugger-krokodiler som lurar i vattnet. Det gäller att vara på sin vakt!",
     en: "Real wilderness with mugger crocodiles lurking in the water. You have to stay alert!" },
@@ -618,7 +627,7 @@ const TRIP_SLIDES = [
     sv: "Krishna Shah, mannen som överlevde en tigerattack. Tigerspårare åt BBC och David Attenborough för serien \"Entangled Asia\".",
     en: "Krishna Shah, the man who survived a tiger attack. Tiger tracker for BBC and David Attenborough on the series \"Entangled Asia\"." },
 ];
-const TRIP_SLIDES_REV = [...TRIP_SLIDES].reverse();
+const TRIP_SLIDES_REV = TRIP_SLIDES;
 
 function TripCarousel() {
   const { lang } = useLang();
@@ -1139,8 +1148,8 @@ function App() {
           </div>
           <div style={{ width: 40, height: 3, background: RED, margin: "20px auto 0" }} />
           <p className="cta-desc" style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "clamp(13px,1.3vw,17px)", color: "rgba(232,228,223,.45)", marginTop: 28, lineHeight: 1.7, maxWidth: 420, margin: "28px auto 0" }}>
-            <T sv={<>En titelpartner per expedition. När platsen är tagen är den tagen, och serien rullar vidare.</>}
-               en={<>One title partner per expedition. Once the slot is taken, it's taken, and the series moves on.</>} />
+            <T sv={<>En titelpartner per expedition. Var med och bygg upplevelser tittarna aldrig glömmer.</>}
+               en={<>One title partner per expedition. Help build experiences viewers never forget.</>} />
           </p>
         </div>
       </Section>
