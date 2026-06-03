@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>100 WILD — Rezdar × Red Bull × RevolutionRace</title>
+<title>100WILD — Expeditionsserie</title>
 <meta name="description" content="100 WILD — En expeditionsserie genom världens mest extrema miljöer. Pokémon möter Bear Grylls.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>">
 <style>body{margin:0;background:#0a0a0a}</style>
@@ -38,6 +38,7 @@ const BIOME_THEMES = {
   arctic:  { bg: "#060d14", accent: "#7ec8e3", particle: "#c8e6f0", glow: "rgba(126,200,227,0.06)" },
   amazon:  { bg: "#050e06", accent: "#4caf50", particle: "#81c784", glow: "rgba(76,175,80,0.06)" },
   savanna: { bg: "#0e0904", accent: "#ff9800", particle: "#ffb74d", glow: "rgba(255,152,0,0.06)" },
+  tiger:   { bg: "#120a04", accent: "#ff8f00", particle: "#ffb74d", glow: "rgba(255,143,0,0.08)" },
   ocean:   { bg: "#040a14", accent: "#039be5", particle: "#4fc3f7", glow: "rgba(3,155,229,0.06)" },
   skills:  { bg: "#0a0a0a", accent: RED, particle: "#ff4444", glow: "rgba(227,0,15,0.06)" },
   species: { bg: "#0a0a0a", accent: "#f59e0b", particle: "#fbbf24", glow: "rgba(245,158,11,0.05)" },
@@ -118,6 +119,64 @@ const BIOMES_SHOWCASE_EN = [
     ]},
 ];
 
+const EXPEDITIONS_SV = [
+  { id: "pantanal", name: "PANTANAL", themeId: "amazon", color: "#4caf50", icon: "🐆",
+    photo: "images/amazon.jpg", grad: "linear-gradient(135deg, #0a1e0a, #2e5e2e)",
+    status: "NÄSTA EXPEDITION", window: "Sep 2026",
+    tagline: "Världens största våtmark.",
+    frame: "Den tätaste rovdjurskoncentrationen på jorden, där land och vatten flyter ihop till en enda värld.",
+    desc: "Världens största våtmark, hem till jordens tätaste population av jaguarer. Jag tar mig in på vatten, till häst och till fots, sover i vildmarken och navigerar den med Pantanals cowboys.",
+    targets: [
+      { name: "Jaguar", icon: "🐆", note: "Tätaste populationen" },
+      { name: "Caiman", icon: "🐊", note: "Miljontals" },
+      { name: "Tapir", icon: "🐗", note: "Största landdjuret" },
+      { name: "Anakonda", icon: "🐍", note: "Tyngsta ormen" },
+    ],
+    cost: "90 000 kr", slots: 2 },
+  { id: "timor", name: "TIMOR-LESTE", themeId: "ocean", color: "#039be5", icon: "🐋",
+    photo: "images/ocean.jpg", grad: "linear-gradient(135deg, #04101f, #0b3a5c)",
+    status: "PLANERAD", window: "Nov 2026",
+    tagline: "Världens mest artrika hav.",
+    frame: "De största djur som någonsin levt, gömda utanför ett av jordens minst besökta länder.",
+    desc: "Längs en 3 000 meter djup undervattensvägg simmar blåvalen, det största djur som någonsin existerat, genom det mest artrika vattnet på planeten. Här finns också spermvalen, enorma flockar av delfiner och världens rikaste rev, allt i samma korridor.",
+    targets: [
+      { name: "Blåval", icon: "🐋", note: "Största djuret någonsin" },
+      { name: "Spermval", icon: "🐳", note: "Största rovdjuret" },
+      { name: "Delfiner", icon: "🐬", note: "Enorma flockar" },
+      { name: "Saltvattenkrokodil", icon: "🐊", note: "Helig, fridlyst" },
+    ],
+    cost: "90 000 kr", slots: 2 },
+];
+
+const EXPEDITIONS_EN = [
+  { id: "pantanal", name: "PANTANAL", themeId: "amazon", color: "#4caf50", icon: "🐆",
+    photo: "images/amazon.jpg", grad: "linear-gradient(135deg, #0a1e0a, #2e5e2e)",
+    status: "NEXT EXPEDITION", window: "Sep 2026",
+    tagline: "The world's largest wetland.",
+    frame: "The densest concentration of predators on Earth, where land and water blur into a single world.",
+    desc: "The world's largest wetland, home to the densest jaguar population on the planet. I move through it by water, on horseback and on foot, sleep in the wild and navigate it with the cowboys of the Pantanal.",
+    targets: [
+      { name: "Jaguar", icon: "🐆", note: "Densest population" },
+      { name: "Caiman", icon: "🐊", note: "Millions" },
+      { name: "Tapir", icon: "🐗", note: "Largest land animal" },
+      { name: "Anaconda", icon: "🐍", note: "Heaviest snake" },
+    ],
+    cost: "90,000 kr", slots: 2 },
+  { id: "timor", name: "TIMOR-LESTE", themeId: "ocean", color: "#039be5", icon: "🐋",
+    photo: "images/ocean.jpg", grad: "linear-gradient(135deg, #04101f, #0b3a5c)",
+    status: "PLANNED", window: "Nov 2026",
+    tagline: "The most biodiverse water on Earth.",
+    frame: "The largest animals that have ever lived, hiding off one of the least-visited countries on the planet.",
+    desc: "Along a 3,000-meter underwater wall, the blue whale, the largest animal that has ever existed, migrates through the most biodiverse water on the planet. Sperm whales, huge pods of dolphins and the richest reef on Earth, all in one corridor.",
+    targets: [
+      { name: "Blue Whale", icon: "🐋", note: "Largest animal ever" },
+      { name: "Sperm Whale", icon: "🐳", note: "Largest predator" },
+      { name: "Dolphins", icon: "🐬", note: "Huge pods" },
+      { name: "Saltwater Croc", icon: "🐊", note: "Sacred, protected" },
+    ],
+    cost: "90,000 kr", slots: 2 },
+];
+
 const SKILL_CATEGORIES_SV = [
   { name: "VATTEN", icon: "🌊", color: "#039be5", skills: [
     { name: "Dykning", icon: "🤿", active: true }, { name: "Kajak", icon: "🛶", active: true },
@@ -171,31 +230,31 @@ const RARITY = {
 };
 
 const BRANDS_SV = [
-  { name: "RED BULL", color: "#e3000f", tagline: "GIVES YOU WINGS", status: "locked",
+  { name: "RED BULL", color: "#e3000f", tagline: "PARTNER", status: "active",
     points: [
-      "Varje avsnitt är en fysisk och mental utmaning — en naturlig matchning",
+      "Partner i 100WILD-serien, inklusive Bardia (tiger, Nepal)",
       "Integration i camp-setups, expeditionsstarter och recovery-moment",
       "Multi-platform: YouTube-avsnitt, TikTok-klipp, Instagram behind-the-scenes",
     ]},
-  { name: "REVOLUTIONRACE", color: "#4caf50", tagline: "GEAR THAT SURVIVES THE WILD", status: "locked",
+  { name: "REVOLUTIONRACE", color: "#4caf50", tagline: "PARTNER", status: "active",
     points: [
       "Produkten syns i varje bildruta — inte som reklam, utan som utrustning som används",
-      "Arktis, Amazonas, Sahara — kläder som testas i verkliga förhållanden",
+      "Flermånaders samarbete, kläder testade i verkliga förhållanden",
       "\"Vad hade Rezdar på sig?\"-content som driver köpintention",
     ]},
 ];
 
 const BRANDS_EN = [
-  { name: "RED BULL", color: "#e3000f", tagline: "GIVES YOU WINGS", status: "locked",
+  { name: "RED BULL", color: "#e3000f", tagline: "PARTNER", status: "active",
     points: [
-      "Every episode is a physical and mental challenge — a natural match",
+      "Partner in the 100WILD series, including Bardia (tiger, Nepal)",
       "Integration in camp setups, expedition starts and recovery moments",
       "Multi-platform: YouTube episodes, TikTok clips, Instagram behind-the-scenes",
     ]},
-  { name: "REVOLUTIONRACE", color: "#4caf50", tagline: "GEAR THAT SURVIVES THE WILD", status: "locked",
+  { name: "REVOLUTIONRACE", color: "#4caf50", tagline: "PARTNER", status: "active",
     points: [
       "The product is visible in every frame — not as advertising, but as gear being used",
-      "Arctic, Amazon, Sahara — clothing tested in real conditions",
+      "A multi-month collaboration, clothing tested in real conditions",
       "\"What was Rezdar wearing?\" content that drives purchase intent",
     ]},
 ];
@@ -285,6 +344,7 @@ const styles = `
     .biome-grid{grid-template-columns:1fr!important}
     .brand-grid{grid-template-columns:1fr!important}
     .catch-row{grid-template-columns:1fr!important}
+    .collage-grid{grid-template-columns:repeat(3,1fr)!important}
     .skill-grid{grid-template-columns:1fr!important}
     .stats-row{flex-wrap:wrap!important;gap:30px!important}
     .sponsor-grid{grid-template-columns:1fr!important}
@@ -527,6 +587,7 @@ function App() {
   const SKILL_CATEGORIES = lang === "en" ? SKILL_CATEGORIES_EN : SKILL_CATEGORIES_SV;
   const CATCH_DEMO = lang === "en" ? CATCH_DEMO_EN : CATCH_DEMO_SV;
   const BRANDS = lang === "en" ? BRANDS_EN : BRANDS_SV;
+  const EXPEDITIONS = lang === "en" ? EXPEDITIONS_EN : EXPEDITIONS_SV;
   const EXPEDITION_PHOTOS = lang === "en" ? EXPEDITION_PHOTOS_EN : EXPEDITION_PHOTOS_SV;
 
   const caughtTotal = BIOMES_SHOWCASE.reduce((a, b) => a + b.creatures.filter(c => c.caught).length, 0);
@@ -568,7 +629,7 @@ function App() {
         <Atmosphere themeId="hero" />
         <div style={{ textAlign: "center", position: "relative", zIndex: 2, padding: "40px 24px", maxWidth: 900 }}>
           <div className="hero-collab" style={{ fontFamily: "'Space Mono',monospace", fontSize: "clamp(9px,1.1vw,12px)", letterSpacing: 7, color: RED, marginBottom: 24, opacity: 0, animation: "fadeUp .8s ease .3s forwards" }}>
-            RED BULL × REVOLUTIONRACE × REZDAR
+            <T sv="EXPEDITIONSSERIE" en="EXPEDITION SERIES" />
             <div style={{ width: 40, height: 2, background: RED, margin: "14px auto 0" }} />
           </div>
           <div style={{ fontFamily: "'Bebas Neue',sans-serif", lineHeight: .85, opacity: 0, animation: "fadeUp 1s ease .6s forwards" }}>
@@ -591,6 +652,164 @@ function App() {
           </div>
         </div>
       </section>
+
+      {/* ═══ 1.4 HIGHLIGHT — BARDIA (KLAR) ═══ */}
+      <Section themeId="tiger">
+        <div style={{ maxWidth: 1000, margin: "0 auto" }}>
+          <Tag color="#ff8f00"><T sv="SENASTE AVSNITTET" en="LATEST EPISODE" /></Tag>
+          <Reveal style={{
+            position: "relative", marginTop: 24, borderRadius: 20, overflow: "hidden",
+            border: "1.5px solid rgba(255,143,0,0.35)", boxShadow: "0 0 60px rgba(255,143,0,0.12), inset 0 1px 0 rgba(255,143,0,0.2)",
+            background: "linear-gradient(135deg, #1a0f04, #2e1a08)",
+          }}>
+            {/* photo / hero band */}
+            <div style={{ position: "relative", aspectRatio: "21/9", background: "linear-gradient(135deg, #1a0f04, #4a2c0a)", overflow: "hidden" }}>
+              <img src="https://i.ibb.co/Jw8Qz1mM/LOOKINGBACK.jpg" alt="Bardia tiger" style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }}
+                onError={e => { e.target.style.display = "none"; }} />
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18,10,4,0.96) 8%, rgba(18,10,4,0.3) 55%, transparent)" }} />
+
+              {/* RELEASED badge */}
+              <div style={{ position: "absolute", top: 16, left: 16, display: "inline-flex", alignItems: "center", gap: 7,
+                padding: "6px 13px", borderRadius: 6, background: "rgba(255,143,0,0.18)", border: "1px solid rgba(255,143,0,0.5)",
+                fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: 2, color: "#ffb74d" }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#4caf50", boxShadow: "0 0 8px #4caf50" }} />
+                <T sv="KLAR · PREMIÄR SNART" en="COMPLETE · PREMIERES SOON" />
+              </div>
+
+              {/* title block */}
+              <div style={{ position: "absolute", bottom: 20, left: 24, right: 24 }}>
+                <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 10, letterSpacing: 3, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>EXPEDITION 01 · BARDIA, NEPAL</div>
+                <div className="glitch" style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: "clamp(48px,9vw,110px)", color: "white", letterSpacing: 2, lineHeight: 0.85 }}>TIGER ISLAND</div>
+                <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: "clamp(18px,2.6vw,30px)", color: "#ff8f00", letterSpacing: 3, marginTop: 4 }}>
+                  <T sv="HÄR JAGAR TIGRAR MÄNNISKOR" en="WHERE TIGERS HUNT HUMANS" />
+                </div>
+              </div>
+            </div>
+
+            {/* body */}
+            <div style={{ padding: "24px 28px 28px" }}>
+              <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 15, color: "rgba(255,255,255,.55)", lineHeight: 1.75, marginBottom: 22, maxWidth: 640 }}>
+                <T sv="Ett folk lever på vildmarkens villkor, sida vid sida med bengaliska tigern, planetens ensamma härskare. Filmat solo i djungeln, från byn till mötet ansikte mot ansikte."
+                   en="A people living on the wilderness's terms, side by side with the Bengal tiger, the planet's lone ruler. Filmed solo in the jungle, from the village to the face-to-face encounter." />
+              </p>
+
+              {/* target species row */}
+              <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: 3, color: "rgba(255,255,255,.25)", marginBottom: 10 }}>
+                <T sv="FÅNGADE ARTER" en="SPECIES CAPTURED" />
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }} className="brand-grid">
+                {[
+                  { name: "Bengalisk tiger", en: "Bengal Tiger", icon: "🐅", note: { sv: "Ensamma härskaren", en: "The lone ruler" } },
+                  { name: "Gharial", en: "Gharial", icon: "🐊", note: { sv: "Förhistorisk krokodil", en: "Prehistoric croc" } },
+                  { name: "Leopard", en: "Leopard", icon: "🐆", note: { sv: "Spårad i mörkret", en: "Tracked at night" } },
+                  { name: "Noshörning", en: "Rhino", icon: "🦏", note: { sv: "Enhornad", en: "One-horned" } },
+                ].map((t, ti) => (
+                  <div key={ti} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 8,
+                    background: "rgba(255,143,0,0.08)", border: "1px solid rgba(255,143,0,0.2)" }}>
+                    <span style={{ fontSize: 18 }}>{t.icon}</span>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 14, letterSpacing: 1, color: "rgba(255,255,255,.85)", lineHeight: 1 }}><T sv={t.name} en={t.en} /></div>
+                      <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 7, letterSpacing: 1, color: "rgba(255,255,255,.3)", marginTop: 2 }}><T sv={t.note.sv} en={t.note.en} /></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* photo collage from the trip */}
+              <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: 3, color: "rgba(255,255,255,.25)", margin: "22px 0 10px" }}>
+                <T sv="FRÅN RESAN" en="FROM THE TRIP" />
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 6 }} className="collage-grid">
+                {[
+                  "https://i.ibb.co/Fqg3v4hm/RB2.jpg",
+                  "https://i.ibb.co/tPJqxdVj/SAFARRI.jpg",
+                  "https://i.ibb.co/1FMtJTH/SUN.jpg",
+                  "https://i.ibb.co/HLS0Z2DF/CROCODILESIGN.jpg",
+                  "https://i.ibb.co/3m6PrTx7/TIGERSIGN.jpg",
+                  "https://i.ibb.co/1YG0Dyns/TREEHOUSE.jpg",
+                  "https://i.ibb.co/MD7DKGWB/CAMPING.jpg",
+                  "https://i.ibb.co/PGyLKRm7/RB.jpg",
+                  "https://i.ibb.co/rft8WfnZ/IMG-0066.jpg",
+                  "https://i.ibb.co/99GB1YL3/IMG-0079-2.jpg",
+                ].map((src, ci) => (
+                  <div key={ci} style={{ position: "relative", aspectRatio: "1", borderRadius: 8, overflow: "hidden", border: "1px solid rgba(255,143,0,0.2)", background: "#1a0f04" }}>
+                    <img src={src} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }}
+                      onError={e => { e.target.style.display = "none"; }} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </Section>
+
+      {/* ═══ 1.5 KOMMANDE AVSNITT ═══ */}
+      <Section themeId="ocean">
+        <div style={{ maxWidth: 1000, margin: "0 auto" }}>
+          <Tag color="#039be5"><T sv="KOMMANDE AVSNITT" en="COMING EPISODES" /></Tag>
+          <div style={{ textAlign: "center", marginBottom: 50 }}>
+            <div className="glitch" style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: "clamp(40px,8vw,90px)", color: "white", letterSpacing: 3, lineHeight: 0.9 }}>
+              <T sv="KOMMANDE AVSNITT" en="COMING EPISODES" />
+            </div>
+            <p style={{ fontSize: "clamp(13px,1.2vw,16px)", color: "rgba(255,255,255,.4)", marginTop: 16, maxWidth: 560, margin: "16px auto 0", lineHeight: 1.7 }}>
+              <T sv="Nästa expeditioner i serien är planerade och redo att filmas."
+                 en="The next expeditions in the series are planned and ready to film." />
+            </p>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }} className="brand-grid">
+            {EXPEDITIONS.map((ex, ei) => (
+              <Reveal key={ex.id + lang} delay={ei * 0.12} style={{
+                background: "#0a0c10", borderRadius: 16, overflow: "hidden",
+                border: `1.5px solid ${ex.color}30`, boxShadow: `0 0 40px ${ex.color}10, inset 0 1px 0 ${ex.color}15`,
+              }}>
+                {/* Photo header */}
+                <div style={{ position: "relative", aspectRatio: "16/9", background: ex.grad, overflow: "hidden" }}>
+                  <img src={ex.photo} alt={ex.name} style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }}
+                    onError={e => { e.target.style.display = "none"; }} />
+                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(8,10,14,0.95) 5%, transparent 60%)" }} />
+                  <div style={{ position: "absolute", top: 14, left: 14, display: "inline-flex", alignItems: "center", gap: 6,
+                    padding: "5px 11px", borderRadius: 6, background: `${ex.color}18`, border: `1px solid ${ex.color}45`,
+                    fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: 2, color: ex.color, animation: "badgePulse 3s ease infinite" }}>
+                    <span style={{ width: 5, height: 5, borderRadius: "50%", background: ex.color, boxShadow: `0 0 6px ${ex.color}` }} />
+                    {ex.status}
+                  </div>
+                  <div style={{ position: "absolute", top: 14, right: 14, fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: 2, color: "rgba(255,255,255,.7)" }}>{ex.window}</div>
+                  <div style={{ position: "absolute", bottom: 12, left: 16, right: 16, display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+                    <div>
+                      <div className="glitch" style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: "clamp(28px,4vw,44px)", color: "white", letterSpacing: 2, lineHeight: 1 }}>{ex.name}</div>
+                      <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: "clamp(14px,1.8vw,20px)", color: ex.color, letterSpacing: 2 }}>{ex.tagline}</div>
+                    </div>
+                    <span style={{ fontSize: 34, opacity: 0.9 }}>{ex.icon}</span>
+                  </div>
+                </div>
+
+                {/* Body */}
+                <div style={{ padding: "20px 22px 24px" }}>
+                  <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 14, color: ex.color, lineHeight: 1.6, fontWeight: 500, marginBottom: 12, fontStyle: "italic" }}>{ex.frame}</p>
+                  <p style={{ fontSize: 13, color: "rgba(255,255,255,.42)", lineHeight: 1.75, marginBottom: 18 }}>{ex.desc}</p>
+
+                  <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: 3, color: "rgba(255,255,255,.25)", marginBottom: 10 }}>
+                    <T sv="MÅLARTER" en="TARGET SPECIES" />
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 20 }}>
+                    {ex.targets.map((t, ti) => (
+                      <div key={ti} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 8,
+                        background: `${ex.color}0c`, border: `1px solid ${ex.color}1e` }}>
+                        <span style={{ fontSize: 18 }}>{t.icon}</span>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 14, letterSpacing: 1, color: "rgba(255,255,255,.85)", lineHeight: 1 }}>{t.name}</div>
+                          <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 7, letterSpacing: 1, color: "rgba(255,255,255,.3)", marginTop: 2 }}>{t.note}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </Section>
 
       {/* ═══ 2. MILJÖERNA — BIOME SHOWCASE ═══ */}
       {BIOMES_SHOWCASE.map((biome, i) => {
@@ -765,18 +984,18 @@ function App() {
       {/* ═══ 7. BRAND FIT ═══ */}
       <Section themeId="brand">
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <Tag>PARTNERSHIP</Tag>
+          <Tag><T sv="PARTNERS" en="PARTNERS" /></Tag>
           <div style={{ textAlign: "center", marginBottom: 50 }}>
-            <div className="glitch" style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: "clamp(40px,8vw,90px)", color: "white", letterSpacing: 3, lineHeight: 0.9 }}>BRAND FIT</div>
+            <div className="glitch" style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: "clamp(40px,8vw,90px)", color: "white", letterSpacing: 3, lineHeight: 0.9 }}><T sv="PARTNERS" en="PARTNERS" /></div>
             <p style={{ fontSize: "clamp(13px,1.2vw,16px)", color: "rgba(255,255,255,.35)", marginTop: 16, maxWidth: 500, margin: "16px auto 0", lineHeight: 1.7 }}>
-              <T sv="Det är en äventyrsserie där varumärken syns i rätt kontext — naturligt, trovärdigt, i verkligheten."
-                 en="An adventure series where brands appear in the right context — naturally, credibly, in the real world." />
+              <T sv="Stora varumärken är med och sponsrar serien. Produkten syns i rätt kontext — naturligt, trovärdigt, i verkligheten."
+                 en="Major brands are partnering on the series. The product appears in the right context — naturally, credibly, in the real world." />
             </p>
           </div>
 
-          {/* Locked-in brands */}
+          {/* Partner brands */}
           <div className="brand-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
-            {BRANDS.filter(b => b.status === "locked").map((b, bi) => (
+            {BRANDS.filter(b => b.status === "active").map((b, bi) => (
               <Reveal key={b.name} delay={bi * 0.12} style={{
                 background: "#0c0c12", borderRadius: 14, padding: "28px 24px", position: "relative", overflow: "hidden",
                 border: `1.5px solid ${b.color}30`,
@@ -794,7 +1013,7 @@ function App() {
                   boxShadow: `0 0 12px ${b.color}20`,
                 }}>
                   <svg viewBox="0 0 24 24" width="10" height="10" fill={b.color}><path d="M12 1l3.09 6.26L22 8.27l-5 4.87 1.18 6.88L12 16.77l-6.18 3.25L7 13.14 2 8.27l6.91-1.01L12 1z"/></svg>
-                  <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: 2, color: b.color, fontWeight: 700 }}>LOCKED IN</span>
+                  <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: 2, color: b.color, fontWeight: 700 }}><T sv="PARTNER" en="PARTNER" /></span>
                 </div>
 
                 <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: "clamp(32px,5vw,48px)", color: b.color, letterSpacing: 3 }}>{b.name}</div>
@@ -831,7 +1050,7 @@ function App() {
 
       {/* Footer */}
       <div style={{ padding: "20px clamp(16px,4vw,40px)", background: DARK, borderTop: "1px solid rgba(255,255,255,.03)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 12, letterSpacing: 3, color: RED, opacity: .5 }}>RED BULL × RVRC</span>
+        <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 12, letterSpacing: 3, color: RED, opacity: .5 }}>100WILD</span>
         <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: 2, color: "rgba(255,255,255,.15)" }}>100 WILD · 2026</span>
       </div>
     </div>
