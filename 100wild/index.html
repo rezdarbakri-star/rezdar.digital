@@ -138,10 +138,10 @@ const EXPEDITIONS_SV = [
     status: "PLANERAD", window: "Nov 2026",
     tagline: "Världens mest artrika hav.",
     frame: "De största djur som någonsin levt, gömda utanför ett av jordens minst besökta länder.",
-    desc: "Längs en 3 000 meter djup undervattensvägg simmar blåvalen, det största djur som någonsin existerat, genom det mest artrika vattnet på planeten. Här finns också spermvalen, enorma flockar av delfiner och världens rikaste rev, allt i samma korridor.",
+    desc: "Här fridyker jag längs en 3 000 meter djup undervattensvägg, öga mot öga med blåvalen, det största djur som någonsin existerat. I samma korridor simmar kaskeloten, enorma flockar av delfiner och så ligger världens rikaste rev.",
     targets: [
       { name: "Blåval", icon: "🐋", note: "Största djuret någonsin" },
-      { name: "Spermval", icon: "🐳", note: "Största rovdjuret" },
+      { name: "Kaskelot", icon: "🐳", note: "Största tandvalen" },
       { name: "Delfiner", icon: "🐬", note: "Enorma flockar" },
       { name: "Saltvattenkrokodil", icon: "🐊", note: "Helig, fridlyst" },
     ],
@@ -167,10 +167,10 @@ const EXPEDITIONS_EN = [
     status: "PLANNED", window: "Nov 2026",
     tagline: "The most biodiverse water on Earth.",
     frame: "The largest animals that have ever lived, hiding off one of the least-visited countries on the planet.",
-    desc: "Along a 3,000-meter underwater wall, the blue whale, the largest animal that has ever existed, migrates through the most biodiverse water on the planet. Sperm whales, huge pods of dolphins and the richest reef on Earth, all in one corridor.",
+    desc: "Here I freedive along a 3,000-meter underwater wall, face to face with the blue whale, the largest animal that has ever existed. The same corridor holds sperm whales, huge pods of dolphins and the richest reef on Earth.",
     targets: [
       { name: "Blue Whale", icon: "🐋", note: "Largest animal ever" },
-      { name: "Sperm Whale", icon: "🐳", note: "Largest predator" },
+      { name: "Sperm Whale", icon: "🐳", note: "Largest toothed whale" },
       { name: "Dolphins", icon: "🐬", note: "Huge pods" },
       { name: "Saltwater Croc", icon: "🐊", note: "Sacred, protected" },
     ],
@@ -345,6 +345,7 @@ const styles = `
     .brand-grid{grid-template-columns:1fr!important}
     .catch-row{grid-template-columns:1fr!important}
     .collage-grid{grid-template-columns:repeat(3,1fr)!important}
+    .trip-card{flex:0 0 calc(78% - 16px)!important}
     .skill-grid{grid-template-columns:1fr!important}
     .stats-row{flex-wrap:wrap!important;gap:30px!important}
     .sponsor-grid{grid-template-columns:1fr!important}
@@ -354,6 +355,7 @@ const styles = `
     section p{text-wrap:balance;overflow-wrap:break-word;word-break:break-word}
     .glitch{word-break:break-word;overflow-wrap:break-word}
   }
+  .trip-track::-webkit-scrollbar{display:none}
 `;
 
 /* ═══════════════════════════════════════════════════════════════
@@ -586,7 +588,7 @@ const TRIP_SLIDES = [
     sv: "Rezdar lär sig navigera med en jeep, off-road jungle edition.",
     en: "Rezdar learning to navigate a jeep, off-road jungle edition." },
   { src: "https://i.ibb.co/1FMtJTH/SUN.jpg",
-    sv: "Vid solnedgången, varje kväll förvandlades solen och blev illröd. Mystiskt!",
+    sv: "Vid solnedgången, varje kväll förvandlas solen och blir illröd. Mystiskt!",
     en: "At sunset, every evening the sun transformed into a fiery red. Mysterious!" },
   { src: "https://i.ibb.co/3m6PrTx7/TIGERSIGN.jpg",
     sv: "Tigern är den ensamma härskaren här.",
@@ -615,47 +617,65 @@ function TripCarousel() {
   const { lang } = useLang();
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
+  const trackRef = useRef(null);
   const n = TRIP_SLIDES.length;
-  const go = (d) => setI((p) => (p + d + n) % n);
-  const goto = (idx) => setI(idx);
+
+  const scrollTo = (idx) => {
+    const track = trackRef.current;
+    if (!track) return;
+    const card = track.children[idx];
+    if (card) track.scrollTo({ left: card.offsetLeft - track.offsetLeft, behavior: "smooth" });
+  };
+  const go = (d) => { const next = (i + d + n) % n; setI(next); scrollTo(next); };
 
   useEffect(() => {
     if (paused) return;
-    const t = setInterval(() => setI((p) => (p + 1) % n), 4500);
+    const t = setInterval(() => { setI((p) => { const nx = (p + 1) % n; scrollTo(nx); return nx; }); }, 4500);
     return () => clearInterval(t);
   }, [paused, n]);
 
-  const s = TRIP_SLIDES[i];
+  // keep dots in sync when user scrolls/swipes manually
+  const onScroll = () => {
+    const track = trackRef.current;
+    if (!track) return;
+    let closest = 0, min = Infinity;
+    for (let k = 0; k < track.children.length; k++) {
+      const d = Math.abs(track.children[k].offsetLeft - track.offsetLeft - track.scrollLeft);
+      if (d < min) { min = d; closest = k; }
+    }
+    if (closest !== i) setI(closest);
+  };
+
   return (
-    <div onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
-      <div style={{ position: "relative", borderRadius: 14, overflow: "hidden", border: "1px solid rgba(255,143,0,0.25)", background: "#120a04", aspectRatio: "16/10" }}>
+    <div onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} style={{ position: "relative" }}>
+      <div ref={trackRef} onScroll={onScroll} className="trip-track" style={{ display: "flex", gap: 10, overflowX: "auto", scrollSnapType: "x mandatory",
+        scrollbarWidth: "none", msOverflowStyle: "none", borderRadius: 14, WebkitOverflowScrolling: "touch" }}>
         {TRIP_SLIDES.map((sl, idx) => (
-          <img key={idx} src={sl.src} alt="" loading={idx === 0 ? "eager" : "lazy"}
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover",
-              opacity: idx === i ? 1 : 0, transition: "opacity 0.6s ease" }}
-            onError={e => { e.target.style.display = "none"; }} />
+          <div key={idx} className="trip-card" style={{ flex: "0 0 calc(50% - 5px)", scrollSnapAlign: "start" }}>
+            <div style={{ position: "relative", aspectRatio: "4/5", borderRadius: 12, overflow: "hidden",
+              border: "1px solid rgba(255,143,0,0.22)", background: "#1a0f04" }}>
+              <img src={sl.src} alt="" loading={idx < 2 ? "eager" : "lazy"}
+                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+                onError={e => { e.target.style.display = "none"; }} />
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18,10,4,0.95) 0%, transparent 50%)", pointerEvents: "none" }} />
+              <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "14px 14px 13px" }}>
+                <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "clamp(11px,1.05vw,13px)", color: "rgba(255,255,255,.93)", lineHeight: 1.5, margin: 0, textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
+                  {lang === "en" ? sl.en : sl.sv}
+                </p>
+              </div>
+            </div>
+          </div>
         ))}
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18,10,4,0.92) 0%, transparent 45%)", pointerEvents: "none" }} />
-
-        {/* caption */}
-        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "18px 20px 16px" }}>
-          <p key={i} style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "clamp(13px,1.4vw,15px)", color: "rgba(255,255,255,.92)", lineHeight: 1.6, margin: 0, textShadow: "0 1px 8px rgba(0,0,0,0.5)", animation: "fadeUp 0.5s ease" }}>
-            {lang === "en" ? s.en : s.sv}
-          </p>
-        </div>
-
-        {/* arrows */}
-        <button onClick={() => go(-1)} aria-label="Previous" style={{ position: "absolute", top: "50%", left: 10, transform: "translateY(-50%)", width: 38, height: 38, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.2)", background: "rgba(18,10,4,0.55)", color: "white", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)" }}>‹</button>
-        <button onClick={() => go(1)} aria-label="Next" style={{ position: "absolute", top: "50%", right: 10, transform: "translateY(-50%)", width: 38, height: 38, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.2)", background: "rgba(18,10,4,0.55)", color: "white", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)" }}>›</button>
-
-        {/* counter */}
-        <div style={{ position: "absolute", top: 12, right: 14, fontFamily: "'Space Mono',monospace", fontSize: 10, letterSpacing: 1, color: "rgba(255,255,255,0.7)", background: "rgba(18,10,4,0.5)", padding: "3px 8px", borderRadius: 5, backdropFilter: "blur(4px)" }}>{i + 1} / {n}</div>
       </div>
 
+      {/* arrows */}
+      <button onClick={() => go(-1)} aria-label="Previous" style={{ position: "absolute", top: "calc(50% - 20px)", left: -6, transform: "translateY(-50%)", width: 40, height: 40, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.2)", background: "rgba(18,10,4,0.72)", color: "white", fontSize: 19, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)", zIndex: 3 }}>‹</button>
+      <button onClick={() => go(1)} aria-label="Next" style={{ position: "absolute", top: "calc(50% - 20px)", right: -6, transform: "translateY(-50%)", width: 40, height: 40, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.2)", background: "rgba(18,10,4,0.72)", color: "white", fontSize: 19, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)", zIndex: 3 }}>›</button>
+
       {/* dots */}
-      <div style={{ display: "flex", justifyContent: "center", gap: 7, marginTop: 12, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", justifyContent: "center", gap: 7, marginTop: 14, flexWrap: "wrap" }}>
         {TRIP_SLIDES.map((_, idx) => (
-          <button key={idx} onClick={() => goto(idx)} aria-label={`Go to ${idx + 1}`}
+          <button key={idx} onClick={() => { setI(idx); scrollTo(idx); }} aria-label={`Go to ${idx + 1}`}
             style={{ width: idx === i ? 22 : 8, height: 8, borderRadius: 4, border: "none", cursor: "pointer", padding: 0,
               background: idx === i ? "#ff8f00" : "rgba(255,255,255,0.25)", transition: "all 0.3s ease" }} />
         ))}
