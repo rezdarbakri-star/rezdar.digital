@@ -630,7 +630,7 @@ const TRIP_SLIDES = [
 const TRIP_SLIDES_REV = TRIP_SLIDES;
 
 function TripCarousel() {
-  const { lang } = useLang();
+  const lang = useLang();
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
   const trackRef = useRef(null);
