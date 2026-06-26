@@ -42,7 +42,7 @@ input:focus,select:focus{outline:none;border-color:rgba(196,181,253,.5)!importan
 </style>
 </head>
 <body>
-<div id="root"></div>
+<div id="root"><p style="color:#7c6f9b;text-align:center;padding:60px;font-family:sans-serif">Laddar scripts...</p></div>
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -54,7 +54,14 @@ input:focus,select:focus{outline:none;border-color:rgba(196,181,253,.5)!importan
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-<script type="text/babel" data-type="module">
+<script>
+// Catch Babel compilation errors visibly
+window.onerror = function(msg, url, line, col, error) {
+  document.getElementById("root").innerHTML = '<pre style="color:#f4a4a4;padding:40px;font-family:monospace;font-size:13px;white-space:pre-wrap">FEL: ' + msg + '\nRad: ' + line + '\n' + (error?.stack||'') + '</pre>';
+};
+</script>
+
+<script type="text/babel">
 // ══════════════════════════════════════════════
 // 🔧 DIN FIREBASE CONFIG — FYLL I HÄR
 // ══════════════════════════════════════════════
@@ -105,6 +112,7 @@ Heart:()=><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="cu
 Copy:()=><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>,
 Users:()=><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
 Out:()=><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
+Brief:()=><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>,
 };
 
 // ── Shared styles ──
@@ -189,17 +197,29 @@ function BillForm({initial:ini,onSave,onCancel}){
   const[n,sN]=useState(ini?.name||"");const[a,sA]=useState(ini?.amount?.toString()||"");
   const[ag,sAg]=useState(ini?.autogiro||false);const[c,sC]=useState(ini?.category||"");
   const[v,sV]=useState(ini?.variable||false);const[p,sP]=useState(ini?.platform||"");
+  const[biz,sBiz]=useState(ini?.bizType||"privat");const[vat,sVat]=useState(ini?.vatRate?.toString()||"25");
   const cats=["Boende","Försäkring","Prenumeration","Transport","Telefon/Internet","Övrigt"];
   const pl=["Klarna","Billo","Kivra","Trafikstyrelsen","Swish","Bankgiro"];
-  const go=()=>{if(!n.trim())return;onSave(n.trim(),v?"0":a,ag,c,v,p);};
+  const go=()=>{if(!n.trim())return;onSave(n.trim(),v?"0":a,ag,c,v,p,biz,parseFloat(vat)||25);};
   const inp={width:"100%",padding:"8px 11px",border:"1px solid rgba(255,255,255,.08)",borderRadius:9,background:"rgba(0,0,0,.2)",color:"#e2ddf0",fontSize:13,fontFamily:"inherit"};
   const lb={display:"block",fontSize:10,color:"#7c6f9b",marginBottom:3,textTransform:"uppercase",letterSpacing:".05em",fontWeight:500};
+  const togStyle=(active,color)=>({flex:1,padding:"8px 6px",border:`1.5px solid ${active?color:"rgba(255,255,255,.08)"}`,borderRadius:10,background:active?color.replace("1)","0.1)"):"transparent",color:active?color:"#6b5f8a",fontSize:12,fontWeight:active?600:400,textAlign:"center"});
   return(
     <div style={{...g,padding:14,marginBottom:12}}>
       <div style={{display:"flex",gap:10,marginBottom:10,flexWrap:"wrap"}}>
         <div style={{flex:1,minWidth:120}}><label style={lb}>Namn</label><input style={inp} value={n} onChange={e=>sN(e.target.value)} placeholder="t.ex. Hyra, Klarna..." autoFocus/></div>
         {!v&&<div style={{flex:0,minWidth:100}}><label style={lb}>Belopp</label><input style={inp} type="number" value={a} onChange={e=>sA(e.target.value)} placeholder="0"/></div>}
       </div>
+      <div style={{display:"flex",gap:6,marginBottom:10}}>
+        <button type="button" onClick={()=>sBiz("privat")} style={togStyle(biz==="privat","rgba(168,230,207,1)")}>🏠 Privat</button>
+        <button type="button" onClick={()=>sBiz("företag")} style={togStyle(biz==="företag","rgba(120,200,255,1)")}>💼 Företag</button>
+      </div>
+      {biz==="företag"&&<div style={{marginBottom:10}}>
+        <label style={lb}>Momssats</label>
+        <div style={{display:"flex",gap:6}}>
+          {["25","12","6","0"].map(r=><button key={r} type="button" onClick={()=>sVat(r)} style={{flex:1,padding:"6px 4px",border:`1.5px solid ${vat===r?"rgba(120,200,255,.6)":"rgba(255,255,255,.08)"}`,borderRadius:8,background:vat===r?"rgba(120,200,255,.08)":"transparent",color:vat===r?"#78c8ff":"#6b5f8a",fontSize:12,fontWeight:vat===r?600:400}}>{r}%</button>)}
+        </div>
+      </div>}
       <div style={{display:"flex",gap:10,marginBottom:10,flexWrap:"wrap"}}>
         <div style={{flex:1}}><label style={lb}>Kategori</label><select style={inp} value={c} onChange={e=>sC(e.target.value)}><option value="">—</option>{cats.map(x=><option key={x}>{x}</option>)}</select></div>
         <div style={{flex:1}}><label style={lb}>Plattform</label><select style={inp} value={p} onChange={e=>sP(e.target.value)}><option value="">—</option>{pl.map(x=><option key={x}>{x}</option>)}</select></div>
@@ -262,13 +282,15 @@ function App({user}){
   const[showAS,setShowAS]=useState(false);const[savNI,setSavNI]=useState("");
   const[eSavA,setESavA]=useState(null);const[savAI,setSavAI]=useState("");
   const[hhV,setHhV]=useState("main");const[joinI,setJoinI]=useState("");const[cp,setCp]=useState(false);
+  const[salaryMult,setSalaryMult]=useState(2.0); // Lönekostnadsmultiplikator
+  const[eMult,setEMult]=useState(false);const[multI,setMultI]=useState("");
 
   const ck=mkey(),cm=months[ck];
 
   // Load
   useEffect(()=>{(async()=>{
-    const[b,m,sc,hc]=await Promise.all([ld(`users/${uid}/bills`,[]),ld(`users/${uid}/months`,{}),ld(`users/${uid}/savingsCategories`,[]),ld(`users/${uid}/householdCode`,"")]);
-    setBills(b||[]);setMonths(m||{});setSavC(sc||[]);setHhCode(hc||"");
+    const[b,m,sc,hc,sm]=await Promise.all([ld(`users/${uid}/bills`,[]),ld(`users/${uid}/months`,{}),ld(`users/${uid}/savingsCategories`,[]),ld(`users/${uid}/householdCode`,""),ld(`users/${uid}/salaryMult`,2.0)]);
+    setBills(b||[]);setMonths(m||{});setSavC(sc||[]);setHhCode(hc||"");setSalaryMult(sm||2.0);
     if(hc){const h=await ld(`households/${hc}/info`,null);if(h)setHh(h);}
     setLoading(false);
   })();},[uid]);
@@ -300,9 +322,10 @@ function App({user}){
   async function leaveHH(){if(!hh)return;await sv(`households/${hhCode}/info`,{...hh,members:hh.members.filter(m=>m.uid!==uid)});await sv(`users/${uid}/householdCode`,"");setHhCode("");setHh(null);setPSum(null);}
 
   // CRUD
-  function addBill(n,a,ag,c,v,p){pB([...bills,{id:gid(),name:n,amount:parseFloat(a)||0,autogiro:ag,category:c,variable:!!v,platform:p||""}]);setShowAdd(false);}
+  function addBill(n,a,ag,c,v,p,biz,vat){pB([...bills,{id:gid(),name:n,amount:parseFloat(a)||0,autogiro:ag,category:c,variable:!!v,platform:p||"",bizType:biz||"privat",vatRate:vat||25}]);setShowAdd(false);}
   function rmBill(id){pB(bills.filter(b=>b.id!==id));}
   function upBill(id,d){pB(bills.map(b=>b.id===id?{...b,...d}:b));setEBill(null);}
+  function saveMult(v){const m=parseFloat(v)||2.0;setSalaryMult(m);sv(`users/${uid}/salaryMult`,m);setEMult(false);setMultI("");}
   function addSC(n){if(!n.trim())return;pS([...savC,{id:gid(),name:n.trim()}]);setShowAS(false);setSavNI("");}
   function rmSC(id){pS(savC.filter(s=>s.id!==id));if(cm?.savings){const{[id]:_,...r}=cm.savings;pM({...months,[ck]:{...cm,savings:r}});}}
   function setSA(cid,a){if(!cm)return;pM({...months,[ck]:{...cm,savings:{...(cm.savings||{}),[cid]:parseFloat(a)||0}}});setESavA(null);setSavAI("");}
@@ -338,6 +361,18 @@ function App({user}){
   const cSv=(mySm?.savings||0)+(pSum?.savings||0);
   const partner=hh?.members?.find(m=>m.uid!==uid);
 
+  // ── Enskild Firma calculations ──
+  const getAmt=(i)=>i.variable?(i.checked&&i.actualAmount!=null?i.actualAmount:0):(i.amount||0);
+  const allItems=cm?cm.items:bills; // use month items if active, else master list
+  const privItems=allItems.filter(i=>(i.bizType||"privat")==="privat");
+  const bizItems=allItems.filter(i=>i.bizType==="företag");
+  const privTotal=privItems.reduce((s,i)=>s+getAmt(i),0);
+  const bizTotalInkl=bizItems.reduce((s,i)=>s+getAmt(i),0);
+  const bizVatBack=bizItems.reduce((s,i)=>{const a=getAmt(i);const r=(i.vatRate||25)/100;return s+a*(r/(1+r));},0);
+  const bizTotalExkl=bizTotalInkl-bizVatBack;
+  const salaryCost=privTotal*salaryMult; // What the business must earn to pay this as salary
+  const totalFirmaCost=salaryCost+bizTotalExkl;
+
   if(loading)return<div style={{display:"flex",alignItems:"center",justifyContent:"center",minHeight:"100vh"}}><span className="pu">Laddar...</span></div>;
 
   return(
@@ -355,7 +390,7 @@ function App({user}){
 
     {/* Nav */}
     <nav style={{display:"flex",maxWidth:560,margin:"0 auto",padding:"8px 8px",gap:3,borderBottom:"1px solid rgba(255,255,255,.03)"}}>
-      {[{k:"checklist",l:"Månadskoll",i:<Ic.Rocket/>},{k:"master",l:"Utgifter",i:<Ic.List/>},{k:"household",l:"Hushåll",i:<Ic.Home/>},{k:"history",l:"Historik",i:<Ic.Clock/>}].map(t=>
+      {[{k:"checklist",l:"Månadskoll",i:<Ic.Rocket/>},{k:"master",l:"Utgifter",i:<Ic.List/>},{k:"firma",l:"Firma",i:<Ic.Brief/>},{k:"household",l:"Hushåll",i:<Ic.Home/>},{k:"history",l:"Historik",i:<Ic.Clock/>}].map(t=>
         <button key={t.k} onClick={()=>setView(t.k)} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:5,padding:"9px 4px",border:"none",borderRadius:12,background:view===t.k?"rgba(196,181,253,.08)":"transparent",color:view===t.k?"#c4b5fd":"#6b5f8a",fontSize:12,fontWeight:500,flexDirection:"column"}}>{t.i}<span style={{fontSize:11}}>{t.l}</span></button>
       )}
     </nav>
@@ -401,6 +436,7 @@ function App({user}){
               <div style={{flex:1,minWidth:0,cursor:"pointer"}} onClick={()=>it.checked&&it.variable?unchV(it.id):tog(it.id)}>
                 <span style={{fontSize:14,color:"#e2ddf0",display:"block",...(it.checked?{textDecoration:"line-through",color:"#6b5f8a"}:{})}}>{it.name}</span>
                 <div style={{display:"flex",gap:5,marginTop:4,flexWrap:"wrap"}}>
+                  {it.bizType==="företag"?<span style={S.badge("#78c8ff","rgba(120,200,255,.08)")}>💼</span>:<span style={S.badge("#a8e6cf","rgba(168,230,207,.08)")}>🏠</span>}
                   {it.autogiro&&<span style={S.badge("#c4b5fd","rgba(196,181,253,.08)")}><Ic.Auto/> Autogiro</span>}
                   {it.variable&&<span style={S.badge("#dbb778","rgba(219,183,120,.08)")}><Ic.Var/> Rörlig</span>}
                   {it.platform&&<span style={{fontSize:10,color:"#e8a4f0",background:"rgba(232,164,240,.08)",padding:"2px 7px",borderRadius:5,fontWeight:500}}>{it.platform}</span>}
@@ -438,13 +474,90 @@ function App({user}){
       {bills.length===0&&!showAdd?<div style={{textAlign:"center",padding:"50px 20px"}}><h2 style={{fontSize:22,fontWeight:300,color:"#e2ddf0",marginBottom:8}}>Tom lista</h2><p style={{fontSize:14,color:"#7c6f9b",maxWidth:320,margin:"0 auto",lineHeight:1.7}}>Lägg till hyra, el, försäkringar och ställen du måste checka.</p></div>
       :<div style={{display:"flex",flexDirection:"column",gap:5}}>
         {bills.map((b,i)=><div key={b.id} className="ce" style={{...g,display:"flex",alignItems:"center",gap:10,padding:"13px 16px",animationDelay:`${i*30}ms`}}>
-          {eBill===b.id?<BillForm initial={b} onSave={(n,a,ag,c,v,p)=>upBill(b.id,{name:n,amount:parseFloat(a)||0,autogiro:ag,category:c,variable:!!v,platform:p||""})} onCancel={()=>setEBill(null)}/>
-          :<><div style={{flex:1,minWidth:0}}><span style={{fontSize:14,color:"#e2ddf0",display:"block"}}>{b.name}</span><div style={{display:"flex",gap:5,marginTop:4,flexWrap:"wrap"}}>{b.autogiro&&<span style={S.badge("#c4b5fd","rgba(196,181,253,.08)")}><Ic.Auto/> Autogiro</span>}{b.variable&&<span style={S.badge("#dbb778","rgba(219,183,120,.08)")}><Ic.Var/> Rörlig</span>}{b.platform&&<span style={{fontSize:10,color:"#e8a4f0",background:"rgba(232,164,240,.08)",padding:"2px 7px",borderRadius:5,fontWeight:500}}>{b.platform}</span>}{b.category&&<span style={{fontSize:10,color:"#8a80a8",background:"rgba(255,255,255,.04)",padding:"2px 7px",borderRadius:5}}>{b.category}</span>}</div></div>
+          {eBill===b.id?<BillForm initial={b} onSave={(n,a,ag,c,v,p,biz,vat)=>upBill(b.id,{name:n,amount:parseFloat(a)||0,autogiro:ag,category:c,variable:!!v,platform:p||"",bizType:biz||"privat",vatRate:vat||25})} onCancel={()=>setEBill(null)}/>
+          :<><div style={{flex:1,minWidth:0}}><span style={{fontSize:14,color:"#e2ddf0",display:"block"}}>{b.name}</span><div style={{display:"flex",gap:5,marginTop:4,flexWrap:"wrap"}}>{b.bizType==="företag"?<span style={S.badge("#78c8ff","rgba(120,200,255,.08)")}>💼 Företag{b.vatRate!=null?` ${b.vatRate}%`:""}</span>:<span style={S.badge("#a8e6cf","rgba(168,230,207,.08)")}>🏠 Privat</span>}{b.autogiro&&<span style={S.badge("#c4b5fd","rgba(196,181,253,.08)")}><Ic.Auto/> Autogiro</span>}{b.variable&&<span style={S.badge("#dbb778","rgba(219,183,120,.08)")}><Ic.Var/> Rörlig</span>}{b.platform&&<span style={{fontSize:10,color:"#e8a4f0",background:"rgba(232,164,240,.08)",padding:"2px 7px",borderRadius:5,fontWeight:500}}>{b.platform}</span>}{b.category&&<span style={{fontSize:10,color:"#8a80a8",background:"rgba(255,255,255,.04)",padding:"2px 7px",borderRadius:5}}>{b.category}</span>}</div></div>
             <span style={{fontSize:13,fontWeight:500,color:"#c4b5fd",whiteSpace:"nowrap",marginRight:6}}>{b.variable?"Rörligt":(b.amount?`${fk(b.amount)} kr`:"–")}</span>
             <div style={{display:"flex",gap:4}}><button style={S.iBtn} onClick={()=>setEBill(b.id)}><Ic.Edit/></button><button style={{...S.iBtn,color:"#f4a4a4"}} onClick={()=>rmBill(b.id)}><Ic.Trash/></button></div></>}
         </div>)}
       </div>}
       {bills.length>0&&<div style={{textAlign:"right",padding:"14px 4px",fontSize:13,color:"#7c6f9b",borderTop:"1px solid rgba(255,255,255,.04)",marginTop:14}}>Fasta: <strong>{fk(bills.filter(b=>!b.variable).reduce((s,b)=>s+(b.amount||0),0))} kr/mån</strong>{bills.some(b=>b.variable)&&<span style={{marginLeft:12,color:"#dbb778"}}>+ {bills.filter(b=>b.variable).length} rörliga</span>}</div>}
+    </div>}
+
+    {/* ═══ FIRMA ═══ */}
+    {view==="firma"&&<div className="pe">
+      <div style={{marginBottom:16}}><h2 style={{fontSize:22,fontWeight:300,color:"#e2ddf0"}}>Enskild firma</h2><p style={{fontSize:12,color:"#7c6f9b",marginTop:4}}>Total kostnad mot ditt företag.</p></div>
+
+      {/* Multiplier setting */}
+      <div style={{...g,padding:"14px 18px",marginBottom:10}} className="ce">
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <div><span style={{fontSize:13,fontWeight:500,color:"#b0a8c8"}}>Lönekostnadsmultiplikator</span><p style={{fontSize:11,color:"#6b5f8a",marginTop:2}}>Skatt + egenavgifter. Privata utgifter × detta = vad firman betalar.</p></div>
+          {eMult?<div style={{display:"flex",gap:4,alignItems:"center"}}>
+            <input style={S.varI} type="number" step="0.1" value={multI} onChange={e=>setMultI(e.target.value)} autoFocus onKeyDown={e=>{if(e.key==="Enter")saveMult(multI);if(e.key==="Escape"){setEMult(false);setMultI("");}}}/>
+            <button style={S.mOk} onClick={()=>saveMult(multI)}>✓</button>
+          </div>
+          :<button style={S.incB} onClick={()=>{setEMult(true);setMultI(salaryMult.toString());}}>{salaryMult}×</button>}
+        </div>
+      </div>
+
+      {/* Overview */}
+      <div style={{...g,padding:"20px 18px",marginBottom:10}} className="ce">
+        <div style={{textAlign:"center",marginBottom:20}}>
+          <span style={{fontSize:11,textTransform:"uppercase",letterSpacing:".08em",color:"#7c6f9b",fontWeight:500}}>Total kostnad för firman</span>
+          <div style={{fontSize:32,fontWeight:700,color:"#78c8ff",marginTop:8}}>{fk(Math.round(totalFirmaCost))} kr</div>
+          <span style={{fontSize:12,color:"#6b5f8a"}}>{cm?"denna månad":"baserat på master-listan"}</span>
+        </div>
+
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+          {/* Private column */}
+          <div style={{padding:14,borderRadius:14,background:"rgba(168,230,207,.04)",border:"1px solid rgba(168,230,207,.1)"}}>
+            <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:10}}><span style={{fontSize:16}}>🏠</span><span style={{fontSize:13,fontWeight:600,color:"#a8e6cf"}}>Privat</span></div>
+            <div style={{fontSize:11,color:"#7c6f9b",marginBottom:4}}>Dina utgifter</div>
+            <div style={{fontSize:18,fontWeight:600,color:"#e2ddf0"}}>{fk(Math.round(privTotal))} kr</div>
+            <div style={{marginTop:10,padding:"8px 0",borderTop:"1px solid rgba(255,255,255,.04)"}}>
+              <div style={{fontSize:11,color:"#7c6f9b",marginBottom:4}}>Lönekostnad ({salaryMult}×)</div>
+              <div style={{fontSize:16,fontWeight:600,color:"#f4a4a4"}}>{fk(Math.round(salaryCost))} kr</div>
+            </div>
+            <div style={{fontSize:10,color:"#6b5f8a",marginTop:6}}>{privItems.length} poster</div>
+          </div>
+
+          {/* Business column */}
+          <div style={{padding:14,borderRadius:14,background:"rgba(120,200,255,.04)",border:"1px solid rgba(120,200,255,.1)"}}>
+            <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:10}}><span style={{fontSize:16}}>💼</span><span style={{fontSize:13,fontWeight:600,color:"#78c8ff"}}>Företag</span></div>
+            <div style={{fontSize:11,color:"#7c6f9b",marginBottom:4}}>Inkl. moms</div>
+            <div style={{fontSize:18,fontWeight:600,color:"#e2ddf0"}}>{fk(Math.round(bizTotalInkl))} kr</div>
+            <div style={{marginTop:10,padding:"8px 0",borderTop:"1px solid rgba(255,255,255,.04)"}}>
+              <div style={{fontSize:11,color:"#7c6f9b",marginBottom:4}}>Momsavdrag</div>
+              <div style={{fontSize:16,fontWeight:600,color:"#a8e6cf"}}>−{fk(Math.round(bizVatBack))} kr</div>
+            </div>
+            <div style={{marginTop:6,padding:"8px 0",borderTop:"1px solid rgba(255,255,255,.04)"}}>
+              <div style={{fontSize:11,color:"#7c6f9b",marginBottom:4}}>Faktisk kostnad</div>
+              <div style={{fontSize:16,fontWeight:600,color:"#78c8ff"}}>{fk(Math.round(bizTotalExkl))} kr</div>
+            </div>
+            <div style={{fontSize:10,color:"#6b5f8a",marginTop:6}}>{bizItems.length} poster</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Breakdown list */}
+      <div style={{...g,padding:"14px 18px"}} className="ce">
+        <span style={{fontSize:13,fontWeight:500,color:"#b0a8c8",display:"block",marginBottom:12}}>Uppdelning per post</span>
+        <div style={{display:"flex",flexDirection:"column",gap:4}}>
+          {allItems.map(it=>{
+            const a=getAmt(it);const isBiz=it.bizType==="företag";
+            const firmaCost=isBiz?a*(1-((it.vatRate||25)/100)/(1+(it.vatRate||25)/100)):a*salaryMult;
+            return<div key={it.id} style={{display:"flex",alignItems:"center",gap:8,padding:"8px 10px",borderRadius:10,background:"rgba(255,255,255,.02)"}}>
+              <span style={{fontSize:14}}>{isBiz?"💼":"🏠"}</span>
+              <span style={{flex:1,fontSize:13,color:"#b0a8c8"}}>{it.name}</span>
+              <div style={{textAlign:"right"}}>
+                <div style={{fontSize:12,color:"#7c6f9b"}}>{a>0?`${fk(a)} kr`:"–"}</div>
+                <div style={{fontSize:11,color:isBiz?"#78c8ff":"#f4a4a4"}}>{a>0?`→ ${fk(Math.round(firmaCost))} kr`:""}
+                  {isBiz&&a>0?<span style={{color:"#a8e6cf",marginLeft:4}}>({fk(Math.round(a-firmaCost))} moms)</span>:""}
+                </div>
+              </div>
+            </div>;
+          })}
+        </div>
+      </div>
     </div>}
 
     {/* ═══ HOUSEHOLD ═══ */}
