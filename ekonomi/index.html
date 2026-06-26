@@ -61,7 +61,14 @@ window.onerror = function(msg, url, line, col, error) {
 };
 </script>
 
-<script type="text/babel">
+<script>
+// Force classic JSX runtime for browser
+Babel.registerPreset('jsx-compat', {
+  presets: [[Babel.availablePresets['react'], { runtime: 'classic' }]]
+});
+</script>
+
+<script type="text/babel" data-presets="jsx-compat">
 // ══════════════════════════════════════════════
 // 🔧 DIN FIREBASE CONFIG — FYLL I HÄR
 // ══════════════════════════════════════════════
