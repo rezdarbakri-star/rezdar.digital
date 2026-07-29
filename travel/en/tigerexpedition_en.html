@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tiger Expedition in Nepal — Travel Guide | 100WILD by Rezdar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f0ea;
+    --bg-warm: #ece6db;
+    --card: #faf8f4;
+    --dark: #1a1a16;
+    --bark: #2c2a22;
+    --forest: #3d5a3e;
+    --forest-light: #4e7350;
+    --moss: #6b8f5e;
+    --sand: #c4a96a;
+    --stone: #7a7468;
+    --muted: #9a9488;
+    --light-text: #5c5850;
+    --white: #fefcf8;
+    --border: rgba(26,26,22,0.08);
+    --gold: #b8963e;
+    --gold-light: #d4b060;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; overflow-x: hidden; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg); color: var(--dark);
+    overflow-x: hidden; -webkit-font-smoothing: antialiased;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 9999;
+  }
+
+  .wrap { max-width: 1100px; margin: 0 auto; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 1.1rem max(1.5rem, calc((100% - 1100px) / 2));
+    display: flex; justify-content: space-between; align-items: center;
+    transition: all 0.4s;
+  }
+  nav.scrolled {
+    background: rgba(244,240,234,0.94); backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-back {
+    font-size: 0.82rem; font-weight: 500; color: var(--light-text);
+    text-decoration: none; display: flex; align-items: center; gap: 0.5rem;
+  }
+  .nav-back:hover { color: var(--forest); }
+  .nav-buy {
+    font-size: 0.8rem; font-weight: 600; padding: 0.6rem 1.4rem;
+    background: var(--gold); color: var(--dark);
+    border-radius: 100px; text-decoration: none; transition: all 0.3s;
+  }
+  .nav-buy:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+  /* HERO */
+  .lp-hero {
+    background: var(--bark); color: var(--bg);
+    padding: 8rem 1.5rem 5rem; position: relative; overflow: hidden;
+  }
+  .lp-hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 25% 25%, rgba(184,150,62,0.13), transparent 62%);
+    pointer-events: none;
+  }
+  .lp-hero-inner {
+    max-width: 1100px; margin: 0 auto; position: relative; z-index: 2;
+    display: grid; grid-template-columns: 330px 1fr; gap: 3.5rem; align-items: center;
+  }
+
+  .cover-art {
+    position: relative; width: 100%; aspect-ratio: 3/4;
+    border-radius: 4px; overflow: hidden;
+    box-shadow: 0 26px 64px rgba(0,0,0,0.5), 0 2px 0 rgba(244,240,234,0.08);
+    transform: rotate(-1.5deg); transition: transform 0.4s;
+  }
+  .cover-art:hover { transform: rotate(0) translateY(-5px); }
+  .cover-art img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; display: block; }
+  .cover-shade { position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(13,20,16,0.55) 0%, rgba(13,20,16,0.12) 40%, rgba(13,20,16,0.9) 100%); }
+  .cover-top { position: absolute; top: 1rem; left: 1.1rem; right: 1.1rem;
+    display: flex; justify-content: space-between; align-items: baseline; }
+  .cover-brand { font-family: 'Instrument Sans', sans-serif; font-weight: 700; font-size: 0.75rem; color: #fff; }
+  .cover-brand b { font-weight: 400; font-style: italic; font-family: 'Playfair Display', serif; }
+  .cover-num { font-size: 0.52rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.65); }
+  .cover-txt { position: absolute; bottom: 1.3rem; left: 1.3rem; right: 1.3rem; }
+  .cover-txt h3 { font-family: 'Playfair Display', serif; font-weight: 400; font-size: 2rem;
+    line-height: 1.03; color: #fff; text-transform: uppercase; margin-bottom: 0.4rem; }
+  .cover-frame { font-family: 'Playfair Display', serif; font-style: italic; font-size: 0.84rem; color: var(--gold-light); }
+
+  .lp-tag { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
+  .lp-hero h1 {
+    font-family: 'Playfair Display', serif; font-weight: 400;
+    font-size: clamp(2.2rem, 4.6vw, 3.4rem); line-height: 1.08; margin-bottom: 1rem;
+  }
+  .lp-hero h1 em { font-style: italic; color: var(--gold-light); }
+  .lp-hero-lead { font-weight: 300; font-size: 1.05rem; line-height: 1.8; color: rgba(244,240,234,0.66); max-width: 46ch; margin-bottom: 1.8rem; }
+
+  .buy-row { display: flex; align-items: center; gap: 1.3rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .buy-price { font-family: 'Instrument Sans', sans-serif; font-weight: 700; font-size: 2rem; color: var(--gold); }
+  .btn-buy {
+    font-weight: 600; font-size: 0.92rem; padding: 1rem 2.4rem;
+    background: var(--gold); color: var(--dark); border-radius: 100px;
+    text-decoration: none; transition: all 0.35s; display: inline-block;
+  }
+  .btn-buy:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 10px 32px rgba(184,150,62,0.32); }
+  .buy-meta { font-size: 0.78rem; color: rgba(244,240,234,0.45); }
+
+  /* SECTION SHELL */
+  section.block { padding: 5rem 1.5rem; }
+  .block-head { text-align: center; max-width: 620px; margin: 0 auto 3rem; }
+  .block-head .tag { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--forest); margin-bottom: 0.9rem; }
+  .block-head h2 { font-family: 'Playfair Display', serif; font-weight: 400; font-size: clamp(1.8rem, 3.6vw, 2.5rem); line-height: 1.15; margin-bottom: 0.8rem; }
+  .block-head h2 em { font-style: italic; color: var(--forest); }
+  .block-head p { font-weight: 300; font-size: 0.97rem; line-height: 1.75; color: var(--stone); }
+
+  /* HIGHLIGHTS */
+  .highlights { background: var(--white); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .hl-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; }
+  .hl-card {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+    padding: 1.7rem 1.5rem; transition: all 0.3s;
+  }
+  .hl-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.06); }
+  .hl-ico { font-size: 1.7rem; margin-bottom: 0.7rem; }
+  .hl-card h3 { font-family: 'Playfair Display', serif; font-weight: 400; font-size: 1.18rem; margin-bottom: 0.4rem; }
+  .hl-card p { font-weight: 300; font-size: 0.87rem; line-height: 1.65; color: var(--stone); }
+
+  /* PEEK */
+  .peek { background: var(--bg); }
+  .peek-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.9rem; }
+  .peek-item {
+    position: relative; border-radius: 8px; overflow: hidden;
+    aspect-ratio: 4/5; background: var(--bark);
+  }
+  .peek-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s; }
+  .peek-item:hover img { transform: scale(1.05); }
+  .peek-cap {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 1.6rem 1rem 0.9rem;
+    background: linear-gradient(180deg, transparent, rgba(13,20,16,0.88));
+    font-family: 'Instrument Sans', sans-serif; font-weight: 600;
+    font-size: 0.72rem; letter-spacing: 0.05em; color: #fff;
+  }
+  .peek-item.wide { grid-column: span 2; aspect-ratio: 16/10; }
+  .peek-note { text-align: center; margin-top: 1.6rem; font-size: 0.85rem; font-weight: 300; font-style: italic; color: var(--muted); }
+
+  /* DISCOVER BARDIA */
+  .discover { background: var(--bark); color: var(--bg); }
+  .discover .block-head h2 { color: var(--bg); }
+  .discover .block-head h2 em { color: var(--gold-light); }
+  .discover .block-head .tag { color: var(--gold); }
+  .discover .block-head p { color: rgba(244,240,234,0.55); }
+
+  .disc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: center; }
+  .disc-photo { border-radius: 8px; overflow: hidden; aspect-ratio: 4/3; }
+  .disc-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .disc-facts { list-style: none; }
+  .disc-facts li {
+    padding: 1rem 0; border-bottom: 1px solid rgba(244,240,234,0.1);
+    display: flex; gap: 1rem; align-items: flex-start;
+  }
+  .disc-facts li:last-child { border-bottom: none; }
+  .disc-num {
+    font-family: 'Instrument Sans', sans-serif; font-weight: 700; font-size: 1.35rem;
+    color: var(--gold); line-height: 1.1; flex-shrink: 0; min-width: 4.6rem;
+  }
+  .disc-tx { font-weight: 300; font-size: 0.9rem; line-height: 1.6; color: rgba(244,240,234,0.72); }
+  .disc-tx b { font-weight: 600; color: var(--bg); display: block; margin-bottom: 0.15rem; }
+
+  /* CONTENTS */
+  .contents { background: var(--white); border-top: 1px solid var(--border); }
+  .toc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem 2.5rem; }
+  .toc-row {
+    display: flex; gap: 1rem; align-items: baseline;
+    padding: 0.85rem 0; border-bottom: 1px solid var(--border);
+  }
+  .toc-no {
+    font-family: 'Instrument Sans', sans-serif; font-weight: 700; font-size: 0.72rem;
+    color: var(--gold); min-width: 1.6rem;
+  }
+  .toc-tx { font-size: 0.92rem; font-weight: 300; color: var(--light-text); }
+  .toc-tx b { font-weight: 600; color: var(--dark); }
+
+  /* FINAL CTA */
+  .final {
+    background: var(--forest); color: var(--white);
+    text-align: center; padding: 5rem 1.5rem;
+  }
+  .final h2 { font-family: 'Playfair Display', serif; font-weight: 400; font-size: clamp(1.9rem, 4vw, 2.7rem); line-height: 1.14; margin-bottom: 1rem; }
+  .final h2 em { font-style: italic; color: var(--sand); }
+  .final p { font-weight: 300; font-size: 1rem; line-height: 1.75; color: rgba(254,252,248,0.75); max-width: 45ch; margin: 0 auto 2rem; }
+  .final .btn-buy { background: var(--white); color: var(--forest); }
+  .final .btn-buy:hover { background: var(--bg); box-shadow: 0 10px 32px rgba(0,0,0,0.2); }
+  .final-meta { margin-top: 1.1rem; font-size: 0.8rem; color: rgba(254,252,248,0.5); }
+
+  /* FOOTER */
+  footer { padding: 2.5rem 1.5rem; background: var(--bg); }
+  .footer-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+  .footer-brand .f100 { font-family: 'Instrument Sans', sans-serif; font-weight: 700; font-size: 1rem; color: var(--dark); }
+  .footer-brand .fwild { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1rem; color: var(--forest); }
+  .footer-note { font-size: 0.72rem; font-weight: 300; color: var(--muted); }
+  .footer-links { display: flex; gap: 1.4rem; }
+  .footer-links a { font-size: 0.8rem; color: var(--stone); text-decoration: none; }
+  .footer-links a:hover { color: var(--forest); }
+
+  /* REVEAL */
+  .reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-d1 { transition-delay: 0.07s; }
+  .reveal-d2 { transition-delay: 0.14s; }
+  .reveal-d3 { transition-delay: 0.21s; }
+
+  @media (max-width: 900px) {
+    .lp-hero { padding: 6.5rem 1.5rem 4rem; }
+    .lp-hero-inner { grid-template-columns: 1fr; gap: 2.2rem; text-align: center; }
+    .cover-art { max-width: 250px; margin: 0 auto; }
+    .lp-hero-lead { margin-left: auto; margin-right: auto; }
+    .buy-row { justify-content: center; }
+    .hl-grid { grid-template-columns: 1fr; }
+    .peek-grid { grid-template-columns: 1fr 1fr; }
+    .peek-item.wide { grid-column: span 2; }
+    .disc-grid { grid-template-columns: 1fr; gap: 1.8rem; }
+    .toc-grid { grid-template-columns: 1fr; gap: 0; }
+    .footer-inner { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+  <a href="index.html" class="nav-back">← 100WILD</a>
+  <a href="https://buy.stripe.com/8x28wO4VH4Fd7cX0uwdZ602" class="nav-buy">Buy the guide — $29</a>
+</nav>
+
+<!-- HERO -->
+<section class="lp-hero">
+  <div class="lp-hero-inner">
+    <div class="cover-art reveal">
+      <img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/LOOKINGBACK%202.JPG" alt="Visit Bardiya — travel guide">
+      <div class="cover-shade"></div>
+      <div class="cover-top">
+        <span class="cover-brand">100<b>WILD</b></span>
+        <span class="cover-num">Travel Guide No. 01</span>
+      </div>
+      <div class="cover-txt">
+        <h3>Visit Bardiya</h3>
+        <div class="cover-frame">Where people live among wild tigers.</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="lp-tag reveal">🐅 Travel Guide No. 01 · Available now</div>
+      <h1 class="reveal reveal-d1">Tiger Expedition <em>in Nepal</em></h1>
+      <p class="lp-hero-lead reveal reveal-d2">
+        My entire trip to Bardiya, documented step by step. The journey there,
+        accommodation, guides, activities, and exactly what everything costs.
+        Everything you need to make the same trip yourself, without guessing.
+      </p>
+      <div class="buy-row reveal reveal-d3">
+        <div class="buy-price">$29</div>
+        <a href="https://buy.stripe.com/8x28wO4VH4Fd7cX0uwdZ602" class="btn-buy">Buy the guide →</a>
+      </div>
+      <div class="buy-meta reveal reveal-d3">One-time purchase · read on your phone · lifetime access</div>
+    </div>
+  </div>
+</section>
+
+<!-- HIGHLIGHTS -->
+<section class="block highlights">
+  <div class="wrap">
+    <div class="block-head">
+      <div class="tag reveal">What you get</div>
+    </div>
+    <div class="hl-grid">
+      <div class="hl-card reveal">
+        <div class="hl-ico">🛫</div>
+        <h3>The whole journey there</h3>
+        <p>Flights, layover, domestic flight, and the final stretch by car. With prices, times, and photos from every step so you know what to expect.</p>
+      </div>
+      <div class="hl-card reveal reveal-d1">
+        <div class="hl-ico">🏡</div>
+        <h3>Accommodation &amp; contacts</h3>
+        <p>From a homestay in the heart of the village to the lodge with a pool. My actual contacts, not a booking-site result.</p>
+      </div>
+      <div class="hl-card reveal reveal-d2">
+        <div class="hl-ico">💰</div>
+        <h3>Real prices</h3>
+        <p>What every activity, night, and meal actually costs.</p>
+      </div>
+      <div class="hl-card reveal">
+        <div class="hl-ico">🗓️</div>
+        <h3>The right season</h3>
+        <p>Month-by-month calendar and temperatures.</p>
+      </div>
+      <div class="hl-card reveal reveal-d1">
+        <div class="hl-ico">🎒</div>
+        <h3>Packing list &amp; clothing</h3>
+        <p>A checklist for everything that goes in your bag.</p>
+      </div>
+      <div class="hl-card reveal reveal-d2">
+        <div class="hl-ico">🧠</div>
+        <h3>The right expectations</h3>
+        <p>What no one says out loud, and how to get the best experience.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SNEAK PEEK -->
+<section class="block peek">
+  <div class="wrap">
+    <div class="block-head">
+      <div class="tag reveal">Sneak peek</div>
+      <h2 class="reveal reveal-d1">A look <em>inside the guide</em></h2>
+      <p class="reveal reveal-d2">The photos are my own, taken during the trip. This is the world you are stepping into.</p>
+    </div>
+    <div class="peek-grid">
+      <div class="peek-item wide reveal">
+        <img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/TIGER%20PA%CC%8A%20A%CC%88NGEN%20O%CC%88GA%20MOT%20O%CC%88GA.jpg" alt="Tiger in the meadow">
+        <div class="peek-cap">Eye to eye in the meadow</div>
+      </div>
+      <div class="peek-item reveal reveal-d1">
+        <img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/WALKING_SAFARI_TIGERFOOT_PRINT.jpg" alt="Tiger tracks">
+        <div class="peek-cap">Tracking on foot</div>
+      </div>
+      <div class="peek-item reveal">
+        <img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/TREEHOUSE.jpg" alt="Treehouse">
+        <div class="peek-cap">Night in a treehouse</div>
+      </div>
+      <div class="peek-item reveal reveal-d1">
+        <img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/VILLGAGE%20BARDIA%20HOUSES.jpg" alt="The village in Bardiya">
+        <div class="peek-cap">Village life</div>
+      </div>
+      <div class="peek-item reveal reveal-d2">
+        <img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/INFINITY%20POOL%20MOT%20DJUNGELN.jpg" alt="The pool facing the jungle">
+        <div class="peek-cap">The lodge facing the jungle</div>
+      </div>
+    </div>
+    <p class="peek-note reveal">The guide contains over 60 photos from the trip.</p>
+  </div>
+</section>
+
+<!-- DISCOVER BARDIA -->
+<section class="block discover">
+  <div class="wrap">
+    <div class="block-head">
+      <div class="tag reveal">Discover Bardiya</div>
+      <h2 class="reveal reveal-d1">Nepal's wildest corner<br><em>— and least known</em></h2>
+      <p class="reveal reveal-d2">Far to the west, near the border with India, lies a national park most people have never heard of.</p>
+    </div>
+    <div class="disc-grid">
+      <div class="disc-photo reveal">
+        <img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/EN%20MAN%20MED%20SIN%20KO%20O%20SITT%20HUS.jpg" alt="Village life in Bardiya">
+      </div>
+      <ul class="disc-facts reveal reveal-d1">
+        <li>
+          <span class="disc-num">~5,574</span>
+          <span class="disc-tx"><b>Wild tigers left in the world</b>One of few places where the chance to actually see one is real.</span>
+        </li>
+        <li>
+          <span class="disc-num">-93%</span>
+          <span class="disc-tx"><b>Of the tiger's historic range is gone</b>What remains are places like Bardiya.</span>
+        </li>
+        <li>
+          <span class="disc-num">400+</span>
+          <span class="disc-tx"><b>Bird species</b>From the great hornbill to the dancing florican.</span>
+        </li>
+        <li>
+          <span class="disc-num">On foot</span>
+          <span class="disc-tx"><b>Not just from a jeep</b>Here you track tigers on foot with a guide, something very few places in the world allow.</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- CONTENTS -->
+<section class="block contents">
+  <div class="wrap">
+    <div class="block-head">
+      <div class="tag reveal">Contents</div>
+      <h2 class="reveal reveal-d1">What's <em>in the guide</em></h2>
+    </div>
+    <div class="toc-grid reveal">
+      <div class="toc-row"><span class="toc-no">01</span><span class="toc-tx"><b>In the shadow of the Himalayas</b> — the place, the landscape, and why Bardiya</span></div>
+      <div class="toc-row"><span class="toc-no">02</span><span class="toc-tx"><b>Four worlds</b> — the sal forest, the savanna, the jungle, and the river</span></div>
+      <div class="toc-row"><span class="toc-no">03</span><span class="toc-tx"><b>The inhabitants</b> — the tiger, the leopard, the rhino, the gharial, and the birds</span></div>
+      <div class="toc-row"><span class="toc-no">04</span><span class="toc-tx"><b>People of the forest</b> — the villages living side by side with the wilderness</span></div>
+      <div class="toc-row"><span class="toc-no">05</span><span class="toc-tx"><b>When to travel</b> — seasonal calendar, weather, and temperatures</span></div>
+      <div class="toc-row"><span class="toc-no">06</span><span class="toc-tx"><b>Visa &amp; vaccines</b> — what you need and how to skip the line</span></div>
+      <div class="toc-row"><span class="toc-no">07</span><span class="toc-tx"><b>The whole way to Bardiya</b> — six steps with prices and photos</span></div>
+      <div class="toc-row"><span class="toc-no">08</span><span class="toc-tx"><b>Accommodation</b> — homestay, lodge, rooms, and what it costs</span></div>
+      <div class="toc-row"><span class="toc-no">09</span><span class="toc-tx"><b>The activities</b> — walking safari, jeep, camping, treehouse, the village</span></div>
+      <div class="toc-row"><span class="toc-no">10</span><span class="toc-tx"><b>The guides</b> — who you meet on the ground</span></div>
+      <div class="toc-row"><span class="toc-no">11</span><span class="toc-tx"><b>Mindset</b> — four things to keep in mind before you land</span></div>
+      <div class="toc-row"><span class="toc-no">12</span><span class="toc-tx"><b>Packing list &amp; clothing</b> — what you wear, and the checklist</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final" id="kop">
+  <div class="wrap">
+    <h2 class="reveal">Experience Bardiya <em>now</em></h2>
+    <p class="reveal reveal-d1">
+      Download the travel guide and get a full trip proposal. Everything you need
+      to book: visa and vaccines, the journey there step by step, accommodation,
+      activities, packing list, and exactly what everything costs.
+    </p>
+    <a href="https://buy.stripe.com/8x28wO4VH4Fd7cX0uwdZ602" class="btn-buy reveal reveal-d2">Buy the guide — $29 →</a>
+    <div class="final-meta reveal reveal-d3">One-time purchase · read on your phone · lifetime access</div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand"><span class="f100">100</span><span class="fwild">WILD</span></div>
+    <div class="footer-note">Not a tour operator · You book your own trip · © 2026 Rezdar Bakri</div>
+    <div class="footer-links">
+      <a href="../index.html">Back</a>
+      <a href="https://www.youtube.com/c/Rezdar1" target="_blank">YouTube</a>
+      <a href="https://www.instagram.com/rezdar/" target="_blank">Instagram</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('navbar');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 50));
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', function(e) {
+      const t = document.querySelector(this.getAttribute('href'));
+      if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    });
+  });
+</script>
+
+<div style="position:fixed;bottom:6px;right:6px;z-index:99999;font-family:monospace;font-size:9px;color:rgba(244,240,234,.75);background:rgba(20,20,16,.55);padding:3px 7px;border-radius:4px;pointer-events:none">build 2026-07-29 16:19 UTC</div>
+</body>
+</html>
