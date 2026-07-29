@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tack för ditt köp — Tigerexpedition i Nepal | 100WILD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f0ea; --bark: #2c2a22; --forest: #3d5a3e; --forest-light: #4e7350;
+    --dark: #1a1a16; --stone: #7a7468; --muted: #9a9488; --white: #fefcf8;
+    --border: rgba(26,26,22,0.08); --gold: #b8963e; --gold-light: #d4b060;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif; background: var(--bark); color: var(--bg);
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    padding: 2rem 1.5rem; -webkit-font-smoothing: antialiased;
+  }
+  .card {
+    max-width: 560px; width: 100%; text-align: center;
+    background: rgba(244,240,234,0.03); border: 1px solid rgba(184,150,62,0.2);
+    border-radius: 14px; padding: 3.5rem 2.5rem;
+    position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(184,150,62,0.12), transparent 60%);
+    pointer-events: none;
+  }
+  .check {
+    width: 56px; height: 56px; border-radius: 50%; background: var(--forest);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.6rem; font-size: 1.6rem; position: relative; z-index: 2;
+  }
+  .tag {
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 0.8rem; position: relative; z-index: 2;
+  }
+  h1 {
+    font-family: 'Playfair Display', serif; font-weight: 400;
+    font-size: clamp(1.8rem, 4vw, 2.4rem); line-height: 1.15; margin-bottom: 1rem;
+    position: relative; z-index: 2;
+  }
+  h1 em { font-style: italic; color: var(--gold-light); }
+  p.lead {
+    font-weight: 300; font-size: 1rem; line-height: 1.75; color: rgba(244,240,234,0.65);
+    max-width: 42ch; margin: 0 auto 2.2rem; position: relative; z-index: 2;
+  }
+  .btn-open {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    font-weight: 600; font-size: 0.95rem; padding: 1rem 2.4rem;
+    background: var(--gold); color: var(--dark); border-radius: 100px;
+    text-decoration: none; transition: all 0.3s; position: relative; z-index: 2;
+  }
+  .btn-open:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 10px 30px rgba(184,150,62,0.3); }
+  .meta {
+    margin-top: 1.3rem; font-size: 0.78rem; color: rgba(244,240,234,0.4);
+    position: relative; z-index: 2;
+  }
+  .divider { width: 40px; height: 1px; background: rgba(184,150,62,0.3); margin: 2rem auto; position: relative; z-index: 2; }
+  .help {
+    font-size: 0.82rem; color: rgba(244,240,234,0.5); line-height: 1.7;
+    position: relative; z-index: 2;
+  }
+  .help a { color: var(--gold-light); text-decoration: none; border-bottom: 1px solid currentColor; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="check">🐅</div>
+  <div class="tag">Betalning genomförd</div>
+  <h1>Guiden är <em>redo</em></h1>
+  <p class="lead">
+    Tack för ditt köp. Din reseguide till Bardiya väntar, klicka nedan för att
+    öppna den direkt i mobilen eller datorn, ingen app behövs.
+  </p>
+  <a href="https://www.rezdar.com/travel/guide.html" class="btn-open">Öppna reseguiden →</a>
+  <div class="meta">Fungerar direkt i webbläsaren · spara länken, du kan öppna den igen när du vill</div>
+
+  <div class="divider"></div>
+
+  <p class="help">
+    Något som inte fungerar? Mejla <a href="mailto:samarbete@rezdar.se">samarbete@rezdar.se</a>
+    så löser vi det.
+  </p>
+</div>
+
+<div style="position:fixed;bottom:6px;right:6px;z-index:99999;font-family:monospace;font-size:9px;color:rgba(244,240,234,.75);background:rgba(20,20,16,.55);padding:3px 7px;border-radius:4px;pointer-events:none">build 2026-07-29 13:21 UTC</div>
+</body>
+</html>

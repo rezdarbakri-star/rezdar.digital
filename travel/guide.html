@@ -1,0 +1,2062 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BARDIYA · 100WILD Reseguide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sp1:#8FA0A6; --sp2:#C08A55; --sp3:#B08468; --sp4:#CBB584;
+    --sp5:#9A7A5C; --sp6:#A3B07C; --sp7:#7E9377; --sp8:#8C8D69;
+
+    --natt:#0D1410; --tiger:#C96322; --gras:#C2AC74;
+    --papper:#F7F1E4; --black:#171511; --mark:#6f6a5d;
+    --rod:#A4351F; --pageW:430px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:#070A08;font-family:'Newsreader',Georgia,serif;color:var(--black);
+    -webkit-font-smoothing:antialiased;display:flex;flex-direction:column;align-items:center;
+    padding:0;gap:0}
+
+  /* ===================================================================
+     MOBIL-FÖRST ARKITEKTUR
+     Skärm: sidorna flödar i en smal kolumn, växer med innehållet.
+     Tryck: @media print paketerar exakt samma innehåll i fasta A4-sidor.
+     =================================================================== */
+  .page{
+    width:100%;
+    max-width:var(--pageW);
+    min-height:100svh;
+    position:relative;
+    background:var(--papper);
+    overflow:hidden;
+    isolation:isolate;
+  }
+  /* diskret skarv mellan sidor på skärm */
+  .page + .page{border-top:1px solid rgba(0,0,0,.12)}
+  /* Foto-sidor och omslag huggar innehållet: ingen påtvingad tomhöjd */
+  .cover,.xp-photo{min-height:0}
+
+  @media print{
+    @page{size:A4;margin:0}
+    body{background:#fff}
+    .page{max-width:none;width:210mm;height:297mm;min-height:0;
+      page-break-after:always;break-after:page;border:none}
+    /* Vägen dit är längre med bilder: låt den flöda över flera A4 i stället för att klippas */
+    #p13{height:auto;min-height:297mm;overflow:visible}
+    #p13 .leg{break-inside:avoid;page-break-inside:avoid}
+    .toolbar,.dev-note{display:none!important}
+
+    /* Fyll A4-bredden i tryck istället för mobil-kolumn */
+    .cover-in,.toc,.about-body,.desc-head,.fauna-head,.fauna-grid,.eco-list,.season-list,.folio,.band .tag{
+      padding-left:20mm;padding-right:20mm}
+    .cover-in{padding-top:22mm;padding-bottom:22mm}
+    .cover-stripes{right:20mm;top:22mm}
+    .cover-title{font-size:120px}
+    /* Omslag i tryck: bilden ryms i sitt format (aldrig stretchad), titel under */
+    .cover{height:297mm;display:block;position:relative}
+    .cover-img{height:188mm;line-height:0;background:var(--natt)}
+    .cover-img .ph.has-img img,.cover-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center}
+    .cover-img::after{display:none}
+    .cover-top{padding:16mm 20mm 0}
+    .cover-main{padding:10mm 20mm 18mm}
+    .cover-frame{font-size:38px}
+    .cover-seed{font-size:16px;max-width:62ch}
+
+    /* Innehåll: två kolumner på A4 för luftig magasinkänsla */
+    .toc h2{font-size:64px}
+    .about-hero{height:150mm}
+    .about-body h2,.fauna-head h2,.desc-head h2{font-size:clamp(40px,6vw,58px)}
+
+    /* Människorna: hero + text fyller A4 */
+    .people-body{padding-left:20mm;padding-right:20mm}
+    .people-hero{height:150mm}
+    .people-body h2{font-size:clamp(40px,6vw,52px)}
+    .people-body p{font-size:13px;max-width:70ch}
+
+    /* Djur-rutnätet: tre kolumner på A4 så alla får plats luftigt */
+    .fauna-grid{grid-template-columns:1fr 1fr 1fr;gap:12mm 8mm}
+    .beast.hero{grid-column:1 / -1}
+    .beast.hero .bimg{aspect-ratio:21/9}
+    .beast .bname{font-size:20px}
+    .beast.hero .bname{font-size:30px}
+
+    /* Nedstigningens band fyller sidhöjden */
+    .descent{height:297mm}
+    .band{min-height:0}
+
+    /* Ekosystem: krymp bilderna så alla fyra kort ryms på en A4 */
+    .eco-list{gap:6mm}
+    .eco-img{aspect-ratio:auto;height:33mm}
+    .eco-tx{padding-top:5px}
+    .eco-tx h4{font-size:18px}
+    .eco-tx p{font-size:10.5px;margin-top:4px;line-height:1.45}
+
+    /* Klimatet · stämningskolumner fyller A4-höjden */
+    #p10b .fauna{height:297mm}
+    .moods{min-height:0;flex:1}
+    .mood{min-height:0}
+    .mood-tx h3{font-size:22px}
+    .mood-tx{padding:18px 16px 22px}
+    .mood-words span{font-size:10px}
+
+    /* Handboken fyller A4-bredden */
+    .part-in,.hb-head,.hb-body,.folio{padding-left:20mm;padding-right:20mm}
+    .part-in{padding-top:22mm;padding-bottom:22mm}
+    .part-title{font-size:110px}
+    .part-seed{font-size:16px;max-width:62ch}
+    .hb-head h2{font-size:clamp(40px,6vw,52px)}
+
+    /* Hero-upplevelser: helsida fyller A4 */
+    .xp-top{padding:20mm 20mm 0}
+    .xp-main{padding:0 20mm 22mm}
+    .xp-main h2{font-size:64px}
+    .xp-main p{font-size:15px;max-width:60ch}
+
+    /* Foto-hero i tryck: bilden ryms i sitt eget format (aldrig beskuren) */
+    .xp-photo{height:297mm;min-height:0;display:block;position:relative}
+    .xpp-figure{height:190mm;min-height:0;line-height:0;background:var(--natt)}
+    .xpp-figure img{width:100%;height:100%;object-fit:contain;object-position:center bottom}
+    .xpp-figure::after{display:none}
+    .xpp-top{padding:16mm 20mm 0}
+    .xpp-main{padding:10mm 20mm 16mm}
+    .xpp-main h2{font-size:54px}
+    .xpp-main p{font-size:13.5px;max-width:64ch}
+
+    /* Duo-foto i tryck: två bilder i sitt format, skalade så de + text ryms på en A4 */
+    .xpp-duo{display:flex;flex-direction:column;gap:4mm;height:180mm;padding:0 20mm}
+    .xpp-duo .dphoto{flex:1;min-height:0;line-height:0}
+    .xpp-duo .dphoto img{width:100%;height:100%;object-fit:contain;object-position:center}
+    .xpp-duo::after{display:none}
+
+    /* Delade halvsidor: två halvor fyller A4 */
+    .xp-split{height:297mm}
+    .xp-half{flex:1}
+    .xph-top{padding:14mm 18mm 0}
+    .xph-main{padding:0 18mm 14mm}
+    .xph-main h2{font-size:38px}
+    .xph-main p{font-size:13px;max-width:64ch}
+
+    /* Aktivitetssidor: krymp bilderna så allt ryms på en A4 */
+    .act-grid{grid-template-columns:1fr 1fr 1fr;gap:8mm 6mm;margin-bottom:8mm}
+    .act-img{aspect-ratio:auto;height:34mm}
+    .act.hero{grid-column:1 / -1}
+    .act.hero .act-img{aspect-ratio:auto;height:52mm}
+    #p16 .act.hero .act-img{height:44mm}
+    .act-tx h3{font-size:16px}
+    .act.hero .act-tx h3{font-size:22px}
+    .act-tx p{font-size:10px;line-height:1.4}
+    .tips-img{aspect-ratio:auto;height:30mm}
+    .tips-list li{font-size:10.5px;padding:5px 0 5px 16px}
+
+    /* Boende & guider: håll ihop på en sida */
+    .hb-guide-img{max-height:30mm;aspect-ratio:1}
+
+    /* Klädguide fyller A4-bredd + krymper så allt ryms */
+    .gear-hero{aspect-ratio:auto;height:95mm;margin-bottom:6px}
+    .gear-key-row{padding:5px 0}
+    .gear-key-tx{font-size:11px;line-height:1.35}
+    .gear-key-tx b{font-size:12.5px}
+    .garments{grid-template-columns:1fr 1fr 1fr 1fr;gap:5mm;margin-bottom:8mm}
+    .garment-img{aspect-ratio:auto;height:40mm}
+    .garment h4{font-size:15px}
+    .garment p{font-size:10px;line-height:1.35}
+    .pack-list li{font-size:11px;padding:5px 0 5px 16px}
+  
+  .mapslot{height:64mm;min-height:0}
+
+  .drop .leg{grid-template-columns:44px 1fr 168px}
+  .drop .leg-photo{margin-top:0;width:168px;aspect-ratio:4/3;align-self:start}
+  .drop .leg-photo .ph{position:absolute;inset:0}
+  .drop .leg-photo .ph span{font-size:7.5px;left:7px;bottom:6px;letter-spacing:.04em}
+
+
+  .dropL .leg{grid-template-columns:44px 168px 1fr}
+  .dropL .leg-photo{margin-top:0;width:168px;aspect-ratio:4/3;align-self:start}
+  .dropL .leg-photo .ph{position:absolute;inset:0}
+  .dropL .leg-photo .ph span{font-size:7.5px;left:7px;bottom:6px;letter-spacing:.04em}
+  .dropL .dpin{font-family:'Instrument Sans';font-weight:700;font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--tiger);margin:3px 0 6px}
+  .dropL p{font-family:'Newsreader';font-size:12.5px;line-height:1.55;font-weight:300;color:#2B2823;max-width:44ch}
+
+
+  .foreword{min-height:0;height:100%;justify-content:center}
+  .desc2{min-height:0;height:297mm}
+  .quadgrid{min-height:0;height:297mm}
+
+  /* ===== förord ===== */
+  .foreword{min-height:100svh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:60px 34px;text-align:center}
+  .fw-kick{font-family:'Instrument Sans';font-weight:700;font-size:9px;letter-spacing:.26em;text-transform:uppercase;color:var(--tiger)}
+  .fw-title{font-family:'Instrument Serif';font-size:34px;line-height:1;margin:10px 0 26px;color:var(--black)}
+  .fw-lead{font-family:'Newsreader';font-size:14.5px;line-height:1.7;font-weight:300;color:#2B2823;text-align:left;max-width:44ch;margin:0 0 6px}
+  .fw-drop::first-letter{font-family:'Instrument Serif';font-size:46px;float:left;line-height:.82;padding:5px 9px 0 0;color:var(--tiger)}
+  .fw-quote{margin:22px 0;max-width:40ch;font-family:'Instrument Serif';font-style:italic;font-size:18px;line-height:1.55;color:var(--black);display:flex;flex-direction:column;align-items:center;gap:13px}
+  .fw-rule{width:34px;height:2px;background:var(--tiger)}
+  .fw-list{list-style:none;margin:8px 0 0;max-width:44ch;width:100%;text-align:left}
+  .fw-list li{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #e2d9c4;font-family:'Newsreader';font-size:13.5px;font-weight:300;line-height:1.5;color:#2B2823}
+  .fw-list li:last-child{border-bottom:none}
+  .fw-list b{flex:0 0 auto;width:20px;padding-top:2px;font-family:'Instrument Sans';font-weight:700;font-size:9px;letter-spacing:.14em;color:var(--tiger)}
+  .fw-sign{margin-top:32px;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .fw-sign .bph{width:74px;height:74px;border-radius:50%;overflow:hidden;position:relative;background:var(--natt)}
+  .fw-sign .bph .ph{position:absolute;inset:0}
+  .fw-sign .bph .ph span{font-size:7.5px;left:8px;bottom:7px}
+  .fw-sign .bph img{width:100%;height:100%;object-fit:cover}
+  .fw-name{font-family:'Instrument Serif';font-style:italic;font-size:20px;color:var(--black)}
+  .fw-role{font-family:'Instrument Sans';font-weight:700;font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--mark)}
+  /* ===== helbilds-nedstigning ===== */
+  .desc2{min-height:100svh;display:flex;flex-direction:column;background:var(--natt);color:var(--papper)}
+  .d-sec{position:relative;flex:1;min-height:0;overflow:hidden}
+  .d-sec.d-map{flex:2}
+  .d-sec + .d-sec{border-top:2px solid var(--papper)}
+  .d-sec .ph{position:absolute;inset:0}
+  .d-sec img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .d-headgrad{position:absolute;top:0;left:0;right:0;height:62%;z-index:2;background:linear-gradient(180deg,rgba(13,20,16,.72),rgba(13,20,16,0))}
+  .d-head{position:absolute;top:0;left:0;right:0;z-index:3;padding:26px}
+  .d-head h2{font-family:'Instrument Serif';font-size:clamp(30px,8vw,40px);line-height:1;color:var(--papper);margin-top:7px}
+  .d-sub{font-family:'Newsreader';font-style:italic;font-weight:300;font-size:13.5px;color:#EDE8DB;margin-top:6px}
+  .d-grad{position:absolute;left:0;right:0;bottom:0;height:58%;z-index:2;background:linear-gradient(180deg,rgba(13,20,16,0),rgba(13,20,16,.9))}
+  .d-tx{position:absolute;left:26px;right:110px;bottom:16px;z-index:3}
+  .d-tx h3{font-family:'Instrument Serif';font-size:24px;line-height:1;color:var(--papper)}
+  .d-alt{font-family:'Instrument Sans';font-weight:700;font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--tiger);margin-top:4px}
+  .d-tx p{font-family:'Newsreader';font-size:12px;line-height:1.5;font-weight:300;color:#EDE8DB;margin-top:5px;max-width:38ch}
+  .d-met{position:absolute;right:22px;top:14px;z-index:3;text-align:right}
+  .d-met b{font-family:'Instrument Serif';font-size:17px;color:var(--papper)}
+  .d-met span{display:block;font-family:'Instrument Sans';font-weight:700;font-size:7px;letter-spacing:.2em;text-transform:uppercase;color:var(--gras);margin-top:2px}
+  /* ===== fyra världar 2×2 ===== */
+  .quadgrid{position:relative;min-height:100svh;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:2px;background:var(--papper)}
+  .quad{position:relative;overflow:hidden;background:var(--natt);color:var(--papper)}
+  .quad .xp-img{position:absolute;inset:0}
+  .quad .xp-img .ph{position:absolute;inset:0}
+  .q-top{position:absolute;top:12px;left:14px;z-index:3;font-family:'Instrument Sans';font-weight:700;font-size:7.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--gras)}
+  .q-tx{position:absolute;left:14px;right:14px;bottom:12px;z-index:3}
+  .q-tx h3{font-family:'Instrument Serif';font-size:22px;line-height:1;color:var(--papper)}
+  .q-lat{font-family:'Instrument Sans';font-weight:700;font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--tiger);margin:4px 0 6px}
+  .q-tx p{font-family:'Newsreader';font-size:10.5px;line-height:1.5;font-weight:300;color:#EDE8DB}
+  .q-badge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:6;background:var(--papper);color:var(--black);font-family:'Instrument Sans';font-weight:700;font-size:8px;letter-spacing:.24em;text-transform:uppercase;padding:9px 16px;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.35)}
+
+
+  .toc2wrap{min-height:0;height:100%;justify-content:center}
+  .fauna2{min-height:0;height:297mm}
+  .outro{min-height:0;height:297mm}
+
+  /* ===== innehåll med stora siffror ===== */
+  .toc2wrap{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:60px 30px}
+  .toc2wrap h2{font-family:'Instrument Serif';font-size:clamp(34px,9vw,44px);line-height:1;margin:8px 0 26px}
+  .toc2-row{display:flex;gap:20px;align-items:baseline;padding:16px 0;border-bottom:1px solid #e2d9c4}
+  .toc2-row:last-child{border-bottom:none}
+  .tn2{font-family:'Instrument Serif';font-size:40px;line-height:1;color:var(--tiger);min-width:62px}
+  .tt2{font-family:'Instrument Serif';font-size:21px;line-height:1.15;color:var(--black)}
+  .tt2 small{display:block;font-family:'Newsreader';font-style:italic;font-weight:300;font-size:12.5px;color:var(--mark);margin-top:4px;letter-spacing:0}
+  /* ===== katalog-kvadranter ===== */
+  .fauna.fauna2{padding-bottom:0}
+  .fauna2{min-height:100svh;display:flex;flex-direction:column}
+  .fauna2 .fauna-head{flex:0 0 auto}
+  .fauna-quads{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--papper)}
+  .fauna-quads.rows2{grid-template-rows:1fr 1fr}
+  .q-status{position:absolute;top:12px;left:14px;z-index:3;font-family:'Instrument Sans';font-weight:700;font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;padding:5px 9px;background:rgba(13,20,16,.72);border-radius:2px;color:var(--papper)}
+  .q-status.st-cr{color:#E8907B}.q-status.st-en{color:#E8A87B}.q-status.st-vu{color:#D9BC7A}
+  .q-status.st-nt{color:#A9BC8F}.q-status.st-lc{color:#9FBE93}
+  .quad .xp-img::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(13,20,16,.32) 0%,rgba(13,20,16,0) 26%,rgba(13,20,16,0) 40%,rgba(13,20,16,.92) 100%)}
+  /* ===== utro + handboksomslag ===== */
+  .outro{position:relative;min-height:100svh;background:var(--natt);overflow:hidden}
+  .outro>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .outro>.ph{position:absolute;inset:0}
+  .outro-grad{position:absolute;left:0;right:0;bottom:0;height:72%;z-index:2;
+    background:linear-gradient(180deg,rgba(13,20,16,0),rgba(13,20,16,.94))}
+  .outro-tx{position:absolute;left:26px;right:26px;bottom:11%;z-index:3;text-align:center;color:var(--papper)}
+  .outro-line{font-family:'Instrument Serif';font-size:32px;line-height:1.1}
+  .outro-tx p{font-family:'Newsreader';font-weight:300;font-size:12.5px;line-height:1.6;color:#EDE8DB;max-width:46ch;margin:12px auto 0}
+  .hbc-tx{position:absolute;left:26px;right:26px;bottom:9%;z-index:3;text-align:left;color:var(--papper)}
+  .hbc-tx h2{font-family:'Instrument Serif';font-size:clamp(38px,11vw,50px);line-height:1;color:var(--papper);margin-top:8px}
+  .hbc-tx p{font-family:'Newsreader';font-weight:300;font-size:13px;line-height:1.6;color:#EDE8DB;max-width:44ch;margin-top:10px}
+
+}
+
+  img{display:block}
+  .sans{font-family:'Instrument Sans',sans-serif}
+  .serif{font-family:'Instrument Serif',Georgia,serif;font-weight:400}
+  .label{font-family:'Instrument Sans',sans-serif;letter-spacing:.16em;text-transform:uppercase;font-weight:500}
+  h1,h2,h3,.standfirst{text-wrap:balance}
+
+  /* signatur: gräsränderna */
+  .stripes{display:flex;gap:6px;align-items:flex-end}
+  .stripes i{display:block;width:2.5px;background:currentColor;border-radius:2px}
+  .s1{height:100%}.s2{height:58%}.s3{height:82%}.s4{height:44%}.s5{height:70%}
+
+  /* placeholderfyllnad (diagonalmönster) */
+  .ph{position:absolute;inset:0;
+    background:repeating-linear-gradient(115deg,#22332788 0 3px,transparent 3px 28px),
+      linear-gradient(160deg,#21321f,#0D1410)}
+  .ph span{position:absolute;bottom:16px;left:24px;right:24px;font-family:'Instrument Sans';
+    font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--gras)}
+  .ph.light{background:repeating-linear-gradient(115deg,#e3dac4 0 2px,transparent 2px 16px),#F0E8D6}
+  .ph.light span{color:#b58a5c}
+
+  /* ============ SIDA 1 · OMSLAG (helbild) ============ */
+  .cover{background:var(--natt);color:var(--papper);display:flex;flex-direction:column;position:relative}
+  /* Bilden i sitt eget format högst upp, aldrig stretchad */
+  .cover-img{position:relative;width:100%;height:58svh;line-height:0;background:var(--natt);overflow:hidden}
+  .cover-img .ph{position:absolute;inset:0;background:none}
+  .cover-img .ph.has-img img,.cover-img img{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover;object-position:50% 30%}
+  .cover-img img{width:100%;height:100%;display:block}
+  /* mjuk övergång från bildens underkant ner i mörkret där titeln ligger */
+  .cover-img::after{content:"";position:absolute;left:0;right:0;bottom:0;height:160px;
+    background:linear-gradient(180deg,rgba(13,20,16,0) 0%,#0D1410 100%);pointer-events:none;z-index:2}
+  /* brand + label pinnade högst upp över bilden */
+  .cover-top{position:absolute;z-index:4;top:0;left:0;right:0;padding:26px;
+    display:flex;justify-content:space-between;align-items:flex-start;
+    background:linear-gradient(180deg,rgba(13,20,16,.55) 0%,rgba(13,20,16,0) 100%)}
+  .brand{font-family:'Instrument Sans';font-weight:700;font-size:14px;letter-spacing:.3em}
+  .brand b{color:var(--tiger)}
+  .cover-top .label{font-size:9.5px;text-align:right;line-height:1.9;opacity:.85}
+  .cover-stripes{position:absolute;top:26px;right:26px;color:rgba(201,180,126,.6);height:52px;z-index:5;display:none}
+  /* titelblocket under bilden, på mörk botten */
+  .cover-main{position:relative;z-index:3;margin-top:-4px;padding:20px 26px 34px}
+  .cover-kick{font-family:'Instrument Sans';font-size:10.5px;letter-spacing:.26em;
+    text-transform:uppercase;color:var(--gras);margin-bottom:14px}
+  h1.cover-title{font-family:'Instrument Serif';font-weight:400;text-transform:uppercase;
+    font-size:clamp(46px,13.5vw,68px);line-height:.95;letter-spacing:.02em}
+  .cover-frame{font-family:'Instrument Serif';font-style:italic;
+    font-size:clamp(15px,4.2vw,26px);color:var(--tiger);margin-top:8px;letter-spacing:.005em;
+    white-space:nowrap}
+  .cover-seed{margin-top:16px;font-size:14.5px;line-height:1.55;font-weight:300;color:#EDE8DB;max-width:40ch}
+  .cover-seed em{font-style:italic;color:var(--gras)}
+
+  /* ============ SIDA 2 · INNEHÅLL (klickbar, mindre bokaktig) ============ */
+  .toc{padding:44px 26px 40px;min-height:100svh;display:flex;flex-direction:column}
+  .toc-kick{font-family:'Instrument Sans';font-weight:700;font-size:10px;letter-spacing:.26em;
+    text-transform:uppercase;color:var(--tiger)}
+  .toc h2{font-family:'Instrument Serif';font-size:clamp(40px,11vw,52px);line-height:1;margin:8px 0 6px}
+  .toc-sub{font-family:'Newsreader';font-style:italic;font-size:15px;color:#3c3a34;margin-bottom:26px}
+  .toc-part{font-family:'Instrument Sans';font-weight:700;font-size:9px;letter-spacing:.22em;
+    text-transform:uppercase;color:#b58a5c;margin:22px 0 4px}
+  .toc-part:first-of-type{margin-top:0}
+  .toc-row{display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit;
+    padding:13px 0;border-bottom:1px solid #e2d9c4}
+  .toc-row .pno{font-family:'Instrument Sans';font-weight:700;font-size:13px;letter-spacing:.05em;
+    color:var(--tiger);min-width:22px}
+  .toc-row .tt{flex:1;font-family:'Instrument Serif';font-size:20px;line-height:1.1}
+  .toc-row .tt small{display:block;font-family:'Newsreader';font-size:12px;color:var(--mark);
+    font-weight:300;margin-top:2px;letter-spacing:0}
+  .toc-row .arw{font-family:'Instrument Sans';color:var(--tiger);font-size:18px;
+    transition:transform .2s}
+  a.toc-row:active .arw{transform:translateX(4px)}
+  .toc-row.soon{opacity:.45}
+  .toc-row.soon .arw{color:var(--mark)}
+  .toc-row.soon .tt small{font-style:italic}
+  .toc-note{margin-top:auto;padding-top:22px;font-family:'Instrument Sans';font-size:9.5px;
+    letter-spacing:.06em;color:var(--mark);line-height:1.7}
+
+  /* ============ SIDA 3 · OM DIG (placeholder + bilder) ============ */
+  .about{min-height:100svh;display:flex;flex-direction:column}
+  .about-hero{position:relative;height:52svh;min-height:340px;background:var(--natt)}
+  .about-hero img{width:100%;height:100%;object-fit:cover;object-position:center 30%}
+  .about-hero .frame-note{position:absolute;z-index:3;top:16px;left:24px;
+    font-family:'Instrument Sans';font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+    color:rgba(247,241,228,.75);border:1px solid rgba(247,241,228,.4);padding:5px 10px}
+  .about-body{padding:30px 26px 40px;flex:1}
+  .about-kick{font-family:'Instrument Sans';font-weight:700;font-size:10px;letter-spacing:.24em;
+    text-transform:uppercase;color:var(--tiger)}
+  .about-body h2{font-family:'Instrument Serif';font-size:clamp(34px,9vw,44px);line-height:1;margin:8px 0 16px}
+  .fill{border:1px dashed #c7bca3;background:#F0E8D6;padding:16px 18px;border-radius:2px;margin-bottom:16px}
+  .fill .ft{font-family:'Instrument Sans';font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--tiger);font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:7px}
+  .fill .ft::before{content:"";width:13px;height:13px;border:2px solid var(--tiger);border-radius:3px;flex:none}
+  .fill p{font-size:13px;line-height:1.6;color:#4a4438}
+  .fill .seed{color:var(--black);font-weight:500}
+  .about-quote{font-family:'Instrument Serif';font-style:italic;font-size:17px;line-height:1.5;
+    color:var(--black);border-left:3px solid var(--tiger);padding-left:16px;margin:18px 0}
+  .about-lead{font-size:14px;line-height:1.65;color:#2B2823;font-weight:300;margin-bottom:12px}
+  .about-list{list-style:none;margin:0 0 18px}
+  .about-list li{font-size:13.5px;line-height:1.5;color:#2B2823;padding:8px 0 8px 22px;
+    position:relative;border-bottom:1px solid #e2d9c4}
+  .about-list li:last-child{border-bottom:none}
+  .about-list li::before{content:"";position:absolute;left:2px;top:15px;width:6px;height:6px;
+    background:var(--tiger);border-radius:50%}
+  .about-close{font-family:'Instrument Serif';font-style:italic;font-size:19px;color:var(--tiger);
+    margin-top:4px}
+
+  /* ============ SIDA 10C · MÄNNISKORNA ============ */
+  .people{min-height:100svh;display:flex;flex-direction:column}
+  .people-hero{position:relative;height:50svh;min-height:330px;background:var(--natt)}
+  .people-hero img{width:100%;height:100%;object-fit:cover;object-position:center 35%}
+  .people-hero .frame-note{position:absolute;z-index:3;top:16px;left:24px;
+    font-family:'Instrument Sans';font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+    color:rgba(247,241,228,.75);border:1px solid rgba(247,241,228,.4);padding:5px 10px}
+  .people-body{padding:32px 26px 40px;flex:1}
+  .people-kick{font-family:'Instrument Sans';font-weight:700;font-size:10px;letter-spacing:.24em;
+    text-transform:uppercase;color:var(--tiger)}
+  .people-body h2{font-family:'Instrument Serif';font-size:clamp(34px,9vw,44px);line-height:1;margin:8px 0 18px}
+  .people-body p{font-size:13.5px;line-height:1.65;color:#2B2823;font-weight:300;margin-bottom:13px;max-width:60ch}
+  .people-body p:last-child{margin-bottom:0}
+
+  /* ============ SIDA 4 · NEDSTIGNINGEN (mobil-först band) ============ */
+  .descent{background:var(--natt);color:var(--papper);min-height:100svh;
+    display:flex;flex-direction:column}
+  .desc-head{position:relative;z-index:6;padding:30px 26px 18px}
+  .desc-head .kick{font-family:'Instrument Sans';font-weight:700;font-size:9.5px;letter-spacing:.26em;
+    text-transform:uppercase;color:var(--tiger)}
+  .desc-head h2{font-family:'Instrument Serif';font-size:clamp(34px,10vw,46px);line-height:1;
+    color:var(--papper);margin-top:8px}
+  .desc-head .stripes{margin-top:12px;color:var(--gras);height:28px}
+  .desc-bands{flex:1;display:flex;flex-direction:column}
+  .band{position:relative;flex:1;min-height:230px;overflow:hidden;background:var(--natt);
+    display:flex;align-items:flex-end}
+  .band + .band{border-top:3px solid var(--papper)}
+  .band img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .band .grad{position:absolute;inset:0}
+  .b1 .grad{background:linear-gradient(180deg,rgba(13,20,16,.15) 30%,rgba(13,20,16,.8) 100%)}
+  .b2 .grad{background:linear-gradient(180deg,rgba(13,20,16,.15) 35%,rgba(13,20,16,.82) 100%)}
+  .b3 .grad{background:linear-gradient(180deg,rgba(13,20,16,.22) 30%,rgba(13,20,16,.9) 100%)}
+  .bmap .grad{background:linear-gradient(180deg,rgba(13,20,16,.15) 35%,rgba(13,20,16,.82) 100%)}
+  .band .tag{position:relative;z-index:3;padding:20px 26px 22px;color:var(--papper);max-width:74%}
+  .band .tag .alt{font-family:'Instrument Sans';font-weight:700;font-size:8px;letter-spacing:.24em;
+    text-transform:uppercase;color:var(--gras);margin-bottom:5px}
+  .band .tag .pin{font-family:'Instrument Sans';font-weight:700;font-size:8.5px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--tiger);margin-bottom:5px}
+  .band .tag h3{font-family:'Instrument Serif';font-size:clamp(28px,7vw,36px);line-height:1;
+    text-shadow:0 2px 18px rgba(0,0,0,.6)}
+  .band .tag p{font-family:'Newsreader';font-size:12.5px;line-height:1.5;font-weight:300;
+    color:#EDE8DB;margin-top:7px;max-width:34ch;text-shadow:0 1px 12px rgba(0,0,0,.6)}
+  .band .meters{position:absolute;z-index:4;right:22px;top:18px;display:flex;align-items:center;gap:8px}
+  .band .meters b{font-family:'Instrument Serif';font-size:15px;color:var(--papper);
+    text-shadow:0 2px 10px rgba(0,0,0,.7)}
+  .band .meters .u{font-family:'Instrument Sans';font-size:7.5px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--gras)}
+
+  /* ============ SIDOR 5-7 · DJUREN (faktabok) ============ */
+  .fauna{min-height:100svh;display:flex;flex-direction:column;padding-bottom:36px}
+  .fauna-head{padding:34px 26px 20px}
+  .fauna-head .kick{font-family:'Instrument Sans';font-weight:700;font-size:9.5px;letter-spacing:.26em;
+    text-transform:uppercase;color:var(--tiger)}
+  .fauna-head h2{font-family:'Instrument Serif';font-size:clamp(32px,8.5vw,42px);line-height:1;margin:8px 0 6px}
+  .fauna-head .sub{font-family:'Newsreader';font-style:italic;font-size:14px;color:#3c3a34;max-width:40ch}
+  .fauna-grid{padding:0 26px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .beast{display:flex;flex-direction:column}
+  .beast .bimg{position:relative;aspect-ratio:4/5;background:var(--natt);overflow:hidden;border-radius:2px}
+  .beast .bimg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .beast .status{position:absolute;z-index:3;top:9px;left:9px;font-family:'Instrument Sans';
+    font-weight:700;font-size:7px;letter-spacing:.12em;text-transform:uppercase;
+    padding:3px 7px;border-radius:2px;color:#fff}
+  .st-cr{background:#A4351F}   /* akut hotad */
+  .st-en{background:#C96322}   /* starkt hotad */
+  .st-vu{background:#B08A2E}   /* sårbar */
+  .st-nt{background:#6E7B52}   /* nära hotad */
+  .st-lc{background:#3d6b4a}   /* livskraftig */
+  .beast .bname{font-family:'Instrument Serif';font-size:19px;line-height:1.05;margin-top:9px}
+  .beast .blat{font-family:'Newsreader';font-style:italic;font-size:11px;color:var(--mark);margin-top:1px}
+  .beast .bfact{font-size:11.5px;line-height:1.45;color:#2B2823;margin-top:6px;font-weight:300}
+  /* hjälte-djur (tigern) spänner över hela bredden */
+  .beast.hero{grid-column:1 / -1}
+  .beast.hero .bimg{aspect-ratio:16/10}
+  .beast.hero .bname{font-size:26px}
+  .beast.hero .bfact{font-size:12.5px;max-width:52ch}
+
+
+  /* ===== EKOSYSTEM-ÖVERSIKT (sida 10) — stora kort ===== */
+  .eco-list{padding:0 26px;display:flex;flex-direction:column;gap:26px}
+  .eco{display:flex;flex-direction:column}
+  .eco-img{position:relative;width:100%;aspect-ratio:16/10;background:var(--natt);
+    overflow:hidden;border-radius:2px}
+  .eco-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .eco-tx{padding-top:12px}
+  .eco-tx h4{font-family:'Instrument Serif';font-size:24px;line-height:1.05}
+  .eco-tx .eco-lat{font-family:'Instrument Sans';font-size:9px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--tiger);font-weight:700;margin-top:4px}
+  .eco-tx p{font-size:13px;line-height:1.55;color:#2B2823;margin-top:8px;font-weight:300;max-width:60ch}
+
+  /* ===== KLIMATET (sida 10b) — säsongskort ===== */
+  .season-list{padding:0 26px;display:flex;flex-direction:column;gap:24px}
+  .season{display:flex;flex-direction:column}
+  .season-img{position:relative;width:100%;aspect-ratio:16/9;background:var(--natt);
+    overflow:hidden;border-radius:2px}
+  .season-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .season-tx{padding-top:12px}
+  .season-tag{font-family:'Instrument Sans';font-weight:700;font-size:8.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--tiger)}
+  .season-tx h3{font-family:'Instrument Serif';font-size:24px;line-height:1.05;margin:4px 0 0}
+  .season-tx p{font-size:12.5px;line-height:1.55;color:#2B2823;margin-top:8px;font-weight:300;max-width:60ch}
+
+  /* ===== KLIMATET · TRE STÄMNINGSKOLUMNER ===== */
+  .moods{display:flex;gap:8px;padding:0 26px;flex:1;min-height:0}
+  .mood{flex:1 1 0;min-width:0;position:relative;border-radius:4px;overflow:hidden;
+    display:flex;flex-direction:column;justify-content:flex-end;min-height:60svh;isolation:isolate}
+  /* atmosfäriska bakgrunder per säsong */
+  .mood.m-dry{background:linear-gradient(180deg,#8ea3ad 0%,#a7b4b0 30%,#c2b98f 100%)}
+  .mood.m-hot{background:linear-gradient(180deg,#d99a4e 0%,#c87a35 45%,#9c5a28 100%)}
+  .mood.m-wet{background:linear-gradient(180deg,#3f6b57 0%,#2f7d5a 40%,#1f5a3f 100%)}
+  .mood-art{position:absolute;inset:0;z-index:1;overflow:hidden}
+  .mood-scrim{position:absolute;inset:0;z-index:2;
+    background:linear-gradient(180deg,rgba(13,20,16,0) 40%,rgba(13,20,16,.55) 78%,rgba(13,20,16,.88) 100%)}
+  .mood-tx{position:relative;z-index:3;padding:16px 14px 18px;color:var(--papper)}
+  .mood-months{font-family:'Instrument Sans';font-weight:700;font-size:8px;letter-spacing:.14em;
+    text-transform:uppercase;color:rgba(247,241,228,.85);margin-bottom:5px}
+  .mood-tx h3{font-family:'Instrument Serif';font-size:20px;line-height:1;margin-bottom:8px}
+  .mood-words{display:flex;flex-direction:column;gap:3px}
+  .mood-words span{font-family:'Instrument Sans';font-size:9px;letter-spacing:.04em;
+    color:#EDE8DB;font-weight:400;display:flex;align-items:center;gap:5px}
+  .mood-words span::before{content:"";width:4px;height:4px;border-radius:50%;
+    background:rgba(247,241,228,.7);flex:none}
+  .mood-label{position:absolute;top:12px;left:0;right:0;z-index:3;text-align:center;
+    font-family:'Instrument Sans';font-weight:700;font-size:8.5px;letter-spacing:.2em;
+    text-transform:uppercase;color:rgba(247,241,228,.9)}
+
+  /* illustrativa element (rena CSS-former) */
+  /* dimstråk */
+  .fog{position:absolute;left:-10%;width:120%;height:14px;border-radius:50%;
+    background:rgba(247,241,228,.35);filter:blur(6px)}
+  /* sol */
+  .sun{position:absolute;top:16%;left:50%;transform:translateX(-50%);width:56px;height:56px;
+    border-radius:50%;background:radial-gradient(circle,#ffe8b0 0%,#ffd27a 60%,rgba(255,210,122,0) 72%)}
+  /* marksprickor */
+  .crack{position:absolute;bottom:0;width:2px;background:rgba(90,50,20,.5);transform-origin:bottom}
+  /* regnstreck */
+  .rain{position:absolute;width:1.5px;height:16px;background:linear-gradient(180deg,rgba(247,241,228,0),rgba(247,241,228,.55));border-radius:2px}
+  /* vattennivå (halvtransparent) */
+  .water{position:absolute;left:0;right:0;bottom:0;background:rgba(31,90,63,.4)}
+
+  .folio{padding:22px 26px 0;font-family:'Instrument Sans';font-size:8.5px;letter-spacing:.25em;
+    text-transform:uppercase;color:var(--mark);display:flex;justify-content:space-between}
+
+  /* ============ VERKTYGSFÄLT (skärm) ============ */
+  .dev-note{max-width:var(--pageW);width:100%;font-family:'Instrument Sans';font-size:11px;
+    line-height:1.8;color:#9b957f;background:#0d1410;padding:16px 22px}
+  .dev-note b{color:#C2AC74}
+  a{color:inherit}
+
+  /* ═══════════ DEL 2 · HANDBOKEN ═══════════ */
+
+  /* Delsida */
+  .part-cover{background:var(--natt);color:var(--papper);min-height:100svh}
+  .part-img{position:absolute;inset:0}
+  .part-img img{width:100%;height:100%;object-fit:cover}
+  .part-img::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(13,20,16,.55) 0%,rgba(13,20,16,.2) 40%,rgba(13,20,16,.9) 85%,#0D1410 100%)}
+  .part-in{position:absolute;inset:0;padding:28px 26px;display:flex;flex-direction:column}
+  .part-top{display:flex;justify-content:space-between;align-items:flex-start}
+  .part-top .label{font-family:'Instrument Sans';font-weight:700;font-size:11px;letter-spacing:.28em;
+    text-transform:uppercase;color:var(--tiger)}
+  .part-main{margin-top:auto}
+  .part-kick{font-family:'Instrument Sans';font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;
+    color:var(--gras);margin-bottom:12px}
+  h1.part-title{font-family:'Instrument Serif';font-weight:400;font-size:clamp(56px,17vw,84px);line-height:.9}
+  .part-seed{margin-top:16px;font-size:15px;line-height:1.6;font-weight:300;color:#EDE8DB;max-width:42ch}
+  .part-stripes{margin-top:20px;color:var(--gras);height:34px}
+
+  /* Handboks-sidor generellt */
+  .hb{min-height:100svh;display:flex;flex-direction:column;padding-bottom:36px}
+  .hb-head{padding:34px 26px 20px}
+  .hb-head .kick{font-family:'Instrument Sans';font-weight:700;font-size:9.5px;letter-spacing:.26em;
+    text-transform:uppercase;color:var(--tiger)}
+  .hb-head h2{font-family:'Instrument Serif';font-size:clamp(32px,8.5vw,42px);line-height:1;margin:8px 0 6px}
+  .hb-head .sub{font-family:'Newsreader';font-style:italic;font-size:14px;color:#3c3a34;max-width:42ch}
+  .hb-body{padding:0 26px;flex:1}
+
+  /* Kort (visum/vaccin) */
+  .hb-card{border:1px solid #d9d0bb;border-radius:3px;padding:18px;margin-bottom:16px;background:#FBF6EA}
+  .hb-card-h{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .hb-card-h .hb-no{font-family:'Instrument Sans';font-weight:700;font-size:12px;color:#fff;
+    background:var(--tiger);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;flex:none}
+  .hb-card-h h3{font-family:'Instrument Serif';font-size:22px;line-height:1}
+  .hb-card p{font-size:12.5px;line-height:1.55;color:#2B2823;font-weight:300}
+  .hb-list{list-style:none;margin:10px 0}
+  .hb-list li{font-size:12px;line-height:1.5;color:#2B2823;padding:5px 0 5px 16px;position:relative}
+  .hb-list li::before{content:"";position:absolute;left:0;top:12px;width:5px;height:5px;
+    background:var(--tiger);border-radius:50%}
+  .hb-list li b{font-weight:600}
+  .hb-tip{font-family:'Instrument Sans';font-size:11px;line-height:1.6;color:#5a5442;
+    background:#F0E8D6;border-left:3px solid var(--tiger);padding:10px 13px;margin-top:12px;border-radius:0 3px 3px 0}
+
+  /* Vägen dit: säsong */
+  .hb-when{background:var(--natt);color:var(--papper);border-radius:3px;padding:20px;margin-bottom:20px}
+  .hb-when-tag{font-family:'Instrument Sans';font-weight:700;font-size:9px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--gras)}
+  .hb-when h3{font-family:'Instrument Serif';font-size:32px;line-height:1;color:var(--papper);margin:4px 0 8px}
+  .hb-when p{font-size:12.5px;line-height:1.6;color:#EDE8DB;font-weight:300}
+
+  /* ===== SAFARI-ÅRSKALENDER (12 månader) ===== */
+  .yearcal{margin:16px 0 4px}
+  .yc-strip{display:grid;grid-template-columns:repeat(12,1fr);gap:3px}
+  .yc-month{position:relative;border-radius:2px;overflow:hidden;text-align:center;
+    padding:8px 0 9px;min-height:58px;display:flex;flex-direction:column;justify-content:flex-start}
+  .yc-m{font-family:'Instrument Sans';font-weight:700;font-size:8px;letter-spacing:.02em;
+    text-transform:uppercase}
+  .yc-dot{margin-top:auto;font-family:'Instrument Sans';font-size:7px;font-weight:600;
+    letter-spacing:.02em;line-height:1.2;padding:0 1px}
+  /* betygsfärger */
+  .yc-best{background:#C96322;color:#fff}
+  .yc-best .yc-m{color:#fff}
+  .yc-good{background:#5a7a52;color:#EDE8DB}
+  .yc-good .yc-m{color:#fff}
+  .yc-poor{background:#39433a;color:rgba(237,232,219,.6)}
+  .yc-poor .yc-m{color:rgba(237,232,219,.7)}
+  /* teckenförklaring */
+  .yc-key{display:flex;gap:16px;margin-top:12px;flex-wrap:wrap}
+  .yc-key span{display:flex;align-items:center;gap:6px;font-family:'Instrument Sans';
+    font-size:9px;letter-spacing:.02em;color:#EDE8DB}
+  .yc-key i{width:12px;height:12px;border-radius:2px;flex:none}
+  .yc-cap{font-family:'Instrument Sans';font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--gras);margin-bottom:8px;font-weight:700}
+
+  /* Vägen dit: SLALOM-RESKARTA */
+  .route{position:relative;padding:6px 0 4px}
+  .leg{position:relative;display:grid;grid-template-columns:44px 1fr;gap:16px;
+    padding-bottom:26px;align-items:start}
+  .leg:last-child{padding-bottom:0}
+  /* nod-kolumnen */
+  .leg-node{position:relative;display:flex;flex-direction:column;align-items:center}
+  .leg-dot{width:22px;height:22px;border-radius:50%;background:var(--tiger);
+    border:3px solid var(--papper);box-shadow:0 0 0 1px var(--tiger);z-index:2;flex:none;
+    display:flex;align-items:center;justify-content:center;color:#fff;
+    font-family:'Instrument Sans';font-weight:700;font-size:10px}
+  .leg-dot.start{background:var(--natt);box-shadow:0 0 0 1px var(--natt)}
+  .leg-dot.end{background:var(--rod);box-shadow:0 0 0 1px var(--rod)}
+  /* slalom-linjen mellan noder (SVG-liknande via border) */
+  .leg-line{position:absolute;top:22px;bottom:-4px;left:50%;width:2px;
+    background:repeating-linear-gradient(var(--tiger) 0 6px,transparent 6px 12px);
+    transform:translateX(-50%)}
+  /* transportikon på linjen */
+  .leg-mode{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    background:var(--papper);z-index:3;font-size:13px;line-height:1;padding:3px 0}
+  /* innehåll */
+  .leg-tx{padding-top:1px}
+  .leg-place{font-family:'Instrument Serif';font-size:21px;line-height:1;margin-bottom:2px}
+  .leg-arrow{font-family:'Instrument Sans';font-weight:700;font-size:8.5px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--tiger);margin-bottom:7px}
+  .leg-do{font-size:13px;line-height:1.5;color:#2B2823;font-weight:300;max-width:46ch}
+  .leg-meta{display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap}
+  .leg-meta .pris{margin:0}
+  .leg-link{font-family:'Instrument Sans';font-weight:700;font-size:9px;letter-spacing:.04em;
+    color:var(--tiger);text-decoration:none;border-bottom:1.5px solid var(--tiger);padding-bottom:1px}
+  .leg-time{font-family:'Instrument Sans';font-size:9px;letter-spacing:.06em;color:var(--mark);
+    text-transform:uppercase;font-weight:600}
+  .leg-photo{margin-top:10px;width:100%;aspect-ratio:16/9;border-radius:3px;overflow:hidden;
+    background:var(--natt);position:relative}
+  .leg-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
+  /* Prisbricka — gräs-beige, mörk text, neutral */
+  .pris{display:inline-block;font-family:'Instrument Sans';font-weight:700;font-size:9px;
+    letter-spacing:.06em;background:#9CBB7C;color:#22331A;padding:3px 8px;border-radius:3px;
+    white-space:nowrap;vertical-align:middle}
+  .act-tx h3 .pris,.hb-step-tx h4 .pris,.hb-stay-tx h3 .pris{margin-left:8px;font-size:8.5px;
+    transform:translateY(-1px)}
+  .pris-row{margin-top:6px}
+  .pris-row .pris{margin-left:0}
+  .pris-after{margin-top:9px}
+  .pris-after .pris{margin-left:0}
+
+  /* Boende */
+  .hb-stay{display:grid;grid-template-columns:110px 1fr;gap:14px;margin-bottom:16px;align-items:stretch}
+  .hb-stay-img{position:relative;border-radius:2px;overflow:hidden;background:var(--natt);min-height:100px}
+  .hb-stay-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .hb-stay-tag{font-family:'Instrument Sans';font-weight:700;font-size:8px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--tiger)}
+  .hb-stay-tx h3{font-family:'Instrument Serif';font-size:21px;line-height:1;margin:3px 0 6px}
+  .hb-stay-tx p{font-size:12px;line-height:1.5;color:#2B2823;font-weight:300}
+
+  /* Guider */
+  .hb-guides{border-top:2px solid var(--black);padding-top:16px;margin-top:6px}
+  .hb-guides-h{font-family:'Instrument Serif';font-size:22px;margin-bottom:4px}
+  .hb-guides-lead{font-size:12px;line-height:1.5;color:#3c3a34;font-weight:300;margin-bottom:14px;font-style:italic;font-family:'Newsreader'}
+  .hb-guide-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .hb-guide{text-align:center}
+  .hb-guide-img{position:relative;aspect-ratio:1;border-radius:50%;overflow:hidden;background:var(--natt);margin-bottom:8px}
+  .hb-guide-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .hb-guide h4{font-family:'Instrument Serif';font-size:15px;line-height:1.1}
+  .hb-guide-role{font-family:'Instrument Sans';font-size:8px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--mark);margin-top:2px}
+
+  /* Aktiviteter */
+  .act-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+  .act{display:flex;flex-direction:column}
+  .act-img{position:relative;aspect-ratio:4/5;background:var(--natt);overflow:hidden;border-radius:2px}
+  .act-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .act-tx h3{font-family:'Instrument Serif';font-size:19px;line-height:1.05;margin-top:9px}
+  .act-tx p{font-size:11.5px;line-height:1.45;color:#2B2823;margin-top:5px;font-weight:300}
+  .act.hero{grid-column:1 / -1}
+  .act.hero .act-img{aspect-ratio:16/9}
+  .act.hero .act-tx h3{font-size:25px}
+  .act.hero .act-tx p{font-size:12.5px;max-width:54ch}
+
+  /* ===== HERO-UPPLEVELSE (helsida) ===== */
+  .xp{position:relative;min-height:100svh;background:var(--natt);color:var(--papper);display:flex;flex-direction:column}
+  .xp-img{position:absolute;inset:0}
+  .xp-img .ph{position:absolute;inset:0}
+  .xp-img img{width:100%;height:100%;object-fit:cover}
+  .xp-img::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(13,20,16,.45) 0%,rgba(13,20,16,0) 30%,rgba(13,20,16,0) 45%,rgba(13,20,16,.92) 85%,#0D1410 100%)}
+  .xp-top{position:relative;z-index:3;padding:28px 26px;display:flex;justify-content:space-between;align-items:flex-start}
+  .xp-num{font-family:'Instrument Sans';font-weight:700;font-size:10px;letter-spacing:.24em;
+    text-transform:uppercase;color:var(--gras)}
+  .xp-main{position:relative;z-index:3;margin-top:auto;padding:0 26px 34px}
+  .xp-tag{font-family:'Instrument Sans';font-weight:700;font-size:9.5px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--gras);margin-bottom:12px}
+  .xp-main h2{font-family:'Instrument Serif';font-size:clamp(42px,12vw,60px);line-height:.95;color:var(--papper)}
+  .xp-main .xp-pris{display:inline-block;font-family:'Instrument Sans';font-weight:700;font-size:10.5px;
+    letter-spacing:.06em;background:#9CBB7C;color:#22331A;padding:5px 12px;border-radius:3px;margin-top:16px}
+  .xp-main p{font-size:14.5px;line-height:1.6;font-weight:300;color:#EDE8DB;margin-top:14px;max-width:44ch}
+  .xp-stripes{margin-top:18px;color:var(--gras);height:30px}
+
+  /* ===== FOTO-HERO: respekterar bildens proportioner (ingen inzoomning) ===== */
+  /* Bilden ligger i flödet i sitt eget format, texten under på mörk botten */
+  .xp-photo{position:relative;background:var(--natt);color:var(--papper);
+    display:flex;flex-direction:column}
+  .xp-photo .xpp-top{position:absolute;z-index:4;top:0;left:0;right:0;
+    padding:22px 24px;display:flex;justify-content:space-between;align-items:flex-start;
+    background:linear-gradient(180deg,rgba(13,20,16,.6) 0%,rgba(13,20,16,0) 100%)}
+  .xp-photo .xpp-top .xp-num{color:var(--gras)}
+  .xpp-figure{position:relative;width:100%;line-height:0;background:var(--natt)}
+  .xpp-figure img{width:100%;height:auto;display:block}
+  /* mjuk övergång från bildens underkant ner i den mörka texten */
+  .xpp-figure::after{content:"";position:absolute;left:0;right:0;bottom:0;height:120px;
+    background:linear-gradient(180deg,rgba(13,20,16,0) 0%,#0D1410 100%);pointer-events:none}
+  .xpp-main{position:relative;z-index:3;padding:20px 26px 34px;margin-top:-4px}
+  .xpp-main .xp-tag{color:var(--tiger)}
+  .xpp-main h2{font-family:'Instrument Serif';font-size:clamp(40px,11vw,58px);line-height:.95;color:var(--papper)}
+  .xpp-main p{font-size:14px;line-height:1.6;font-weight:300;color:#EDE8DB;margin-top:12px;max-width:46ch}
+  .xpp-main .xp-pris{display:inline-block;font-family:'Instrument Sans';font-weight:700;font-size:10.5px;
+    letter-spacing:.06em;background:#9CBB7C;color:#22331A;padding:5px 12px;border-radius:3px;margin-top:14px}
+  .xpp-main .xp-stripes{margin-top:16px}
+
+  /* ===== HALVSIDS-HERO (två per sida, delad helsida) ===== */
+  .xp-split{min-height:100svh;display:flex;flex-direction:column}
+  .xp-half{position:relative;flex:1;min-height:0;background:var(--natt);color:var(--papper);
+    overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end}
+  .xp-half + .xp-half{border-top:2px solid var(--papper)}
+  .xp-half .xp-img{position:absolute;inset:0}
+  .xp-half .xp-img .ph{position:absolute;inset:0}
+  .xp-half .xp-img img{width:100%;height:100%;object-fit:cover}
+  .xp-half .xp-img::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(13,20,16,.35) 0%,rgba(13,20,16,0) 32%,rgba(13,20,16,0) 42%,rgba(13,20,16,.92) 88%,#0D1410 100%)}
+  .xph-top{position:relative;z-index:3;padding:18px 24px 0;display:flex;justify-content:space-between;align-items:flex-start}
+  .xph-status{font-family:'Instrument Sans';font-weight:700;font-size:8px;letter-spacing:.1em;
+    text-transform:uppercase;color:#fff;padding:3px 8px;border-radius:3px}
+  .xph-eco{font-family:'Instrument Sans';font-weight:700;font-size:8.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--gras)}
+  .xph-main{position:relative;z-index:3;margin-top:auto;padding:0 24px 24px}
+  .xph-lat{font-family:'Instrument Sans';font-style:italic;font-size:10px;letter-spacing:.04em;
+    color:var(--gras);margin-bottom:4px}
+  .xph-main h2{font-family:'Instrument Serif';font-size:clamp(30px,8vw,40px);line-height:.98;color:var(--papper)}
+  .xph-main p{font-size:12.5px;line-height:1.5;font-weight:300;color:#EDE8DB;margin-top:8px;max-width:52ch}
+
+  /* ===== HERO MED TVÅ BILDER (collage-helsida) ===== */
+  .xp-duo{position:absolute;inset:0;display:flex;flex-direction:column}
+  .xp-duo .duo-img{position:relative;flex:1;min-height:0;overflow:hidden;background:var(--natt)}
+  .xp-duo .duo-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .xp-duo .duo-img.ph{background-image:repeating-linear-gradient(45deg,#12201a 0 10px,#0f1c16 10px 20px)}
+
+  /* ===== TVÅ BILDER I SITT EGET FORMAT (staplade, ingen cropping) ===== */
+  .xpp-duo{position:relative;width:100%;background:var(--natt);line-height:0}
+  .xpp-duo .dphoto{position:relative;width:100%;line-height:0}
+  .xpp-duo .dphoto img{width:100%;height:auto;display:block}
+  .xpp-duo .dphoto + .dphoto{margin-top:3px}
+  .xpp-duo::after{content:"";position:absolute;left:0;right:0;bottom:0;height:120px;
+    background:linear-gradient(180deg,rgba(13,20,16,0) 0%,#0D1410 100%);pointer-events:none}
+
+  /* Aktivitets-index (intro-sidan) */
+  .xp-index{display:flex;flex-direction:column}
+  .xp-index-row{display:flex;align-items:center;gap:14px;padding:15px 0;border-bottom:1px solid #e2d9c4}
+  .xp-index-row:last-child{border-bottom:none}
+  .xp-index-no{font-family:'Instrument Sans';font-weight:700;font-size:12px;color:var(--tiger);min-width:24px}
+  .xp-index-tx{flex:1;font-family:'Instrument Serif';font-size:22px;line-height:1}
+  .xp-index-row.soon{opacity:.55}
+  .xp-index-row.soon .xp-index-tx{font-size:18px}
+
+  /* Guider (egen sida) — större porträtt med luft */
+  .guide-list{display:flex;flex-direction:column;gap:20px}
+  .guide-big{display:grid;grid-template-columns:130px 1fr;gap:18px;align-items:center;
+    border-top:2px solid var(--black);padding-top:20px}
+  .guide-big:first-child{border-top:none;padding-top:0}
+  .guide-big-img{position:relative;aspect-ratio:1;border-radius:50%;overflow:hidden;background:var(--natt)}
+  .guide-big-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .guide-big-role{font-family:'Instrument Sans';font-weight:700;font-size:9px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--tiger)}
+  .guide-big-tx h3{font-family:'Instrument Serif';font-size:26px;line-height:1;margin:4px 0 7px}
+  .guide-big-tx p{font-size:12.5px;line-height:1.55;color:#2B2823;font-weight:300;max-width:44ch}
+
+  /* ===== KLÄDGUIDE — utpekad bild + plagg-kort ===== */
+  /* Annoterad hero-bild med numrerade markörer */
+  .gear-hero{position:relative;width:100%;aspect-ratio:3/4;background:var(--natt);
+    overflow:hidden;border-radius:2px;margin-bottom:8px}
+  .gear-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .gear-hero .gh-tag{position:absolute;z-index:4;top:14px;left:14px;font-family:'Instrument Sans';
+    font-weight:700;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--gras);
+    background:rgba(13,20,16,.7);padding:5px 10px;border-radius:3px}
+  /* numrerad markör som sitter på bilden */
+  .hot{position:absolute;z-index:5;width:26px;height:26px;border-radius:50%;background:var(--tiger);
+    color:#fff;font-family:'Instrument Sans';font-weight:700;font-size:12px;display:flex;
+    align-items:center;justify-content:center;transform:translate(-50%,-50%);
+    box-shadow:0 2px 10px rgba(0,0,0,.5);border:2px solid #F7F1E4}
+  /* förklaringar under bilden, kopplade till numren */
+  .gear-key{display:flex;flex-direction:column;gap:0;margin-bottom:22px}
+  .gear-key-row{display:grid;grid-template-columns:26px 1fr;gap:12px;align-items:baseline;
+    padding:9px 0;border-bottom:1px solid #e2d9c4}
+  .gear-key-row:last-child{border-bottom:none}
+  .gear-key-no{width:22px;height:22px;border-radius:50%;background:var(--tiger);color:#fff;
+    font-family:'Instrument Sans';font-weight:700;font-size:10px;display:flex;align-items:center;
+    justify-content:center}
+  .gear-key-tx{font-size:12.5px;line-height:1.45;color:#2B2823;font-weight:300}
+  .gear-key-tx b{font-weight:600;font-family:'Instrument Serif';font-size:14px}
+  /* stora plagg-kort */
+  .garments{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px}
+  .garment{display:flex;flex-direction:column}
+  .garment-img{position:relative;aspect-ratio:4/5;background:var(--natt);overflow:hidden;border-radius:2px}
+  .garment-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .garment h4{font-family:'Instrument Serif';font-size:18px;line-height:1.1;margin-top:9px}
+  .garment .g-brand{font-family:'Instrument Sans';font-size:8px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--tiger);font-weight:700;margin-top:2px}
+  .garment p{font-size:11.5px;line-height:1.45;color:#2B2823;margin-top:5px;font-weight:300}
+
+  /* Tips-block (rekommendationer) */
+  .tips{border-top:2px solid var(--black);padding-top:16px}
+  .tips-img{position:relative;width:100%;aspect-ratio:16/7;background:var(--natt);overflow:hidden;
+    border-radius:2px;margin-bottom:14px}
+  .tips-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .tips-h{font-family:'Instrument Sans';font-weight:700;font-size:13px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--tiger);margin-bottom:14px}
+  .tips-list{list-style:none}
+  .tips-list li{font-size:15px;line-height:1.6;color:#2B2823;padding:14px 0 14px 22px;position:relative;
+    border-bottom:1px solid #e2d9c4;font-weight:300}
+  .tips-list li:last-child{border-bottom:none}
+  .tips-list li b{font-weight:700;font-style:normal;color:var(--black)}
+  .tips-list li::before{content:"";position:absolute;left:0;top:20px;width:7px;height:7px;
+    background:var(--gras);border-radius:50%}
+
+  /* Itinerary */
+  .itin{display:flex;flex-direction:column}
+  .itin-day{display:grid;grid-template-columns:64px 1fr;gap:14px;padding:13px 0;
+    border-bottom:1px solid #e2d9c4}
+  .itin-day:last-child{border-bottom:none}
+  .itin-d{font-family:'Instrument Sans';font-weight:700;font-size:10px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--tiger);padding-top:3px}
+  .itin-tx h4{font-family:'Instrument Serif';font-size:18px;line-height:1.1;margin-bottom:3px}
+  .itin-tx p{font-size:11.5px;line-height:1.5;color:#2B2823;font-weight:300}
+
+  /* Budget */
+  .budget{margin-bottom:14px}
+  .budget-row{display:flex;justify-content:space-between;gap:16px;padding:11px 0;
+    border-bottom:1px solid #e2d9c4;align-items:baseline}
+  .budget-item{font-size:13px;color:#2B2823;font-weight:300}
+  .budget-cost{font-family:'Instrument Sans';font-size:12px;font-weight:600;color:var(--black);
+    white-space:nowrap}
+  .budget-total{display:flex;justify-content:space-between;gap:16px;padding:14px 0 4px;
+    border-top:2px solid var(--black);margin-top:4px;align-items:baseline}
+  .budget-total .budget-item{font-family:'Instrument Serif';font-size:18px;font-weight:400}
+  .budget-total .budget-cost{font-family:'Instrument Serif';font-size:20px;color:var(--tiger);font-weight:400}
+
+  /* Packlista */
+  .pack-clothes{display:grid;grid-template-columns:120px 1fr;gap:16px;margin-bottom:20px;align-items:stretch}
+  .pack-clothes-img{position:relative;border-radius:2px;overflow:hidden;background:var(--natt);min-height:150px}
+  .pack-clothes-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .pack-clothes-tag{font-family:'Instrument Sans';font-weight:700;font-size:8.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--tiger)}
+  .pack-clothes-tx h3{font-family:'Instrument Serif';font-size:22px;line-height:1;margin:3px 0 8px}
+  .pack-clothes-tx p{font-size:12px;line-height:1.55;color:#2B2823;font-weight:300}
+  .pack-cols{display:grid;grid-template-columns:1fr 1fr;gap:20px;border-top:2px solid var(--black);padding-top:16px}
+  .pack-col-h{font-family:'Instrument Sans';font-weight:700;font-size:10px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--tiger);margin-bottom:10px}
+  .pack-list{list-style:none}
+  .pack-list li{font-size:12px;line-height:1.4;color:#2B2823;padding:7px 0 7px 16px;position:relative;
+    border-bottom:1px solid #e2d9c4;font-weight:300}
+  .pack-list li:last-child{border-bottom:none}
+  .pack-list li::before{content:"";position:absolute;left:0;top:12px;width:5px;height:5px;
+    background:var(--tiger);border-radius:50%}
+
+  /* Resurser (avslutning) */
+  .res-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px}
+  .res-h{font-family:'Instrument Sans';font-weight:700;font-size:10px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--tiger);margin-bottom:10px;padding-bottom:6px;
+    border-bottom:2px solid var(--black)}
+  .res-list{list-style:none}
+  .res-list li{font-size:12px;line-height:1.5;color:#2B2823;padding:6px 0;font-weight:300;
+    border-bottom:1px solid #e2d9c4}
+  .res-list li:last-child{border-bottom:none}
+  .res-list li b{font-weight:600}
+  .res-close{background:var(--natt);color:var(--papper);border-radius:3px;padding:24px 20px;text-align:center}
+  .res-brand{font-family:'Instrument Sans';font-weight:700;font-size:16px;letter-spacing:.3em;margin-bottom:12px}
+  .res-brand b{color:var(--tiger)}
+  .res-close p{font-family:'Newsreader';font-size:13.5px;line-height:1.6;font-weight:300;color:#EDE8DB;
+    max-width:40ch;margin:0 auto;font-style:italic}
+
+
+  .ph.has-img{background:none}
+  .ph.has-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
+  /* ===== författar-not (kontributörssida) ===== */
+  .note{min-height:100svh;display:flex;flex-direction:column;padding:72px 26px 44px;max-width:var(--pageW)}
+  .note-h{font-family:'Instrument Serif';font-size:26px;line-height:1.05;margin:8px 0 16px;color:var(--black)}
+  .byline{display:flex;align-items:center;gap:14px;margin-top:auto;padding-top:18px;border-top:1px solid #e2d9c4}
+  .byline .bph{width:60px;height:60px;border-radius:6px;overflow:hidden;flex:0 0 auto;position:relative;background:var(--natt)}
+  .byline .bph .ph{position:absolute;inset:0}
+  .byline .bph .ph span{font-size:7.5px;left:6px;bottom:5px;letter-spacing:.04em}
+  .byline .bph img{width:100%;height:100%;object-fit:cover}
+  .byline-name{font-family:'Instrument Serif';font-style:italic;font-size:19px;color:var(--black);line-height:1.1}
+  .byline-role{font-family:'Instrument Sans';font-weight:700;font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--mark);margin-top:4px}
+
+
+  /* ===== nedstigningen: kartplats + höjdresa (samma språk som Vägen dit) ===== */
+  .mapslot{position:relative;height:30svh;min-height:220px;background:var(--natt);border-radius:2px;overflow:hidden}
+  .mapslot .ph{position:absolute;inset:0}
+  .mapslot img{width:100%;height:100%;object-fit:cover}
+  .mapcap{font-family:'Instrument Sans';font-size:9.5px;letter-spacing:.05em;color:var(--mark);margin:10px 0 24px;line-height:1.5}
+  .mapcap b{color:var(--tiger);font-weight:700;letter-spacing:.18em;text-transform:uppercase;margin-right:8px}
+  .drop .dalt{font-family:'Instrument Serif';font-size:24px;color:var(--black);line-height:1}
+  .drop .dalt span{font-family:'Instrument Sans';font-weight:700;font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--tiger);margin-left:8px;vertical-align:4px}
+  .drop .leg-place{margin-top:3px}
+  .drop .dpin{font-family:'Instrument Sans';font-weight:700;font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--tiger);margin-top:4px}
+  .drop p{font-family:'Newsreader';font-size:13px;line-height:1.55;font-weight:300;color:#2B2823;margin-top:6px;max-width:40ch}
+
+
+  .drop .leg{grid-template-columns:44px 1fr 168px}
+  .drop .leg-photo{margin-top:0;width:168px;aspect-ratio:4/3;align-self:start}
+  .drop .leg-photo .ph{position:absolute;inset:0}
+  .drop .leg-photo .ph span{font-size:7.5px;left:7px;bottom:6px;letter-spacing:.04em}
+
+
+  .dropL .leg{grid-template-columns:44px 168px 1fr}
+  .dropL .leg-photo{margin-top:0;width:168px;aspect-ratio:4/3;align-self:start}
+  .dropL .leg-photo .ph{position:absolute;inset:0}
+  .dropL .leg-photo .ph span{font-size:7.5px;left:7px;bottom:6px;letter-spacing:.04em}
+  .dropL .dpin{font-family:'Instrument Sans';font-weight:700;font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--tiger);margin:3px 0 6px}
+  .dropL p{font-family:'Newsreader';font-size:12.5px;line-height:1.55;font-weight:300;color:#2B2823;max-width:44ch}
+
+
+  /* ===== förord ===== */
+  .foreword{min-height:100svh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:60px 34px;text-align:center}
+  .fw-kick{font-family:'Instrument Sans';font-weight:700;font-size:9px;letter-spacing:.26em;text-transform:uppercase;color:var(--tiger)}
+  .fw-title{font-family:'Instrument Serif';font-size:34px;line-height:1;margin:10px 0 26px;color:var(--black)}
+  .fw-lead{font-family:'Newsreader';font-size:14.5px;line-height:1.7;font-weight:300;color:#2B2823;text-align:left;max-width:44ch;margin:0 0 6px}
+  .fw-drop::first-letter{font-family:'Instrument Serif';font-size:46px;float:left;line-height:.82;padding:5px 9px 0 0;color:var(--tiger)}
+  .fw-quote{margin:22px 0;max-width:40ch;font-family:'Instrument Serif';font-style:italic;font-size:18px;line-height:1.55;color:var(--black);display:flex;flex-direction:column;align-items:center;gap:13px}
+  .fw-rule{width:34px;height:2px;background:var(--tiger)}
+  .fw-list{list-style:none;margin:8px 0 0;max-width:44ch;width:100%;text-align:left}
+  .fw-list li{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #e2d9c4;font-family:'Newsreader';font-size:13.5px;font-weight:300;line-height:1.5;color:#2B2823}
+  .fw-list li:last-child{border-bottom:none}
+  .fw-list b{flex:0 0 auto;width:20px;padding-top:2px;font-family:'Instrument Sans';font-weight:700;font-size:9px;letter-spacing:.14em;color:var(--tiger)}
+  .fw-sign{margin-top:32px;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .fw-sign .bph{width:74px;height:74px;border-radius:50%;overflow:hidden;position:relative;background:var(--natt)}
+  .fw-sign .bph .ph{position:absolute;inset:0}
+  .fw-sign .bph .ph span{font-size:7.5px;left:8px;bottom:7px}
+  .fw-sign .bph img{width:100%;height:100%;object-fit:cover}
+  .fw-name{font-family:'Instrument Serif';font-style:italic;font-size:20px;color:var(--black)}
+  .fw-role{font-family:'Instrument Sans';font-weight:700;font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--mark)}
+  /* ===== helbilds-nedstigning ===== */
+  .desc2{min-height:100svh;display:flex;flex-direction:column;background:var(--natt);color:var(--papper)}
+  .d-sec{position:relative;flex:1;min-height:0;overflow:hidden}
+  .d-sec.d-map{flex:2}
+  .d-sec + .d-sec{border-top:2px solid var(--papper)}
+  .d-sec .ph{position:absolute;inset:0}
+  .d-sec img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .d-headgrad{position:absolute;top:0;left:0;right:0;height:62%;z-index:2;background:linear-gradient(180deg,rgba(13,20,16,.72),rgba(13,20,16,0))}
+  .d-head{position:absolute;top:0;left:0;right:0;z-index:3;padding:26px}
+  .d-head h2{font-family:'Instrument Serif';font-size:clamp(30px,8vw,40px);line-height:1;color:var(--papper);margin-top:7px}
+  .d-sub{font-family:'Newsreader';font-style:italic;font-weight:300;font-size:13.5px;color:#EDE8DB;margin-top:6px}
+  .d-grad{position:absolute;left:0;right:0;bottom:0;height:58%;z-index:2;background:linear-gradient(180deg,rgba(13,20,16,0),rgba(13,20,16,.9))}
+  .d-tx{position:absolute;left:26px;right:110px;bottom:16px;z-index:3}
+  .d-tx h3{font-family:'Instrument Serif';font-size:24px;line-height:1;color:var(--papper)}
+  .d-alt{font-family:'Instrument Sans';font-weight:700;font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--tiger);margin-top:4px}
+  .d-tx p{font-family:'Newsreader';font-size:12px;line-height:1.5;font-weight:300;color:#EDE8DB;margin-top:5px;max-width:38ch}
+  .d-met{position:absolute;right:22px;top:14px;z-index:3;text-align:right}
+  .d-met b{font-family:'Instrument Serif';font-size:17px;color:var(--papper)}
+  .d-met span{display:block;font-family:'Instrument Sans';font-weight:700;font-size:7px;letter-spacing:.2em;text-transform:uppercase;color:var(--gras);margin-top:2px}
+  /* ===== fyra världar 2×2 ===== */
+  .quadgrid{position:relative;min-height:100svh;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:2px;background:var(--papper)}
+  .quad{position:relative;overflow:hidden;background:var(--natt);color:var(--papper)}
+  .quad .xp-img{position:absolute;inset:0}
+  .quad .xp-img .ph{position:absolute;inset:0}
+  .q-top{position:absolute;top:12px;left:14px;z-index:3;font-family:'Instrument Sans';font-weight:700;font-size:7.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--gras)}
+  .q-tx{position:absolute;left:14px;right:14px;bottom:12px;z-index:3}
+  .q-tx h3{font-family:'Instrument Serif';font-size:22px;line-height:1;color:var(--papper)}
+  .q-lat{font-family:'Instrument Sans';font-weight:700;font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--tiger);margin:4px 0 6px}
+  .q-tx p{font-family:'Newsreader';font-size:10.5px;line-height:1.5;font-weight:300;color:#EDE8DB}
+  .q-badge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:6;background:var(--papper);color:var(--black);font-family:'Instrument Sans';font-weight:700;font-size:8px;letter-spacing:.24em;text-transform:uppercase;padding:9px 16px;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.35)}
+
+
+  /* ===== innehåll med stora siffror ===== */
+  .toc2wrap{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:60px 30px}
+  .toc2wrap h2{font-family:'Instrument Serif';font-size:clamp(34px,9vw,44px);line-height:1;margin:8px 0 26px}
+  .toc2-row{display:flex;gap:20px;align-items:baseline;padding:16px 0;border-bottom:1px solid #e2d9c4}
+  .toc2-row:last-child{border-bottom:none}
+  .tn2{font-family:'Instrument Serif';font-size:40px;line-height:1;color:var(--tiger);min-width:62px}
+  .tt2{font-family:'Instrument Serif';font-size:21px;line-height:1.15;color:var(--black)}
+  .tt2 small{display:block;font-family:'Newsreader';font-style:italic;font-weight:300;font-size:12.5px;color:var(--mark);margin-top:4px;letter-spacing:0}
+  /* ===== katalog-kvadranter ===== */
+  .fauna.fauna2{padding-bottom:0}
+  .fauna2{min-height:100svh;display:flex;flex-direction:column}
+  .fauna2 .fauna-head{flex:0 0 auto}
+  .fauna-quads{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--papper)}
+  .fauna-quads.rows2{grid-template-rows:1fr 1fr}
+  .q-status{position:absolute;top:12px;left:14px;z-index:3;font-family:'Instrument Sans';font-weight:700;font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;padding:5px 9px;background:rgba(13,20,16,.72);border-radius:2px;color:var(--papper)}
+  .q-status.st-cr{color:#E8907B}.q-status.st-en{color:#E8A87B}.q-status.st-vu{color:#D9BC7A}
+  .q-status.st-nt{color:#A9BC8F}.q-status.st-lc{color:#9FBE93}
+  .quad .xp-img::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(13,20,16,.32) 0%,rgba(13,20,16,0) 26%,rgba(13,20,16,0) 40%,rgba(13,20,16,.92) 100%)}
+  /* ===== utro + handboksomslag ===== */
+  .outro{position:relative;min-height:100svh;background:var(--natt);overflow:hidden}
+  .outro>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .outro>.ph{position:absolute;inset:0}
+  .outro-grad{position:absolute;left:0;right:0;bottom:0;height:72%;z-index:2;
+    background:linear-gradient(180deg,rgba(13,20,16,0),rgba(13,20,16,.94))}
+  .outro-tx{position:absolute;left:26px;right:26px;bottom:11%;z-index:3;text-align:center;color:var(--papper)}
+  .outro-line{font-family:'Instrument Serif';font-size:32px;line-height:1.1}
+  .outro-tx p{font-family:'Newsreader';font-weight:300;font-size:12.5px;line-height:1.6;color:#EDE8DB;max-width:46ch;margin:12px auto 0}
+  .hbc-tx{position:absolute;left:26px;right:26px;bottom:9%;z-index:3;text-align:left;color:var(--papper)}
+  .hbc-tx h2{font-family:'Instrument Serif';font-size:clamp(38px,11vw,50px);line-height:1;color:var(--papper);margin-top:8px}
+  .hbc-tx p{font-family:'Newsreader';font-weight:300;font-size:13px;line-height:1.6;color:#EDE8DB;max-width:44ch;margin-top:10px}
+
+
+  .toc2-grupp{font-family:'Instrument Sans';font-weight:700;font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--mark);padding:4px 0 2px}
+  .toc2-row{cursor:pointer}
+  .toc2-row{padding:12px 0}
+  .tn2{font-size:34px;min-width:54px}
+  .toc-chip{margin-left:auto;align-self:center;width:30px;height:14px;border-radius:3px}
+  .toc-chip.sp1{background:var(--sp1)}.toc-chip.sp2{background:var(--sp2)}.toc-chip.sp3{background:var(--sp3)}
+  .toc-chip.sp4{background:var(--sp4)}.toc-chip.sp5{background:var(--sp5)}.toc-chip.sp6{background:var(--sp6)}
+  .toc-chip.sp7{background:var(--sp7)}.toc-chip.sp8{background:var(--sp8)}
+
+
+  .ph.has-img.map-contain{background:var(--natt)}
+  .map-contain img{object-fit:contain!important;object-position:50% 50%}
+
+
+  .fw-portrait{width:148px;height:148px;border-radius:50%;overflow:hidden;margin-bottom:22px;
+    box-shadow:0 10px 30px rgba(0,0,0,.18);border:3px solid var(--papper)}
+  .fw-portrait img{width:100%;height:100%;object-fit:cover;object-position:50% 22%;display:block}
+
+
+  .route-svg{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;overflow:visible}
+  .route-path{fill:none;stroke:var(--papper);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;
+    opacity:.92;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));
+    stroke-dasharray:900;stroke-dashoffset:900;animation:drawroute 2.6s cubic-bezier(.4,.1,.2,1) .5s forwards}
+  .route-dot{fill:var(--tiger);stroke:var(--papper);stroke-width:1.5;opacity:0;
+    filter:drop-shadow(0 1px 3px rgba(0,0,0,.5))}
+  .route-dot.start{animation:dotpop .5s ease .5s forwards}
+  .route-dot.end{animation:dotpop .5s ease 2.85s forwards}
+  @keyframes drawroute{to{stroke-dashoffset:0}}
+  @keyframes dotpop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+
+
+  .illus-map{background:var(--natt)}
+  .illus-svg{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+  .ctx-label{font-family:'Instrument Sans',sans-serif;font-weight:700;font-size:10px;letter-spacing:.32em;
+    fill:rgba(247,241,228,.38);text-anchor:middle}
+  .ctx-rule{stroke:rgba(247,241,228,.14);stroke-width:1;stroke-dasharray:2 5}
+  .nepal-shape{fill:rgba(201,99,34,.14);stroke:var(--tiger);stroke-width:1.6;stroke-linejoin:round;
+    opacity:0;animation:mapfade 1s ease .2s forwards}
+  .country-label{font-family:'Instrument Sans',sans-serif;font-weight:700;font-size:9px;letter-spacing:.22em;
+    fill:rgba(247,241,228,.5);text-anchor:middle;opacity:0;animation:mapfade 1s ease .5s forwards}
+  .city-dot{fill:var(--papper);opacity:0;animation:mapfade .6s ease .9s forwards}
+  .city-label{font-family:'Newsreader';font-style:italic;font-weight:300;font-size:9.5px;
+    fill:rgba(247,241,228,.75);opacity:0;animation:mapfade .6s ease 1s forwards}
+  .route-path{fill:none;stroke:var(--papper);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;
+    opacity:.95;stroke-dasharray:220;stroke-dashoffset:220;animation:drawroute 1.6s cubic-bezier(.4,.1,.2,1) 1.3s forwards}
+  .bardia-label{font-family:'Instrument Sans',sans-serif;font-weight:700;font-size:10.5px;letter-spacing:.1em;
+    fill:var(--papper);text-anchor:middle;opacity:0;animation:mapfade .5s ease 2.9s forwards}
+  .bardia-dot{fill:var(--tiger);stroke:var(--papper);stroke-width:1.4;opacity:0;
+    animation:dotpop .5s ease 2.85s forwards}
+  .pulse-ring{fill:none;stroke:var(--tiger);stroke-width:1.6;opacity:0;
+    animation:pulsering 2.2s ease-out 3s infinite}
+  .pulse-ring.delay{animation-delay:4.1s}
+  @keyframes mapfade{to{opacity:1}}
+  @keyframes drawroute{to{stroke-dashoffset:0}}
+  @keyframes dotpop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+  @keyframes pulsering{0%{r:4;opacity:.8}100%{r:22;opacity:0}}
+
+
+  .map-white{background:var(--papper)}
+  .map-white .ph.has-img.map-contain{background:var(--natt)}
+  .dark-head .kick{color:var(--tiger)}
+  .dark-head h2{color:var(--black)}
+  .dark-head .d-sub{color:#4a463c}
+
+
+  .d-titleband{background:var(--natt);color:var(--papper);padding:56px 26px 44px;text-align:center}
+  .d-titleband .kick{color:var(--tiger)}
+  .d-titleband h2{font-family:'Instrument Serif';font-size:clamp(30px,8vw,40px);line-height:1;color:var(--papper);margin-top:9px}
+  .d-titleband .d-sub{font-family:'Newsreader';font-style:italic;font-weight:300;font-size:14px;color:#EDE8DB;margin-top:9px}
+  .d-titlemeta{margin-top:20px;font-family:'Newsreader';font-size:12.5px;line-height:1.6;font-weight:300;
+    color:#C9C2AE;max-width:38ch;margin-left:auto;margin-right:auto}
+  .d-titlemeta span{font-family:'Instrument Sans';font-weight:700;font-size:8px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--gras);margin-right:6px}
+
+
+  #p5 .xpp-figure{height:58svh;overflow:hidden}
+  #p5 .xpp-figure img{height:100%;object-fit:cover;object-position:50% 25%}
+
+
+
+
+
+
+  /* Floden + De sällsynta: text under bilden istället för overlay, så bilden kan vara riktigt liggande */
+  #p7, #p8, #p9, #p10eco, #p10d{min-height:0}
+  #p7 .fauna2, #p8 .fauna2, #p9 .fauna2{min-height:0}
+  .quad-stacked .quad{position:relative;overflow:visible;background:var(--natt)}
+  .quad-stacked .xp-img{position:relative;width:100%;height:0;padding-top:66.66%;overflow:hidden;display:block}
+  .quad-stacked .xp-img .ph{position:absolute;inset:0}
+  .quad-stacked .xp-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+  .quad-stacked .xp-img::after{display:none}
+  .quad-stacked .q-status{position:absolute;top:12px;left:14px;z-index:3}
+  .quad-stacked .q-tx{position:static;display:block;padding:16px 14px 18px}
+
+
+  /* Floden: en bild i taget, full bredd, matchar sidans dominerande stil */
+  .quad-single{grid-template-columns:1fr!important}
+  .quad-single .xp-img{padding-top:56.25%!important}
+
+
+
+
+  /* Fåglarna: stående bildformat inom samma järnhårda teknik */
+  #p9 .xp-img{padding-top:133.33%!important}
+
+
+  #p10c, #p10c .people{min-height:0}
+
+
+  /* Kalendern staplad: en månad per rad istället för hoptryckt 12-strip */
+  .yc-stack{display:flex;flex-direction:column;gap:3px}
+  .yc-row{display:flex;align-items:center;padding:9px 12px;border-radius:2px}
+  .yc-rm{font-family:'Instrument Sans';font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+  .yc-best{background:#C96322;color:#fff}
+  .yc-good{background:#5a7a52;color:#EDE8DB}
+  .yc-poor2{background:#39433a;color:rgba(237,232,219,.65)}
+  .yc-poor{background:rgba(57,67,58,.55);color:rgba(237,232,219,.5)}
+  .yc-temps{display:flex;flex-direction:column;gap:9px;margin-bottom:18px}
+  .yc-temp{display:flex;flex-direction:column;gap:4px;padding:14px 16px;background:rgba(201,99,34,.06);border-radius:3px}
+  .yc-temp b{font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:11px;color:var(--tiger)}
+  .yc-temp span{color:var(--mark);font-size:13px}
+    font-family:'Instrument Sans';font-size:11.5px;color:var(--black)}
+
+
+  .hb-img{margin:14px 0}
+  .hb-img img{width:100%;height:auto;display:block;border-radius:3px}
+  .hb-img span{display:block;margin-top:8px;font-family:'Newsreader';font-style:italic;font-weight:300;
+    font-size:11.5px;color:var(--mark);line-height:1.5}
+  .hb-imgpair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+  .hb-imgpair-cell img{width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;display:block;border-radius:3px}
+  .hb-imgpair-cell span{display:block;margin-top:6px;font-family:'Newsreader';font-style:italic;font-weight:300;
+    font-size:10.5px;color:var(--mark);line-height:1.4}
+
+
+  .gear-warn{background:rgba(201,99,34,.08);border-left:3px solid var(--tiger);padding:12px 16px;
+    margin:16px 0 22px;font-family:'Newsreader';font-style:italic;font-size:12.5px;color:#2B2823}
+  .gear-segs{display:flex;flex-direction:column;gap:26px}
+  .gear-seg{padding-bottom:22px;border-bottom:1px solid #e2d9c4}
+  .gear-seg:last-child{border-bottom:none;padding-bottom:0}
+  .gear-seg-tx{font-size:12.5px;line-height:1.5;color:#2B2823;font-weight:300;margin-bottom:12px}
+  .gear-seg-no{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;
+    border-radius:50%;background:var(--tiger);color:#fff;font-family:'Instrument Sans';font-weight:700;
+    font-size:10px;margin-right:8px;vertical-align:middle}
+  .gear-seg-img{position:relative;width:100%;aspect-ratio:4/3;background:var(--natt);border-radius:3px;
+    overflow:hidden;margin-bottom:12px}
+
+
+  .outro-invite{margin-top:18px!important;padding-top:18px;border-top:1px solid rgba(237,232,219,.18)}
+  .outro-invite a{color:var(--tiger);text-decoration:none;border-bottom:1px solid currentColor}
+
+
+  .gear-discount{background:rgba(156,187,124,.14);border-left:3px solid #7A9A5C;padding:12px 16px;
+    margin-bottom:22px;font-family:'Instrument Sans';font-size:12px;color:#2B2823;line-height:1.5}
+  .gear-discount b{color:#4B6B33;letter-spacing:.03em}
+
+
+  .quadgrid-single{grid-template-columns:1fr;grid-template-rows:none}
+  .quadgrid-single .quad{aspect-ratio:4/3;min-height:0}
+  /* ===== porterade komponenter (stående boken) ===== */
+  .stg-grid,.stepgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+  .stg-cell,.stepinfo{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--natt);border-radius:2px}
+  .stg-cell img{width:100%;height:100%;object-fit:cover;display:block}
+  .stg-cell::after{content:"";position:absolute;left:0;right:0;bottom:0;height:44%;
+    background:linear-gradient(180deg,rgba(13,20,16,0),rgba(13,20,16,.86))}
+  .stg-cell .scap{position:absolute;left:12px;bottom:10px;right:12px;z-index:2;
+    font-family:'Instrument Sans',sans-serif;font-weight:700;font-size:9.5px;letter-spacing:.05em;
+    color:rgba(247,241,228,.95);line-height:1.35}
+  .stepinfo{display:flex;flex-direction:column;justify-content:flex-end;padding:16px 18px;color:var(--papper)}
+  .stepinfo p{font-size:13px;line-height:1.5;color:#EDE8DB;font-weight:300;margin:0}
+  .stepinfo .im{margin-top:9px;display:flex;flex-wrap:wrap;gap:9px;align-items:center;
+    font-family:'Instrument Sans',sans-serif;font-size:10px;color:var(--gras)}
+  .stepinfo .im a{color:var(--gras);text-decoration:none;border-bottom:1px solid currentColor}
+  .stepmeta{margin-top:12px;display:flex;gap:11px;flex-wrap:wrap;align-items:center;
+    font-family:'Instrument Sans',sans-serif;font-size:10.5px;color:var(--mark)}
+  .visrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+  .visrow .stg-cell{aspect-ratio:16/9}
+  .grid3v{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:14px;margin-top:16px}
+  .grid3v .stg-cell{aspect-ratio:auto}
+  .grid3v .stg-cell:first-child{grid-row:span 2}
+  .grid3v .stg-cell:nth-child(n+2){aspect-ratio:4/3}
+  .grid3v.rows3u{grid-template-rows:1fr 1fr 1fr}
+  .grid3v.rows3u .stg-cell:first-child{grid-row:auto}
+  .grid3v.rows3u .stg-cell{aspect-ratio:auto}
+
+
+  .scrolldiv{min-height:0;padding:64px 26px;background:var(--natt);color:var(--papper);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:22px}
+  .scrolldiv-rule{width:1px;height:38px;background:linear-gradient(180deg,rgba(247,241,228,0),rgba(201,99,34,.6))}
+  .scrolldiv-tx{font-family:'Instrument Serif';font-size:clamp(30px,7vw,42px);line-height:1.15;color:var(--papper)}
+  .scrolldiv-tx em{font-style:italic;color:var(--tiger);font-size:.72em}
+
+
+  .pw-lead{font-family:'Newsreader';font-size:14px;line-height:1.6;font-weight:300;color:#2B2823;margin-bottom:6px}
+  .pw-imggroup{margin-top:16px}
+  .pw-img{position:relative;width:100%;margin-top:2px;background:var(--natt);overflow:hidden}
+  .pw-img:first-child{margin-top:0}
+  .pw-img img{width:100%;height:auto;display:block}
+  .pw-imgrad{position:absolute;inset:0;z-index:2;
+    background:linear-gradient(180deg,rgba(13,20,16,.15) 0%,rgba(13,20,16,.5) 100%)}
+  .pw-imgtx{position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:center;
+    text-align:center;padding:0 20px;pointer-events:none;
+    font-family:'Instrument Serif';font-style:italic;font-size:22px;line-height:1.2;color:var(--papper);
+    text-shadow:0 2px 14px rgba(0,0,0,.5)}
+
+
+  html{scroll-behavior:smooth}
+  body{overflow-x:hidden}
+  .fadein{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+  .fadein.in{opacity:1;transform:translateY(0)}
+  .buybtn{display:inline-block;margin-top:20px;background:var(--tiger);color:#fff;
+    font-family:'Instrument Sans',sans-serif;font-weight:700;font-size:13px;letter-spacing:.04em;
+    padding:15px 26px;border-radius:3px;text-decoration:none}
+  .buybtn:hover{filter:brightness(1.08)}
+  .buysub{margin-top:10px;font-family:'Instrument Sans',sans-serif;font-size:10.5px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--gras)}
+  .stickybuy{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;justify-content:center;
+    padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+    background:linear-gradient(180deg,rgba(13,20,16,0),rgba(13,20,16,.96) 40%);
+    transform:translateY(120%);transition:transform .35s ease}
+  .stickybuy.show{transform:translateY(0)}
+  .stickybuy a{background:var(--tiger);color:#fff;font-family:'Instrument Sans',sans-serif;font-weight:700;
+    font-size:12.5px;letter-spacing:.04em;padding:13px 22px;border-radius:3px;text-decoration:none;
+    box-shadow:0 8px 24px rgba(0,0,0,.35);max-width:var(--pageW);width:100%;text-align:center}
+
+
+  @media (min-width: 760px){
+    body{
+      background:
+        radial-gradient(1100px 700px at 50% -8%, rgba(201,99,34,.10), transparent 60%),
+        linear-gradient(180deg, #0D1410 0%, #171511 100%);
+      padding:56px 0 88px;
+    }
+    .stickybuy{ background:linear-gradient(180deg, rgba(13,20,16,0), rgba(13,20,16,.98) 55%); padding-bottom:26px }
+  }
+
+
+.rs-steps{display:flex;flex-direction:column;gap:34px;margin-top:6px}
+.rs-step{padding-bottom:26px;border-bottom:1px solid #e2d9c4}
+.rs-step:last-child{border-bottom:none;padding-bottom:0}
+.rs-steph{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.rs-no{flex:0 0 auto;width:30px;height:30px;border-radius:50%;background:var(--tiger);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-family:'Instrument Sans';font-weight:700;font-size:13px}
+.rs-steph h3{font-family:'Instrument Serif';font-size:22px;color:var(--black)}
+.rs-step>p{font-family:'Newsreader';font-size:13.5px;line-height:1.6;font-weight:300;color:#2B2823}
+.rs-btn{display:block;margin-top:12px;font-family:'Instrument Sans';font-weight:700;font-size:12px;
+    letter-spacing:.03em;color:#fff;text-decoration:none;background:var(--tiger);
+    padding:12px 18px;border-radius:4px;text-align:center;width:fit-content}
+.rs-metarow{display:block;margin-top:10px}
+.rs-inline{color:var(--tiger);text-decoration:none;border-bottom:1px solid currentColor}
+.rs-img{position:relative;width:100%;margin-top:14px;background:var(--natt);overflow:hidden;border-radius:2px}
+.rs-img img{width:100%;height:auto;display:block}
+.rs-cap{position:absolute;left:0;right:0;bottom:0;padding:10px 14px;
+    background:linear-gradient(180deg,rgba(13,20,16,0),rgba(13,20,16,.82));
+    font-family:'Instrument Sans';font-weight:700;font-size:9.5px;letter-spacing:.05em;color:var(--papper)}
+.rs-tip{margin-top:12px;font-family:'Instrument Sans';font-size:11px;color:var(--mark);font-style:italic}
+.rs-ph{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;
+    background:repeating-linear-gradient(45deg,#12201a 0 10px,#0f1c16 10px 20px)}
+.rs-ph span{font-family:'Instrument Sans';font-size:10px;letter-spacing:.06em;color:rgba(237,232,219,.55)}</style>
+</head>
+<body>
+
+
+<!-- ============ SIDA 1 · OMSLAG ============ -->
+<section class="page cover" id="p1">
+  <div class="cover-top">
+    
+    <div class="label">Reseguide Nº 01</div>
+  </div>
+  <div class="cover-img">
+    <div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/LOOKINGBACK%202.JPG" alt="Bengalisk tiger i Bardiya" style="object-position:50% 30%"></div>
+  </div>
+  <div class="cover-main">
+    <h1 class="cover-title">Bardiya</h1>
+    <div class="cover-frame">Här lever människor bland vilda tigrar.</div>
+    <p class="cover-seed">På gränsen mellan Indien och Nepal ligger Sydasiens bäst bevarade hemlighet: en värld där människan och vildmarken överlappar. Här spårar du tigern till fots.</p>
+  </div>
+</section>
+
+<section class="page" id="p3">
+  <div class="foreword">
+    <div class="fw-portrait"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/PROFILBILD%20A%CC%88VENTYR%20REZDAR.png" alt="Rezdar Bakri"></div>
+    <div class="fw-kick">100WILD · Reseguide Nº 01</div>
+    <div class="fw-title">Rezdar Bakri</div>
+    <p class="fw-lead fw-drop">Jag har spårat isbjörnar på Svalbard, övernattat i Amazonas regnskog och vandrat i Sahara med kameler. Bardia är en av de vildaste platser jag besökt, och den minst kända.</p>
+        <p class="fw-lead">Den här guiden innehåller allt du behöver för att genomföra din egen tigerexpedition:</p>
+    <ul class="fw-list">
+      <li><b>01</b><span>Vad du kan göra i Bardia, vart du ska bo och vilka aktiviteter du ska boka</span></li>
+      <li><b>02</b><span>När du ska åka, visum och vaccin</span></li>
+      <li><b>03</b><span>Hur du tar dig dit, vad det kostar och vad du ska packa</span></li>
+      <li><b>04</b><span>Allmän säkerhet och trygghet</span></li>
+    </ul>
+  </div>
+</section>
+
+
+
+
+
+<section class="page" id="p4">
+  <div class="desc2">
+    <div class="d-titleband">
+      <div class="kick">Kapitel 02 · Berättelsen</div>
+      <h2>I skuggan av Himalaya</h2>
+      <div class="d-titlemeta"><span>Läget</span> Långt västerut i Nepal nära gränsen mot Indien.</div>
+    </div>
+    <div class="d-sec">
+      <div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/I%20SKUGGAN%20AV%20HIMALAYA.jpg" alt="Himalaya" style="object-position:50% 45%"></div>
+      <div class="d-grad"></div>
+      <div class="d-met"><b>8 848 m</b><span>Topp</span></div>
+      <div class="d-tx"><h3>Himalaya</h3><div class="d-alt">Vid utkanten av Himalayas klippor</div></div>
+    </div>
+    <div class="d-sec">
+      <div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/VILLGAGE%20BARDIA%20HOUSES.jpg" alt="Byn i Bardiya"></div>
+      <div class="d-grad"></div>
+      <div class="d-met"><b>~150 m</b><span>Terai</span></div>
+      <div class="d-tx"><h3>Bardiya</h3><div class="d-alt">Vid gränsen till Indien</div></div>
+    </div>
+</div>
+</section>
+
+<section class="page" id="p4x-divider" style="min-height:0">
+  <div class="scrolldiv">
+    <span class="scrolldiv-rule"></span>
+    <div class="scrolldiv-tx">Fyra världar<br><em>· en vildmark</em></div>
+    <span class="scrolldiv-rule"></span>
+  </div>
+</section>
+
+<section class="page" id="p10eco">
+  <div class="quadgrid">
+    <div class="quad">
+      <div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/JEEPVIEW.jpg" alt="Sal-skogen, pelarsal av salträd"></div></div>
+      <div class="q-top">Fyra världar · 01</div>
+      <div class="q-tx"><h3>Sal-skogen</h3><div class="q-lat">Lövskog · Shorea robusta</div><p>Ryggraden i Bardiya. Höga, raka salträd bildar ett tak av löv som täcker stora delar av parken, och i skuggan under rör sig de största rovdjuren. En katedral av stammar och sipprande ljus.</p></div>
+    </div>
+    <div class="quad">
+      <div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/SAVANNEN.jpg" alt="Savannen"></div></div>
+      <div class="q-top">Fyra världar · 02</div>
+      <div class="q-tx"><h3>Savannen</h3><div class="q-lat">Phantas · elefantgräs</div><p>De öppna slätterna som Bardiya kallar phantas, hav av gräs högre än en människa. Här betar noshörning och hjort, och här jagar tigern i det gyllene ljuset, synlig hundratals meter bort.</p></div>
+    </div>
+    <div class="quad">
+      <div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/DJUNGELN%20VIEW.jpg" alt="Djungeln"></div></div>
+      <div class="q-top">Fyra världar · 03</div>
+      <div class="q-tx"><h3>Djungeln</h3><div class="q-lat">Riverine forest · Babai &amp; Karnali</div><p>Där floderna Babai och Karnali drar fram växer skogen tätast. Snabbväxande träd och ogenomtränglig undervegetation bildar gröna korridorer längs vattnet. Här är livet som rikast.</p></div>
+    </div>
+    <div class="quad">
+      <div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/FLODEN%20KARNALI.jpg" alt="Floden"></div></div>
+      <div class="q-top">Fyra världar · 04</div>
+      <div class="q-tx"><h3>Floden</h3><div class="q-lat">Karnali &amp; Babai · flodsystem</div><p>Flodens grenar spinner ett nät av sidoarmar, sandbankar och träsk. Livets ådra, där ghavial och muggerkrokodil ligger på bankarna och gangesdelfinen bryter ytan. Utan vattnet finns inget av det andra.</p></div>
+    </div>
+    
+  </div>
+</section>
+
+<section class="page" id="p10eco-divider" style="min-height:0">
+  <div class="scrolldiv">
+    <span class="scrolldiv-rule"></span>
+    <div class="scrolldiv-tx">Djurriket<br><em>· arterna som delar vildmarken</em></div>
+    <span class="scrolldiv-rule"></span>
+  </div>
+</section>
+
+
+
+
+<!-- ============ SIDA 5 · DJUREN I · ROVDJUREN & JÄTTARNA ============ -->
+
+
+<!-- ============ SIDA 5B · LEOPARD + LÄPPBJÖRN (delad) ============ -->
+<section class="page xp-split" id="p5b">
+  <div class="xp-half">
+    <div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/LEOPARD%20ON%20A%20TREE.jpg" alt="Leopard"></div></div>
+    <div class="xph-top"><span class="xph-status st-vu">Sårbar</span></div>
+    <div class="xph-main">
+      <div class="xph-lat">Panthera pardus</div>
+      <h2>Leopard</h2>
+      <p>Den andra katten, och en mästare på att inte synas. I Bardiya lever leoparden i tigerns skugga och jagar i utkanterna där hon inte rör sig, ofta nattetid. Den släpar sitt byte upp i träden, borta från både tiger och hyena.</p>
+    </div>
+  </div>
+  <div class="xp-half">
+    <div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/LA%CC%88PPBJO%CC%88RN.webp" alt="Läppbjörn"></div></div>
+    <div class="xph-top"><span class="xph-status st-vu">Sårbar</span></div>
+    <div class="xph-main">
+      <div class="xph-lat">Melursus ursinus</div>
+      <h2>Läppbjörn</h2>
+      <p>Raggig, svart och oberäknelig. Sliter upp termitstackar med klor långa som fingrar och suger i sig insekterna genom en glugg i tänderna. Anses farligare att möta till fots än tigern, eftersom den är närsynt och lätt blir skrämd.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SIDA 5C · NOSHÖRNING + ELEFANT (delad) ============ -->
+<section class="page xp-split" id="p5c">
+  <div class="xp-half">
+    <div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/INDISK%20PANSARNOSHO%CC%88RNING.jpg" alt="Pansarnoshörning"></div></div>
+    <div class="xph-top"><span class="xph-status st-vu">Sårbar</span></div>
+    <div class="xph-main">
+      <div class="xph-lat">Rhinoceros unicornis</div>
+      <h2>Pansarnoshörning</h2>
+      <p>Två ton i vad som ser ut som nitad rustning. Den grå huden ligger i veck som pansarplåtar, ett urtidsdjur som betar i våtmarkerna vid gryning och skymning. Nästan utrotad i Nepal för femtio år sedan, nu tillbaka i Bardiyas gräs.</p>
+    </div>
+  </div>
+  <div class="xp-half">
+    <div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/INDISK%20ELEFANT.jpg" alt="Asiatisk elefant"></div></div>
+    <div class="xph-top"><span class="xph-status st-en">Starkt hotad</span></div>
+    <div class="xph-main">
+      <div class="xph-lat">Elephas maximus</div>
+      <h2>Asiatisk elefant</h2>
+      <p>Jätten som vandrar genom parken i familjegrupper ledda av den äldsta honan, längs stigar deras mödrar gått före dem. Bardiya hyste Rajagaj, den högsta uppmätta asiatiska elefanten någonsin. Vissa hanar rör sig ensamma och kan vara oberäkneliga i brunst.</p>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="page" id="p7">
+  <div class="fauna fauna2">
+    <div class="fauna-head">
+      <div class="kick">Kapitel 03 · Invånarna · 2 av 4</div>
+      <h2>Floden</h2>
+      <div class="sub">Karnali bär glaciärvatten genom parken, och en helt egen värld lever i den.</div>
+    </div>
+    <div class="fauna-quads quad-stacked quad-single">
+      <div class="quad">
+        <div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/MUGGER.png" alt="Muggerkrokodil"></div></div>
+        <div class="q-status st-vu">Sårbar</div>
+        <div class="q-tx"><h3>Muggerkrokodil</h3><div class="q-lat">Crocodylus palustris</div><p>Ghavialens bredkäftade granne, en generalist som tar allt från fisk till däggdjur vid vattenkanten. Den ligger orörlig på sandbankarna med gapet öppet för att kyla sig, och gräver långa hålor i strandbrinken där den övervintrar.</p></div>
+      </div>
+      <div class="quad">
+        <div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/GOLDENMAHSEER.jpg" alt="Gyllene mahseer"></div></div>
+        <div class="q-status st-nt">Nära hotad</div>
+        <div class="q-tx"><h3>Gyllene mahseer</h3><div class="q-lat">Tor putitora</div><p>Himalayas silverdrake, en kraftfull karpfisk som kan bli över en meter lång och kämpar så hårt att den kallas subkontinentens främsta sportfisk. Den vandrar uppför floden för att leka, och dess närvaro är ett tecken på att vattnet fortfarande är rent och friskt.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SIDA 7B · GHARIAL + GANGESDELFIN (delad) ============ -->
+<section class="page xp-split" id="p7b">
+  <div class="xp-half">
+    <div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/GHARIALRA%CC%88TT.webp" alt="Ghavial" style="object-position:50% 35%"></div></div>
+    <div class="xph-top"><span class="xph-status st-cr">Akut hotad</span></div>
+    <div class="xph-main">
+      <div class="xph-lat">Gavialis gangeticus</div>
+      <h2>Ghavial</h2>
+      <p>Floddraken med en nos smal som ett svärd, byggd för att snärta genom vattnet och fånga fisk. Hanen får en rund knöl på nostippen som förstärker hans väsande läte. Akut hotad globalt med bara några hundra vuxna kvar i vilt tillstånd, och Karnalifloden är ett av dess allra sista fästen.</p>
+    </div>
+  </div>
+  <div class="xp-half">
+    <div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/GANGES%20RIVER%20DOLPHIN.webp" alt="Gangesdelfin"></div></div>
+    <div class="xph-top"><span class="xph-status st-en">Starkt hotad</span></div>
+    <div class="xph-main">
+      <div class="xph-lat">Platanista gangetica</div>
+      <h2>Gangesdelfin</h2>
+      <p>Sötvattensspöket, nästan helt blind eftersom ögonen saknar lins, den ser världen genom eko. Du hör den innan du ser den: ett ”pffft” när den bryter ytan för att andas. Nepals nationella vattendjur, och en av de sällsyntaste delfinerna på jorden.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="p8">
+  <div class="fauna fauna2">
+    <div class="fauna-head">
+      <div class="kick">Kapitel 03 · Invånarna · 3 av 4</div>
+      <h2>De sällsynta &amp; svårfångade</h2>
+      <div class="sub">Djuren du kanske aldrig ser.</div>
+    </div>
+    <div class="fauna-quads quad-stacked quad-single">
+      <div class="quad">
+        <div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/DHOLE.jpg" alt="Dhole" style="object-position:70% 15%"></div></div>
+        <div class="q-status st-en">Starkt hotad</div>
+        <div class="q-tx"><h3>Dhole</h3><div class="q-lat">Cuon alpinus</div><p>Den asiatiska vildhunden, varken varg eller räv utan sitt eget släkte. Den skäller inte, den visslar, och en flock jagar med sådan samordning att den kan fälla byten tio gånger sin egen storlek. Att se en är sällsynt nog att göra hela resan.</p></div>
+      </div>
+      <div class="quad">
+        <div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/KING%20KOBRA.jpg" alt="Kungskobra"></div></div>
+        <div class="q-status st-vu">Sårbar</div>
+        <div class="q-tx"><h3>Kungskobra</h3><div class="q-lat">Ophiophagus hannah</div><p>Världens längsta giftorm, upp till fem meter, och den enda orm som bygger ett bo åt sina ägg. Den äter nästan uteslutande andra ormar. När den känner sig hotad reser den en tredjedel av kroppen rakt upp och ser dig i ögonhöjd, ett möte få glömmer.</p></div>
+      </div>
+      <div class="quad">
+        <div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/STRIPED%20HYENA.webp" alt="Randig hyena"></div></div>
+        <div class="q-status st-nt">Nära hotad</div>
+        <div class="q-tx"><h3>Randig hyena</h3><div class="q-lat">Hyaena hyaena</div><p>Ensamvargen bland hyenor, mindre och skyggare än sina afrikanska släktingar. Den rör sig ensam i skymningen med käkar starka nog att krossa ben som inget annat rovdjur rår på. Sällan sedd, oftare bara hörd som ett ljud i mörkret vid parkens kant.</p></div>
+      </div>
+      <div class="quad">
+        <div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/CHINESE%20PANGOLIN.jpg" alt="Kinesisk pangolin"></div></div>
+        <div class="q-status st-cr">Akut hotad</div>
+        <div class="q-tx"><h3>Kinesisk pangolin</h3><div class="q-lat">Manis pentadactyla</div><p>Ett däggdjur klätt i fjäll av samma material som dina naglar, som rullar ihop sig till en boll när det hotas. Den lever på myror och termiter och rör sig mest om natten. Sorgligt nog världens mest tjuvjagade däggdjur, vilket gör varje observation i Bardiya till något dyrbart.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="p9">
+  <div class="fauna fauna2">
+    <div class="fauna-head">
+      <div class="kick">Kapitel 03 · Invånarna · 4 av 4</div>
+      <h2>Fåglarna</h2>
+      <div class="sub">Över 400 arter fyller luften. Här är de som fastnar i minnet.</div>
+    </div>
+    <div class="fauna-quads cols2 rows2 quad-stacked">
+      <div class="quad">
+        <div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/PA%CC%8AFA%CC%8AGEL.webp" alt="Påfågel"></div></div>
+        <div class="q-status st-lc">Livskraftig</div>
+        <div class="q-tx"><h3>Påfågel</h3><div class="q-lat">Pavo cristatus</div><p>Djungelns väckarklocka. Hanens skri ekar genom salskogen i gryningen, och när han slår upp stjärten till ett solfjäderöga av blått och grönt finns få syner som mäter sig. Påfåglar varnar också för rovdjur, så ett plötsligt skrik kan betyda att tigern är i rörelse.</p></div>
+      </div>
+      <div class="quad">
+        <div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/GREAT%20HORNBILL.jpg" alt="Större hornkorp"></div></div>
+        <div class="q-status st-vu">Sårbar</div>
+        <div class="q-tx"><h3>Större hornkorp</h3><div class="q-lat">Buceros bicornis</div><p>Näbbjätten, med en gul hjälmliknande utväxt ovanpå näbben. Vingslagen dånar så kraftigt att man hör fågeln innan man ser den. Honan murar in sig i ett ihåligt träd medan hon ruvar, och hanen matar henne genom en smal springa tills ungarna är redo.</p></div>
+      </div>
+      <div class="quad">
+        <div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/BENGAL%20FLORICAN.jpeg" alt="Bengal florican"></div></div>
+        <div class="q-status st-cr">Akut hotad</div>
+        <div class="q-tx"><h3>Bengal florican</h3><div class="q-lat">Houbaropsis bengalensis</div><p>En av världens sällsyntaste fåglar, med bara några hundra kvar. På våren gör hanen en spelflykt där han kastar sig upp ur det höga gräset i en fladdrande dans för att synas för honorna. Beroende av just den sortens orörda gräsmark som Bardiya skyddar.</p></div>
+      </div>
+      <div class="quad">
+        <div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/SAURUSTRANA.webp" alt="Sarustrana"></div></div>
+        <div class="q-status st-vu">Sårbar</div>
+        <div class="q-tx"><h3>Sarustrana</h3><div class="q-lat">Antigone antigone</div><p>Världens högsta flygande fågel, nästan mannshög med ett rött huvud som lyser mot gräset. Sarustranan parar sig för livet, och paren ses nästan alltid tillsammans i våtmarkerna. I regionen är den en symbol för trohet och lycka.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="p9-divider" style="min-height:0">
+  <div class="scrolldiv">
+    <span class="scrolldiv-rule"></span>
+    <div class="scrolldiv-tx">Härskaren<br><em>· den ensamma</em></div>
+    <span class="scrolldiv-rule"></span>
+  </div>
+</section>
+
+
+
+<!-- ============ SIDA 5 · TIGERN (foto-helsida) ============ -->
+<section class="page xp-photo" id="p5">
+  <div class="xpp-top"><div class="xp-num">Invånarna · härskaren</div></div>
+  <div class="xpp-figure"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/LOOKINGBACK%202.JPG" alt="Bengalisk tiger" style="object-position:50% 25%"></div>
+  <div class="xpp-main">
+    <div class="xp-tag">Panthera tigris tigris · starkt hotad</div>
+    <h2>Bengalisk tiger</h2>
+    <p>Härskaren, och skälet till att du är här. Bardiya har en av de högsta tigertätheterna på hela subkontinenten, tätare per kvadratkilometer än nästan någon annanstans. Här spårar du henne inte från en jeep utan till fots, genom gräs som växer högre än en människa. En hane kan väga 250 kilo och röra sig ljudlöst tre steg ifrån dig utan att du anar något.</p>
+    
+  </div>
+</section>
+
+<section class="page" id="p5-divider" style="min-height:0">
+  <div class="scrolldiv">
+    <span class="scrolldiv-rule"></span>
+    <div class="scrolldiv-tx">Byn<br><em>· människorna som lever i den</em></div>
+    <span class="scrolldiv-rule"></span>
+  </div>
+</section>
+
+<!-- ============ SIDA 10C · MÄNNISKORNA ============ -->
+<section class="page" id="p10c">
+  <div class="people">
+    <div class="people-hero">
+      <div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/VILLAGE%20MAN%20WITH%20COWS.jpg" alt="Bybo med kor"></div>
+      <div class="frame-note">Helbild · byn</div>
+    </div>
+    <div class="people-body">
+      <div class="people-kick">Folket i Terai</div>
+      <h2>Skogens folk</h2>
+      <p class="fw-drop">Byarna ligger där vildmarken börjar, och livet i dem har en rytm som försvunnit nästan överallt annars. Hus av lera och bambu, målade med blommor och djur. Ris och linser från fälten, fisk ur floden, kvällar kring elden. Och i gräset några hundra meter bort rör sig tigrarna, tätare här än nästan någon annanstans. Att spendera tid i byn är en stor del av upplevelsen.</p>
+      <p>Det är det här som gör Bardiya till en världsunik plats. Du tittar inte in i den här världen genom en jeepruta, du kliver in i den: bor hos en familj, äter vid deras bord, vaknar till byns morgon med djungeln som granne. I reseguiden visar jag dig vart du ska bo och hur du tar dig hit.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="p10d"><div class="quadgrid quadgrid-single"><div class="quad"><div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/EN%20MAN%20MED%20SIN%20KO%20O%20SITT%20HUS.jpg" alt="En man med sin ko"></div></div><div class="q-top">Byn · 01</div><div class="q-tx"><h3>En man med sin ko</h3><p>Livet vid husets tröskel, mitt i Terai.</p></div></div><div class="quad"><div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/COLORFUL%20HOUSE%20AND%20GOATS%20ON%20THE%20ROAD.jpg" alt="Målat hus"></div></div><div class="q-top">Byn · 02</div><div class="q-tx"><h3>Målat hus</h3><p>Getter längs vägen genom byn.</p></div></div><div class="quad"><div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/VARNING%20FO%CC%88R%20TIGERSKYLT.jpg" alt="Varning för tiger"></div></div><div class="q-top">Byn · 03</div><div class="q-tx"><h3>Varning för tiger</h3><p>Skylten som visar var vildmarken börjar.</p></div></div><div class="quad"><div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/CYKLAR%20I%20BYN.jpg" alt="Cyklar i byn"></div></div><div class="q-top">Byn · 04</div><div class="q-tx"><h3>Cyklar i byn</h3><p>Det vardagliga färdmedlet, för alla åldrar.</p></div></div></div></section>
+
+<!-- ═══════════════ DEL 2 · HANDBOKEN ═══════════════ -->
+
+<section class="page" id="p11" style="min-height:0">
+  <div class="scrolldiv">
+    <span class="scrolldiv-rule"></span>
+    <div class="scrolldiv-tx">Reseguiden<br><em>· allt du behöver för resan</em></div>
+    <span class="scrolldiv-rule"></span>
+  </div>
+</section>
+
+<!-- ============ SIDA 12 · VISUM & VACCIN ============ -->
+<section class="page" id="p13cal">
+  <div class="hb">
+    <div class="hb-head">
+      <div class="kick">Reseguiden · Förberedelse</div>
+      <h2>När du ska resa</h2>
+      <div class="sub">Chanserna att se djuren påverkas starkt av säsongen. Använd kalendern för att planera din resa.</div>
+    </div>
+    <div class="hb-body">
+      <div class="hb-when">
+        <div class="hb-when-tag">När du ska åka</div>
+        <h3>April &amp; maj</h3>
+        <div class="yearcal">
+          <div class="yc-cap">Chans att se tiger, månad för månad</div>
+          <div class="yc-stack">
+<div class="yc-row yc-good"><span class="yc-rm">Jan</span></div>
+<div class="yc-row yc-good"><span class="yc-rm">Feb</span></div>
+<div class="yc-row yc-best"><span class="yc-rm">Mar</span></div>
+<div class="yc-row yc-best"><span class="yc-rm">Apr</span></div>
+<div class="yc-row yc-best"><span class="yc-rm">Maj</span></div>
+<div class="yc-row yc-poor2"><span class="yc-rm">Jun</span></div>
+<div class="yc-row yc-poor2"><span class="yc-rm">Jul</span></div>
+<div class="yc-row yc-poor2"><span class="yc-rm">Aug</span></div>
+<div class="yc-row yc-poor2"><span class="yc-rm">Sep</span></div>
+<div class="yc-row yc-good"><span class="yc-rm">Okt</span></div>
+<div class="yc-row yc-good"><span class="yc-rm">Nov</span></div>
+<div class="yc-row yc-good"><span class="yc-rm">Dec</span></div>
+          </div>
+          <div class="yc-key">
+            <span><i style="background:#C96322"></i>Tigersäsong</span>
+            <span><i style="background:#5a7a52"></i>Natursäsong</span>
+            <span><i style="background:#39433a"></i>Regnsäsong</span>
+          </div>
+        </div>
+        <p>Mellan Mars och Maj har du bästa chansen att se tigrar. Då är det är torrsäsong, gräset har brunnit av och är kortare, värmen driver djuren till de sista vattenhålen, och sikten är som bäst. Undvik monsunen från juni till september när allt svämmar över.</p>
+      </div>
+      <div class="hb-card">
+        <div class="hb-card-h"><span class="hb-no hb-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></span><h3>Temperatur och väder</h3></div>
+        <div class="yc-temps">
+          <div class="yc-temp"><b>Tigersäsong</b><span>Dag 30–38°C · Natt 15–20°C</span></div>
+        </div>
+        <p>De flesta utflykter sker tidigt på morgonen eller på eftermiddagen när det är svalt. När man åker på motorcykel eller jeep, blir det dessutom kyligare med vinden. Jag rekommenderar rum med AC och att vila mitt på dagen för att ha en behaglig vistelse. Längre ner får du rekommendation på hur du ska klä dig.</p>
+      </div>
+      </div>
+    </div>
+    <div class="folio"><span>Bardiya · Reseguiden</span><span>Förberedelse</span></div>
+  </div>
+</section>
+
+<section class="page" id="p12">
+  <div class="hb">
+    <div class="hb-head">
+      <div class="kick">Reseguiden · Förberedelser</div>
+      <h2>Visum &amp; vaccin</h2>
+    </div>
+    <div class="hb-body">
+
+      <div class="hb-card">
+        <div class="hb-card-h"><span class="hb-no">01</span><h3>Visum till Nepal</h3></div>
+        <p>Som svensk medborgare får du "Visa-on-Arrival". Något du kan skaffa genom en kort enkät via automaterna du möts av direkt när du landar i Kathmandu eller via mobilen. Länk: <a href="https://nepaliport.immigration.gov.np/" target="_blank" rel="noopener">nepaliport.immigration.gov.np ↗</a> (Nepals officiella immigrationsportal).</p>
+        <ul class="hb-list">
+          <li><b>Välj:</b> (infoga rätt kategori)</li>
+          <li><b>15 dagar:</b> runt 30 USD</li>
+          <li><b>30 dagar:</b> runt 50 USD</li>
+          <li><b>Ta med:</b> pass giltigt minst 6 månader</li>
+          <li><b>Ta med:</b> kontanter i USD för avgiften</li>
+        </ul>
+        <div class="hb-tip">Jag skaffade Visa-on-Arrival via mobilen efter att jag hade landat. Personalen var trevlig och hjälpsam och fanns skyltar överallt med instruktioner så det kändes enkelt. Kunde också ta ut kontanter via disken men rekommenderar att man har det redo så sparar man tid och slipper springa runt och fråga.</div>
+        <div class="hb-imgpair">
+          <div class="hb-imgpair-cell"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/VISA%20ON%20ARRIVAL.jpg" alt="Visa on Arrival"><span>Automaterna för Visa on Arrival</span></div>
+          <div class="hb-imgpair-cell"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/AIRPORT%20BUDDHA%20STATUE.jpg" alt="Buddhastatyn på flygplatsen"><span>Buddhastatyn vid ankomsten</span></div>
+        </div>
+      </div>
+
+      <div class="hb-card">
+        <div class="hb-card-h"><span class="hb-no">02</span><h3>Vaccin &amp; hälsa</h3></div>
+        <p>Det krävs inga vaccin för inresa. Men om du vill vara skyddad för diverse sjukdomar, boka tid på en vaccinationsmottagning i god tid, vissa kräver flera doser med veckors mellanrum.</p>
+        <div class="hb-tip">Boka vaccinationssamtalet 6-8 veckor innan resan. Då hinner alla doser bli klara i tid.</div>
+      </div>
+
+    </div>
+    <div class="folio"><span>Bardiya · Reseguiden</span><span>Förberedelser</span></div>
+  </div>
+</section>
+
+<!-- ============ SIDA 13 · VÄGEN DIT ============ -->
+<section class="page" id="p13">
+  <div class="hb">
+    <div class="hb-head">
+      <div class="kick">Reseguiden · Resan</div>
+      <h2>Hela vägen till Bardiya</h2>
+    </div>
+    <div class="hb-body">
+
+      <div class="rs-steps"><div class="rs-step"><div class="rs-steph"><span class="rs-no">1</span><h3>Flyg till Kathmandu</h3></div><p>Den snabbaste och billigaste vägen dit går via Dubai eller Doha.<br><span class="pris">Förväntat pris: 5000–8000 kr t/r</span></p><a class="rs-btn" href="https://www.skyscanner.se/transport/flyg/stoc/ktm/?adultsv2=1&cabinclass=economy&childrenv2=&ref=home&rtn=1&preferdirects=false&outboundaltsenabled=false&inboundaltsenabled=false&oym=2703&iym=2703&selectedoday=01&selectediday=01" target="_blank" rel="noopener">Sök flyg på Skyscanner ↗</a><div class="rs-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/KATHMANDU%20AIRPORT.jpg" alt="Kathmandu"><div class="rs-cap">Kathmandu</div></div></div><div class="rs-step"><div class="rs-steph"><span class="rs-no">2</span><h3>Stanna en natt i Kathmandu</h3></div><p>Inrikesflygen påverkas av vädret och kan ställas in. Jag rekommenderar att du har en buffertdag när du landar. Passa på att utforska staden eller vila på hotell.<br><span class="pris">Pris: ~400 kr/natt</span></p><a class="rs-btn" href="https://www.apexbusinesshotel.com/" target="_blank" rel="noopener">Apex Business Hotel, 100 m från flygplatsen ↗</a><div class="rs-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/KATHMANDU%20AIRPORT.jpg" alt="Kathmandu"><div class="rs-cap">Kathmandu</div></div></div><div class="rs-step"><div class="rs-steph"><span class="rs-no">3</span><h3>Flyg till Nepalgunj</h3></div><p>Bokas separat via Buddha Air eller Yeti Airlines, går flera gånger om dagen och tar 2–3 timmar.<br><span class="pris">Förväntat pris: 1250 kr enkelbiljett</span></p><a class="rs-btn" href="https://www.buddhaair.com/flight-routes/flights-from-kathmandu-to-nepalgunj" target="_blank" rel="noopener">Buddha Air ↗</a><a class="rs-btn" href="https://yetiairlines.com/destination/kathmandu-to-nepalgunj-flight" target="_blank" rel="noopener" style="margin-top:8px">Yeti Airlines ↗</a><div class="rs-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/WALK%20UPSTAIRS%20UPP%20THE%20HILL.jpg" alt="Gå uppför backen när du kommer ut ur flygplatsen"><div class="rs-cap">Gå uppför backen när du kommer ut ur flygplatsen</div></div><div class="rs-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/FOLLOW%20THE%20SIGNS%20TO%20DOMESTIC%20AIRPORT.jpg" alt="Följ skyltarna mot domestic arrivals/departures"><div class="rs-cap">Följ skyltarna mot domestic arrivals/departures</div></div><div class="rs-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/WALK%20TO%20DOMESTIC%20DEPARTURES.jpg" alt="Gå till Domestic Departures"><div class="rs-cap">Gå till Domestic Departures</div></div><div class="rs-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/HOP%20ON%20THE%20SMALL%20PLANE.jpg" alt="Kliv på lilla planet"><div class="rs-cap">Kliv på lilla planet</div></div><div class="rs-tip">Tips: Sitt på höger sida för utsikt över Himalaya.</div></div><div class="rs-step"><div class="rs-steph"><span class="rs-no">4</span><h3>Ta bilen till Bardia</h3></div><p>Boka förare via boendet, så hämtar de upp dig utanför flygplatsen. Nepalgunjs flygplats är väldigt liten, du går rakt igenom den på några sekunder.</p><div class="rs-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/ARRIVING%20AT%20NEPALGUNJ%20AIRPORT.jpg" alt="Framme i Nepalgunj"><div class="rs-cap">Framme i Nepalgunj</div></div><div class="rs-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/BAGGAGE%20SUPEREASY%20SMALL%20JUST%20WALK%20OUT.jpg" alt="Bagaget går snabbt, bara att gå ut"><div class="rs-cap">Bagaget går snabbt, bara att gå ut</div></div><div class="rs-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/DRIVER%20MEET%20UP%20RIGHT%20OUTSIDE.jpg" alt="Föraren väntar direkt utanför"><div class="rs-cap">Föraren väntar direkt utanför</div></div><div class="rs-tip">Tips! Byt om till heltäckande eller smörj in dig med solkräm innan du åker med bilen. Solen är stark här och du hinner bränna dig genom glasrutan under resan.</div></div><div class="rs-step"><div class="rs-steph"><span class="rs-no">5</span><h3>Åk genom vildmarkskorridoren</h3></div><p>Du kommer passera en check-point där din förare får en tid som han måste hålla. På vägen finns det chans att se djur, men ha i åtanke att du inte får stanna på vägen, så var beredd med kameran i bilen.</p><div class="rs-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/WILDERNESS%20CORRIDOR%20INTERESTING%20SIGNS%20AND%20SOME%20WILDLIFE.jpg" alt="Bardiya"></div></div><div class="rs-step"><div class="rs-steph"><span class="rs-no">6</span><h3>Framme i Bardia</h3></div><p></p><div class="rs-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/AFTER%202%20HOURS%20ROUGHLY.jpg" alt="Efter ungefär två timmar"><div class="rs-cap">Efter ungefär två timmar</div></div><div class="rs-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/DIRT%20ROAD%20LONE%20MAN%20WITH%20COW.jpg" alt="Grusvägen genom byarna"><div class="rs-cap">Grusvägen genom byarna</div></div><div class="rs-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/HOMESTAY%20SIGN.jpg" alt="Framme"><div class="rs-cap">Framme</div></div></div></div>
+</div>
+</section>
+
+<section class="page" id="p13z-divider" style="min-height:0">
+  <div class="scrolldiv">
+    <span class="scrolldiv-rule"></span>
+    <div class="scrolldiv-tx">Boende</div>
+    <span class="scrolldiv-rule"></span>
+  </div>
+</section>
+
+<!-- ============ BOENDE 01 · HOMESTAY (helsida) ============ -->
+<section class="page xp-photo" id="p14a">
+  <div class="xpp-top"><div class="xp-num">Boende · nära folket</div></div>
+  <div class="xpp-duo">
+<div class="dphoto"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/BILD%20PA%CC%8A%20HOMESTAY%20BRA.jpg" alt="Homestay"></div>
+<div class="dphoto"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/BUDDHI%20%26%20FAM.jpg" alt="Buddhi med familj"></div>
+</div>
+  <div class="xpp-main">
+    <div class="xp-tag">Bo hos en familj</div>
+    <h2>Homestay</h2>
+    <p>Bo hos Buddhi och Sonja, enkelt och äkta. Du äter husmanskost lagad på öppen eld, sover nära byn och kommer människorna in på livet. Här bor du inte bredvid Bardiya, du bor mitt i det.</p>
+    <span class="xp-pris">från ~95 kr/natt</span>
+    <p style="font-family:'Newsreader';font-weight:300;font-size:12.5px;color:#EDE8DB;max-width:44ch;margin-top:10px">De löser permits på plats innan din resa när du betalar handpenningen, resten betalas när resan är klar.</p>
+    <a class="rs-btn" href="https://bardiahomestay.com" target="_blank" rel="noopener">bardiahomestay.com ↗</a>
+    
+  </div>
+</section>
+
+<section class="page" id="p14g">
+<div class="hb">
+<div class="hb-head">
+<div class="kick">Boende · hos Buddhi &amp; Sonja</div>
+<h2>Rummen &amp;<br>trädgården</h2>
+</div>
+<div class="hb-body">
+<p class="pw-lead">Rummen är superbekväma med AC, stora sängar och myggnät, och trädgården är samlingsplatsen där dagarna avslutas. Extremt prisvärt.</p><div class="rs-metarow"><span class="pris">Pris: ~150 kr/natt</span></div><a class="rs-btn" href="#" target="_blank" rel="noopener">Boka hos Buddhi &amp; Sonja (länk saknas än) ↗</a><div class="rs-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/COMFORTABLE%20ROOMS.jpg" alt="Rummen"><div class="rs-cap">Rummen</div></div><div class="rs-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/THE%20DOG%20IN%20THE%20VILLAGE.jpg" alt="Sonjas hund"><div class="rs-cap">Sonjas hund</div></div><div class="rs-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/ROOM%20WITH%20MOSQITO%20NET%20AND%20AC.jpg" alt="Myggnät &amp; AC"><div class="rs-cap">Myggnät &amp; AC</div></div><div class="rs-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/BEATIFUL%20GARDEN%20TO%20SOCIALIZE%20WITH%20OTHER%20GUESTS.jpg" alt="Trädgården, samlingsplatsen"><div class="rs-cap">Trädgården, samlingsplatsen</div></div><div class="rs-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/SONJA%20AND%20HER%20DOG%20AND%20FAMILY%20MEMBERS.jpg" alt="Sonja med familjen och hunden · homestayn"><div class="rs-cap">Sonja med familjen och hunden · homestayn</div></div>
+</div>
+</div>
+</section>
+
+<section class="page" id="p14lodge-divider" style="min-height:0">
+  <div class="scrolldiv">
+    <span class="scrolldiv-rule"></span>
+    <div class="scrolldiv-tx">Tiger Tops<br><em>· Karnali Lodge</em></div>
+    <span class="scrolldiv-rule"></span>
+  </div>
+</section>
+
+<!-- ============ BOENDE 02 · LODGE (helsida) ============ -->
+<section class="page xp-photo" id="p14b">
+  <div class="xpp-top"><div class="xp-num">Boende · mer komfort</div></div>
+  <div class="xpp-duo">
+    <div class="dphoto"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/TIGER%20TOPS%204-5.jpg" alt="Tiger Tops lodge"></div>
+    <div class="dphoto"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/KARNALI%20TIGER%20TOPS.jpg" alt="Karnali Tiger Tops"></div>
+    <div class="dphoto"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/POOL%20BA%CC%88STA.jpg" alt="Poolen"></div>
+    <div class="dphoto"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/CLASSIC%20LODGE%20ROOM%20LYX.jpg" alt="Rummen på Tiger Tops"></div>
+    <div class="dphoto"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/STAFF%20MEETS%20YOU%20OUTSIDE.jpg" alt="Personalen möter dig"></div>
+  </div>
+  <div class="xpp-main">
+    <div class="xp-tag">Egen bungalow</div>
+    <h2>Tiger Tops Karnali Lodge</h2>
+    <p>En av de första lodgerna i det här hörnet av Nepal, byggd av samma pionjärer som en gång öppnade Bardiya för resenärer. Fortfarande en av de mest lyxiga adresserna i nationalparken, med en servicenivå som känns steget före det mesta annat i regionen. Jag rekommenderar att spendera din sista natt här, ett sätt att runda av resan, ladda batterierna inför en lång hemresa med pool och högsta bekvämlighet till bra pris. Rekommenderar starkt Birdwatching härifrån, mysig och lugn aktivitet med chans att även se leoparden.</p>
+    <span class="xp-pris">från ~3300 kr/natt</span>
+    <a class="rs-btn" href="https://www.tigertops.com/lodges/karnali-lodge/" target="_blank" rel="noopener">Tiger Tops Karnali Lodge ↗</a>
+    
+  </div>
+</section>
+
+<section class="page" id="p14c-pre-divider" style="min-height:0">
+  <div class="scrolldiv">
+    <span class="scrolldiv-rule"></span>
+    <div class="scrolldiv-tx">Aktiviteterna</div>
+    <span class="scrolldiv-rule"></span>
+  </div>
+</section>
+
+<!-- ============ GUIDERNA (egen sida) ============ -->
+
+
+<!-- ============ HERO 01 · WALKING SAFARI ============ -->
+<section class="page xp-photo" id="p15a">
+  <div class="xpp-top"><div class="xp-num">Upplevelse 01</div></div>
+  <div class="xpp-duo">
+<div class="dphoto"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/LURKING%20TIGER.JPG" alt="Tiger i gräset"></div>
+<div class="dphoto"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/WALKING_SAFARI_TIGERFOOT_PRINT.jpg" alt="Tigerspår i leran"></div>
+</div>
+  <div class="xpp-main">
+    <div class="xp-tag">Till fots · flaggskeppet</div>
+    <h2>Walking Safari</h2>
+    <p>Hjärtat i Bardiya. Att spåra tiger till fots, med bara en guide och tystnaden, är en helt annan sak än att sitta i en jeep. Du läser spår i leran, lyssnar efter varningsropen, och känner djungeln andas runt dig. Ingenting kommer nära den här känslan.</p>
+    <span class="xp-pris">~370 kr/dag</span>
+    
+  </div>
+</section>
+
+<!-- ============ HERO 02 · JEEP SAFARI ============ -->
+<section class="page xp-photo" id="p15b">
+  <div class="xpp-top"><div class="xp-num">Upplevelse 02</div></div>
+  <div class="xpp-duo">
+    <div class="dphoto"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/SAFARRI.jpg" alt="Rezdar under jeepsafari"></div>
+    <div class="dphoto"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/JEEPVIEW.jpg" alt="Utsikt från jeepen"></div>
+  </div>
+  <div class="xpp-main">
+    <div class="xp-tag">På hjul · längre in</div>
+    <h2>Jeep Safari</h2>
+    <p>Täcker mer mark och når djupare in i parken än vad fötterna hinner. Bäst för att spana av de vidsträckta gräsmarkerna och nå flodens utsiktsplatser, där tigern ofta visar sig i värmen när den kommer ner för att dricka.</p>
+    <span class="xp-pris">~800 kr/dag</span>
+    
+  </div>
+</section>
+
+<!-- ============ HERO 03 · ÖVERNATTNING I TÄLT ============ -->
+<section class="page xp" id="p15c">
+  <div class="xp-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/CAMPINGEN.jpg" alt="Läger i djungeln"></div></div>
+  <div class="xp-top"><div class="xp-num">Upplevelse 03</div></div>
+  <div class="xp-main">
+    <div class="xp-tag">Under bar himmel · natten</div>
+    <h2>Jeepsafari &amp; camping</h2>
+    <p>Ett paket på två dagars jeepsafari och en natts camping i djungeln, tillsammans med Homestay-crewet. Här behöver gänget vara med för att säkerställa att tigern inte vågar närma sig. Passa på att spela kort, umgås och ta del av deras upplevelser och berättelser. Ta ett dopp i Karnali-floden och njut av naturen. Ljuden efter mörkrets inbrott är en helt egen värld, och gryningen när parken vaknar ger dig tidig tillgång till djurriket. Det här ökar inte chanserna för att se vilddjur men ger dig möjligheten att säga att du har campat i en tigerdjungel. Jag såg faktiskt en tiger nära lägret, så det blev en otroligt mäktig upplevelse!</p>
+    <span class="xp-pris">~5600 kr</span>
+    <p style="font-family:'Newsreader';font-style:italic;font-weight:300;font-size:11.5px;color:#EDE8DB;margin-top:10px">Tips: Dela upplevelsen med andra i gruppen, så sänks priset per person rejält.</p>
+    
+  </div>
+</section>
+
+<!-- ============ HERO 04 · TRÄDKOJA ============ -->
+<section class="page xp-photo" id="p15d">
+  <div class="xpp-top"><div class="xp-num">Upplevelse 04</div></div>
+  <div class="xpp-duo">
+    <div class="dphoto"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/TREEHOUSE.jpg" alt="Trädkoja"></div>
+    <div class="dphoto"><img src="https://i.ibb.co/9Hc3QSYX/SUN.jpg" alt="Soluppgång över parken"></div>
+  </div>
+  <div class="xpp-main">
+    <div class="xp-tag">Bland grenarna · gryningen</div>
+    <h2>Natt i trädkoja</h2>
+    <p>Uppe bland grenarna omgiven av savannen. I det höga gräset gömmer sig en tigerhona och hennes två ungar. Bli embedded i naturen på ett säkert avstånd med panoramavy och titta ut över den alien-liknande naturen där torka och grönska överlappar. Om du har tur kliver djurriket fram ur det höga gräset. Det var här jag bevittnade en framgångsrik tigerjakt.</p>
+    <span class="xp-pris">~310 kr</span>
+    
+  </div>
+</section>
+
+<!-- ============ HERO 05 · THARU-BY ============ -->
+<section class="page xp" id="p15e">
+  <div class="xpp-duo">
+  <div class="dphoto"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/VILLGAGE%20BARDIA%20HOUSES.jpg" alt="Tharu-by"></div>
+  <div class="dphoto"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/EN%20MAN%20MED%20SIN%20KO%20O%20SITT%20HUS.jpg" alt="En man med sin ko"></div>
+  <div class="dphoto"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/CYKLAR%20I%20BYN.jpg" alt="Cykling i byn"></div>
+</div>
+  <div class="xp-main">
+    <h2>Besök i Tharu-by</h2>
+    <p>Folket som levt sida vid sida med tigern i generationer. Att gå genom byn, se de lerklinade husen med sina målade mönster och möta människorna, ger resan ett djup som djuren ensamma inte kan. Det här är hjärtat som slår runt vildmarken.</p>
+    <span class="xp-pris">~200 kr</span>
+    
+  </div>
+</section>
+
+<section class="page" id="p15f-divider" style="min-height:0">
+  <div class="scrolldiv">
+    <span class="scrolldiv-rule"></span>
+    <div class="scrolldiv-tx">Fler<br><em>aktiviteter</em></div>
+    <span class="scrolldiv-rule"></span>
+  </div>
+</section>
+
+<!-- ============ AKTIVITETER · MER ============ ============ -->
+<section class="page" id="p16">
+  <div class="hb">
+    <div class="hb-head">
+      <div class="kick">Reseguiden · Aktiviteter · mer</div>
+      <div class="sub">Lugnare stunder mellan safariturerna, och några äventyr att lägga till om du vill mer.</div>
+    </div>
+    <div class="hb-body">
+
+      <div class="act-grid">
+        <div class="act hero">
+          <div class="act-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/BIRD%20WATCHING%20TOUR%20GUIDE.jpg" alt="Fågelskådning"></div></div>
+          <div class="act-tx"><h3>Fågelskådning</h3><p>Över 400 arter, från jättehornkorpen till dansande floricaner. Ta med kikare och en tidig morgon, gräsmarkerna och floden sjuder av liv.</p><div class="pris-after"><span class="pris">~95 kr</span></div></div>
+        </div>
+        <div class="act hero">
+          <div class="act-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/CYKLAR%20I%20BYN.jpg" alt="Cykling i byn"></div></div>
+          <div class="act-tx"><h3>Cykling i byn</h3><p>Hyr en cykel och rulla genom risfält och småvägar i eget tempo. Det lugnaste sättet att se landskapet mellan turerna.</p><div class="pris-after"><span class="pris">~100 kr/dag</span></div><a class="rs-btn" href="https://bardiahomestay.com" target="_blank" rel="noopener" style="margin-top:10px">Boka via Bardia Homestay ↗</a></div>
+        </div>
+        <div class="act hero">
+          <div class="act-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/MARKNADEN.jpg" alt="Marknaden i byn"></div></div>
+          <div class="act-tx"><h3>Marknaden i byn</h3><p>Vissa dagar har byn marknad. Möt hela byn, hälsa med ett Namaste, och passa på att köpa souvenirer och smaka spännande snacks.</p><a class="rs-btn" href="https://bardiahomestay.com" target="_blank" rel="noopener" style="margin-top:10px">Boka via Bardia Homestay ↗</a></div>
+        </div>
+      </div>
+
+      <div class="tips">
+        <div class="tips-img" style="aspect-ratio:auto"><div class="ph has-img" style="position:static"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/SAFARRI.jpg" alt="Jeepsafari" style="position:static;width:100%;height:auto;object-fit:initial"></div></div>
+        <div class="tips-tx">
+          <div class="tips-h">Om du vill lägga till mer</div>
+          <ul class="tips-list">
+            <li><b>Rafting på Karnali.</b> Flyt nerför Nepals längsta flod och spana efter gangesdelfiner och ghavial från vattnet.</li>
+            <li><b>Vandring i Churia-kullarna.</b> Upp i bergen i norr för utsikt över hela slätten och en annan sida av parken.</li>
+            <li><b>Tharu fiske &amp; jordbruk.</b> Följ med ut och prova de traditionella metoderna, händerna i leran och vattnet.</li>
+            <li><b>Matlagningskurs.</b> Lär dig laga dal bhat och Tharu-rätter från grunden, en smak att ta med hem.</li>
+          </ul>
+          <a class="rs-btn" href="https://bardiahomestay.com" target="_blank" rel="noopener">Boka via Bardia Homestay ↗</a>
+        </div>
+      </div>
+
+    </div>
+    <div class="folio"><span>Bardiya · Reseguiden</span><span>Aktiviteter · mer</span></div>
+  </div>
+</section>
+
+<section class="page" id="p17mindset">
+<div class="hb">
+<div class="hb-head">
+<div class="kick">Reseguiden · Innan du åker</div>
+<h2>Mindset</h2>
+<div class="sub">Fyra saker att ha med sig i huvudet innan du landar, så resan möter dig där du är.</div>
+</div>
+<div class="hb-body">
+<div class="hb-card"><div class="hb-card-h"><span class="hb-no">01</span><h3>Kalibrera dina förväntningar</h3></div><p>Tigern är extremt sällsynt, bara några hundra finns kvar i Nepal. Bardiya har öppna gräsmarker som gör att chansen att faktiskt se en är bland de bästa i Nepal, men det sker alltid på naturens villkor. Om du åker med förväntningen att uppleva byn och naturen i sig, kommer du alltid komma hem med magiska minnen. Vissa åker och ser ingen tiger, andra ser flera på en enda dag.</p></div><div class="hb-card"><div class="hb-card-h"><span class="hb-no">02</span><h3>Var flexibel, boka inte allt i förväg</h3></div><p>Det rekommenderas inte att du bokar alla aktiviteter i förväg. Var öppen, lyssna på guidernas råd. De vill att du ska åka hem med de bästa upplevelserna, och lita på deras omdöme. Lämna dagarna flexibla för anpassning utifrån deras rekommendationer. Ordet sprids snabbt i byn när tigern synts till, och du kan behöva ändra planer för att få din chans.</p></div><div class="hb-card"><div class="hb-card-h"><span class="hb-no">03</span><h3>Inte som Tanzania eller Kenya</h3></div><p>Djurlivet är magiskt i Bardiya men skiljer sig från klassiska safaris i Tanzania och Kenya, där du kan se hundratals djur vid ett och samma tillfälle. Skogen är tät och gräset är högt, och djuren gillar att gömma sig. Det är det som gör varje sighting mer värdefull här.</p></div><div class="hb-card"><div class="hb-card-h"><span class="hb-no">04</span><h3>Bardiya är vilt, på riktigt</h3></div><p>Gränsen mellan vildmark och bysamhälle är nästan obefintlig. Risken är verklig, och det gäller att vara medveten om det. Guiderna har goda kunskaper och tänker på din säkerhet, men det här är inget zoo med stängsel. Du åker på egen risk.</p></div>
+</div>
+</div>
+</section>
+
+<section class="page" id="p14c-divider" style="min-height:0">
+  <div class="scrolldiv">
+    <span class="scrolldiv-rule"></span>
+    <div class="scrolldiv-tx">Guiderna</div>
+    <span class="scrolldiv-rule"></span>
+  </div>
+</section>
+
+<section class="page" id="p14c">
+  <div class="hb">
+    <div class="hb-head">
+      <div class="kick">Reseguiden · På plats</div>
+      <h2>Guiderna</h2>
+      <div class="sub">En bra guide är skillnaden mellan att gå i djungeln och att läsa den. De här känner Bardiya utan och innan.</div>
+    </div>
+    <div class="hb-body">
+      <div class="guide-list">
+
+        <div class="guide-big">
+<div class="guide-big-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/Sonja.jpg" alt="Sonja"></div></div>
+<div class="guide-big-tx">
+<div class="guide-big-role">Värd</div>
+<h3>Sonja</h3>
+<p>Driver homestayn tillsammans med Buddhi. Det är hennes hem du bor i och vid hennes bord du äter.</p>
+</div>
+</div>
+<div class="guide-big">
+          <div class="guide-big-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/BUDDHI%20GLA%CC%88DJE.jpg" alt="Buddhi"></div></div>
+          <div class="guide-big-tx">
+            <div class="guide-big-role">Värd &amp; guide</div>
+            <h3>Buddhi</h3>
+            <p>Din värd och den som knyter ihop hela resan. Känner varje stig, varje vattenhål, och folket i byarna runt parken.</p>
+          </div>
+        </div>
+
+        <div class="guide-big">
+          <div class="guide-big-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/KRISHNA_SHAH_AND_REZDAR.jpg" alt="Krishna Shah"></div></div>
+          <div class="guide-big-tx">
+            <div class="guide-big-role">Naturguide</div>
+            <h3>Krishna Shah</h3>
+            <p>Ögonen i djungeln. Läser spår och läten som en bok, och vet var tigern rör sig långt innan du ser den.</p>
+          </div>
+        </div>
+
+        <div class="guide-big">
+          <div class="guide-big-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/BIRD%20WATCHING%20TOUR%20GUIDE.jpg" alt="Krishna, fågelguide"></div></div>
+          <div class="guide-big-tx">
+            <div class="guide-big-role">Fågelguide</div>
+            <h3>Krishna</h3>
+            <p>En annan Krishna, specialiserad på Bardiyas fågelliv. Känner lätena, boplatserna och de bästa timmarna på dygnet för att se de sällsynta arterna.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="folio"><span>Bardiya · Reseguiden</span><span>På plats</span></div>
+  </div>
+</section>
+
+<!-- ============ SIDA 19 · PACKLISTA & KLÄDER ============ -->
+<section class="page" id="p19">
+  <div class="hb">
+    <div class="hb-head">
+      <div class="kick">Reseguiden · Packning</div>
+      <h2>Packlista &amp; kläder</h2>
+      <div class="sub">Rätt utrustning skyddar dig mot den varma solen, håller dig flexibel och ökar chanserna till djurmöten.</div>
+    </div>
+    <div class="hb-body">
+
+      <div class="gear-hero">
+        <div class="ph has-img"><img src="https://i.ibb.co/PGtwrNxx/RVRC.jpg" alt="Fältmundering, RevolutionRace"></div>
+        <div class="gh-tag">Så klär du dig i fält</div>
+      </div>
+
+      <div class="gear-warn">Undvik vita tröjor och starka färger. Försök ha så naturtrogna färger som möjligt.</div>
+
+      <div class="gear-discount">Använd koden <b>REZDAR15</b> eller <b>REZDAR10</b> för rabatt på RevolutionRace. Gäller hela 2026, endast ordinarie priser, exkluderar ULTRA-serien.</div>
+
+      <div class="gear-segs">
+        <div class="gear-seg">
+          <p class="gear-seg-tx"><span class="gear-seg-no">1</span><b>Tunn långärmad skjorta</b> i dämpad jordfärg. Skyddar mot sol och grenar, andas i värmen och smälter in i landskapet.</p>
+          <div class="gear-seg-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/Gradiet%20Pro%20UV%20Shirt.jpg" alt="Tunn långärmad skjorta"></div></div>
+          <a class="rs-btn" href="#" target="_blank" rel="noopener">Köp Tunn långärmad skjorta (länk saknas än) ↗</a>
+        </div>
+        <div class="gear-seg">
+          <p class="gear-seg-tx"><span class="gear-seg-no">2</span><b>Tåliga långbyxor</b> med stretch. Klarar snårig terräng och långa dagar utan att bli tunga.</p>
+          <div class="gear-seg-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/Nordwand%20Stretch%20byxor.webp" alt="Tåliga långbyxor"></div></div>
+          <a class="rs-btn" href="#" target="_blank" rel="noopener">Köp Tåliga långbyxor (länk saknas än) ↗</a>
+        </div>
+        <div class="gear-seg">
+          <p class="gear-seg-tx"><span class="gear-seg-no">3</span><b>Vandringskängor</b> med bra grepp. Håller foten torr och stadig på lerig mark.</p>
+          <div class="gear-seg-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/Phantom%20Trail%20Mid%20Waterproof%20Hiking%20Boots.jpg" alt="Vandringskängor"></div></div>
+          <a class="rs-btn" href="#" target="_blank" rel="noopener">Köp Vandringskängor (länk saknas än) ↗</a>
+        </div>
+        <div class="gear-seg">
+          <p class="gear-seg-tx"><span class="gear-seg-no">4</span><b>Tunna höga strumpor</b> när du går i högt gräs.</p>
+          <div class="gear-seg-img"><div class="ph"><span>Produktbild — Tunna höga strumpor</span></div></div>
+          <a class="rs-btn" href="#" target="_blank" rel="noopener">Köp Tunna höga strumpor (länk saknas än) ↗</a>
+        </div>
+        </div>
+<div class="pack-cols">
+        <div class="pack-col">
+          <div class="pack-col-h">På kroppen</div>
+          <ul class="pack-list">
+            <li>Långärmade skjortor i dämpade färger</li>
+            <li>Långbyxor, tåliga och luftiga</li>
+            <li>Vandringskängor, inkörda</li>
+            <li>Hatt eller keps, buff för dammet</li>
+            <li>Lätt regnjacka</li>
+          </ul>
+        </div>
+        <div class="pack-col">
+          <div class="pack-col-h">I ryggsäcken</div>
+          <ul class="pack-list">
+            <li>Kikare, oumbärlig</li>
+            <li>Solkräm</li>
+            <li>Myggspray</li>
+            <li>Vattenflaska att fylla på</li>
+            <li>Ryggsäck för dagsturerna</li>
+            <li>Axelväska eller midjeväska till kameran</li>
+            <li>Powerbank, ström är inte given</li>
+            <li>Kamera med extra batterier</li>
+            <li>Pannlampa eller ficklampa</li>
+            <li>Litet första hjälpen-kit</li>
+            <li>Handsprit och våtservetter</li>
+            <li>Öronproppar för nätterna</li>
+            <li><b>E-sim via <a href="https://www.airalo.com/" target="_blank" rel="noopener" style="color:var(--tiger);border-bottom:1px solid currentColor;text-decoration:none">Airalo</a></b>, skaffa den innan du landar så har du internet direkt. Jag kör alltid e-sim, slipper allt krångel med fysiska kort.</li>
+          </ul>
+        </div>
+      <a class="rs-btn" href="https://bardiahomestay.com/travel-checklist-bardia-nepal/" target="_blank" rel="noopener" style="margin-top:16px">Fler tips på Bardia Homestays checklista ↗</a>
+</div>
+    </div>
+    <div class="folio"><span>Bardiya · Reseguiden</span><span>Kläderna</span></div>
+  </div>
+</section>
+
+<!-- ============ SIDA 19B · PLAGGEN & PACKLISTAN ============ -->
+
+
+<section class="page" id="p20">
+  <div class="outro">
+    <img src="https://i.ibb.co/9Hc3QSYX/SUN.jpg" alt="Gryning över Bardiya" style="object-position:50% 40%">
+    <div class="outro-grad"></div>
+    <div class="outro-tx">
+      
+      <span class="fw-rule" style="margin:16px auto"></span>
+      <div class="outro-line">Tills vi ses där.</div>
+      <p class="outro-invite">Känner du dig inspirerad men vill inte åka ensam? Då finns möjligheten att åka tillsammans med mig och ett härligt gäng. Anmäl ditt intresse inför 2027 via <a href="mailto:samarbete@rezdar.se">samarbete@rezdar.se</a>.</p>
+    </div>
+  </div>
+</section>
+<div style="position:fixed;bottom:4px;right:6px;z-index:99999;font-family:monospace;font-size:9px;color:rgba(255,255,255,.28);pointer-events:none">build 2026-07-29 12:24 UTC</div>
+</body>
+</html>
