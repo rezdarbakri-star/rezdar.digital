@@ -1166,6 +1166,10 @@
   .gear-discount b{color:#4B6B33;letter-spacing:.03em}
 
 
+  .gear-alt{margin-top:10px;font-family:'Newsreader';font-style:italic;font-size:11.5px;color:var(--mark)}
+  .gear-alt a{color:var(--tiger);text-decoration:none;border-bottom:1px solid currentColor;font-style:normal}
+
+
   .quadgrid-single{grid-template-columns:1fr;grid-template-rows:none}
   .quadgrid-single .quad{aspect-ratio:4/3;min-height:0}
   /* ===== porterade komponenter (stående boken) ===== */
@@ -1267,7 +1271,28 @@
 .rs-tip{margin-top:12px;font-family:'Instrument Sans';font-size:11px;color:var(--mark);font-style:italic}
 .rs-ph{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;
     background:repeating-linear-gradient(45deg,#12201a 0 10px,#0f1c16 10px 20px)}
-.rs-ph span{font-family:'Instrument Sans';font-size:10px;letter-spacing:.06em;color:rgba(237,232,219,.55)}</style>
+.rs-ph span{font-family:'Instrument Sans';font-size:10px;letter-spacing:.06em;color:rgba(237,232,219,.55)}
+  #toc .toc-list{display:flex;flex-direction:column}
+  #toc .toc-row{display:flex;align-items:center;gap:14px;padding:16px 4px;
+    border-bottom:1px solid #e2d9c4;text-decoration:none;color:inherit;transition:opacity .2s}
+  #toc .toc-row:last-child{border-bottom:none}
+  #toc .toc-row:active{opacity:.6}
+  #toc .toc-no{font-family:'Instrument Sans';font-weight:700;font-size:11px;color:var(--tiger);
+    letter-spacing:.04em;flex:0 0 auto;width:22px}
+  #toc .toc-tx{font-family:'Newsreader';font-weight:400;font-size:14.5px;color:#2B2823;flex:1}
+  #toc .toc-arrow{color:var(--tiger);font-size:14px;flex:0 0 auto}
+
+  .back-toc{position:fixed;bottom:22px;right:18px;z-index:9998;
+    display:flex;align-items:center;gap:7px;
+    background:var(--natt);color:var(--papper);
+    font-family:'Instrument Sans';font-weight:700;font-size:11px;letter-spacing:.03em;
+    padding:11px 16px;border-radius:100px;text-decoration:none;
+    box-shadow:0 10px 30px rgba(0,0,0,.28);
+    opacity:0;transform:translateY(12px);pointer-events:none;
+    transition:opacity .25s,transform .25s}
+  .back-toc.show{opacity:1;transform:translateY(0);pointer-events:auto}
+
+</style>
 </head>
 <body>
 
@@ -1285,6 +1310,41 @@
     <h1 class="cover-title">Bardiya</h1>
     <div class="cover-frame">Här lever människor bland vilda tigrar.</div>
     <p class="cover-seed">På gränsen mellan Indien och Nepal ligger Sydasiens bäst bevarade hemlighet: en värld där människan och vildmarken överlappar. Här spårar du tigern till fots.</p>
+  </div>
+</section>
+
+<section class="page" id="toc">
+  <div class="hb">
+    <div class="hb-head">
+      <div class="kick">Reseguiden</div>
+      <h2>Innehåll</h2>
+      <div class="sub">Klicka på ett kapitel för att hoppa dit direkt.</div>
+    </div>
+    <div class="hb-body">
+      <div class="toc-list">
+<a class="toc-row" href="#p4"><span class="toc-no">01</span><span class="toc-tx">I skuggan av Himalaya</span><span class="toc-arrow">→</span></a>
+<a class="toc-row" href="#p10eco"><span class="toc-no">02</span><span class="toc-tx">Fyra världar</span><span class="toc-arrow">→</span></a>
+<a class="toc-row" href="#p5b"><span class="toc-no">03</span><span class="toc-tx">Djurriket · Leopard & noshörning</span><span class="toc-arrow">→</span></a>
+<a class="toc-row" href="#p7"><span class="toc-no">04</span><span class="toc-tx">Floden · Krokodiler & fisk</span><span class="toc-arrow">→</span></a>
+<a class="toc-row" href="#p8"><span class="toc-no">05</span><span class="toc-tx">De sällsynta & svårfångade</span><span class="toc-arrow">→</span></a>
+<a class="toc-row" href="#p9"><span class="toc-no">06</span><span class="toc-tx">Fåglarna</span><span class="toc-arrow">→</span></a>
+<a class="toc-row" href="#p5"><span class="toc-no">07</span><span class="toc-tx">Härskaren · Bengalisk tiger</span><span class="toc-arrow">→</span></a>
+<a class="toc-row" href="#p10c"><span class="toc-no">08</span><span class="toc-tx">Skogens folk</span><span class="toc-arrow">→</span></a>
+<a class="toc-row" href="#p10d"><span class="toc-no">09</span><span class="toc-tx">Byn i bilder</span><span class="toc-arrow">→</span></a>
+<a class="toc-row" href="#p11"><span class="toc-no">10</span><span class="toc-tx">Reseguiden börjar</span><span class="toc-arrow">→</span></a>
+<a class="toc-row" href="#p13cal"><span class="toc-no">11</span><span class="toc-tx">När du ska resa</span><span class="toc-arrow">→</span></a>
+<a class="toc-row" href="#p12"><span class="toc-no">12</span><span class="toc-tx">Visum & vaccin</span><span class="toc-arrow">→</span></a>
+<a class="toc-row" href="#p13"><span class="toc-no">13</span><span class="toc-tx">Hela vägen till Bardiya</span><span class="toc-arrow">→</span></a>
+<a class="toc-row" href="#p14a"><span class="toc-no">14</span><span class="toc-tx">Boende · Homestay</span><span class="toc-arrow">→</span></a>
+<a class="toc-row" href="#p14g"><span class="toc-no">15</span><span class="toc-tx">Rummen & trädgården</span><span class="toc-arrow">→</span></a>
+<a class="toc-row" href="#p14b"><span class="toc-no">16</span><span class="toc-tx">Tiger Tops Karnali Lodge</span><span class="toc-arrow">→</span></a>
+<a class="toc-row" href="#p15a"><span class="toc-no">17</span><span class="toc-tx">Aktiviteterna</span><span class="toc-arrow">→</span></a>
+<a class="toc-row" href="#p17mindset"><span class="toc-no">18</span><span class="toc-tx">Mindset</span><span class="toc-arrow">→</span></a>
+<a class="toc-row" href="#p14c"><span class="toc-no">19</span><span class="toc-tx">Guiderna</span><span class="toc-arrow">→</span></a>
+<a class="toc-row" href="#p19"><span class="toc-no">20</span><span class="toc-tx">Packlista & kläder</span><span class="toc-arrow">→</span></a>
+      </div>
+    </div>
+    <div class="folio"><span>Bardiya · Reseguiden</span><span>Innehåll</span></div>
   </div>
 </section>
 
@@ -1988,17 +2048,18 @@
         <div class="gear-seg">
           <p class="gear-seg-tx"><span class="gear-seg-no">1</span><b>Tunn långärmad skjorta</b> i dämpad jordfärg. Skyddar mot sol och grenar, andas i värmen och smälter in i landskapet.</p>
           <div class="gear-seg-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/Gradiet%20Pro%20UV%20Shirt.jpg" alt="Tunn långärmad skjorta"></div></div>
-          <a class="rs-btn" href="#" target="_blank" rel="noopener">Köp Tunn långärmad skjorta (länk saknas än) ↗</a>
+          <a class="rs-btn" href="https://www.revolutionrace.se/herr/trojor/skjortor/gradient-pro-uv-shirt-men?Color=2897" target="_blank" rel="noopener">Köp Gradient Pro UV Shirt ↗</a>
         </div>
         <div class="gear-seg">
           <p class="gear-seg-tx"><span class="gear-seg-no">2</span><b>Tåliga långbyxor</b> med stretch. Klarar snårig terräng och långa dagar utan att bli tunga.</p>
           <div class="gear-seg-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/Nordwand%20Stretch%20byxor.webp" alt="Tåliga långbyxor"></div></div>
-          <a class="rs-btn" href="#" target="_blank" rel="noopener">Köp Tåliga långbyxor (länk saknas än) ↗</a>
+          <a class="rs-btn" href="https://www.revolutionrace.se/herr/byxor/frilufts-vandringsbyxor/nordwand-pants-men-2-0?Color=2891" target="_blank" rel="noopener">Köp Nordwand Pants 2.0 ↗</a>
         </div>
         <div class="gear-seg">
           <p class="gear-seg-tx"><span class="gear-seg-no">3</span><b>Vandringskängor</b> med bra grepp. Håller foten torr och stadig på lerig mark.</p>
           <div class="gear-seg-img"><div class="ph has-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/Phantom%20Trail%20Mid%20Waterproof%20Hiking%20Boots.jpg" alt="Vandringskängor"></div></div>
-          <a class="rs-btn" href="#" target="_blank" rel="noopener">Köp Vandringskängor (länk saknas än) ↗</a>
+          <a class="rs-btn" href="https://www.revolutionrace.se/skor/phantom-trail-mid-waterproof-hiking-boots-men?Color=4731" target="_blank" rel="noopener">Köp Phantom Trail Mid Waterproof ↗</a>
+          <p class="gear-alt">Vill du ha något lättare? <a href="https://www.revolutionrace.se/skor/phantom-trail-low-hiking-shoes-men?Color=962" target="_blank" rel="noopener">Phantom Trail Low Hiking Shoes ↗</a></p>
         </div>
         </div>
 <div class="pack-cols">
@@ -2051,6 +2112,18 @@
     </div>
   </div>
 </section>
-<div style="position:fixed;bottom:4px;right:6px;z-index:99999;font-family:monospace;font-size:9px;color:rgba(255,255,255,.28);pointer-events:none">build 2026-07-29 14:00 UTC</div>
+<a href="#toc" class="back-toc" id="backToc">↑ Innehåll</a>
+<script>
+(function(){
+  const btn=document.getElementById('backToc');
+  const tocEl=document.getElementById('toc');
+  if(!btn||!tocEl) return;
+  window.addEventListener('scroll', function(){
+    const tocBottom = tocEl.getBoundingClientRect().bottom;
+    btn.classList.toggle('show', tocBottom < 0);
+  }, {passive:true});
+})();
+</script>
+<div style="position:fixed;bottom:4px;right:6px;z-index:99999;font-family:monospace;font-size:9px;color:rgba(255,255,255,.28);pointer-events:none">build 2026-07-29 14:14 UTC</div>
 </body>
 </html>
