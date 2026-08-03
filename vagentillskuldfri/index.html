@@ -45,6 +45,10 @@ em{font-style:italic}
 .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;position:relative;
   border-bottom:1px solid var(--line)}
 .label{margin-bottom:34px}
+.label.tag{display:inline-flex;align-items:center;gap:11px;padding:11px 22px 11px 18px;border-radius:999px;
+  background:rgba(47,107,79,.09);border:1px solid rgba(47,107,79,.35);color:var(--accent);
+  letter-spacing:.16em;font-size:13px;box-shadow:0 6px 22px rgba(47,107,79,.14)}
+.label-logo{height:22px;width:auto;display:block}
 .hero h1{font-size:clamp(58px,13vw,156px);line-height:.9;letter-spacing:-.02em;font-weight:400;color:var(--accent)}
 .hero h1 .kr{color:var(--muted);font-size:.34em;letter-spacing:.01em;margin-left:.12em;vertical-align:baseline}
 .daysub{margin-top:26px;font-size:clamp(28px,4.2vw,48px);line-height:1.05;letter-spacing:-.01em}
@@ -117,19 +121,58 @@ section{padding:clamp(90px,13vw,150px) 0;border-bottom:1px solid var(--line)}
 .integrate{margin-top:48px;font-size:22px;color:var(--soft);max-width:780px}
 .integrate b{color:var(--ink);font-style:italic;font-weight:400}
 
-.record{display:grid;grid-template-columns:260px 1fr;gap:40px;padding:40px 0;border-bottom:1px solid var(--line-soft);align-items:baseline}
+.record{display:grid;grid-template-columns:300px 1fr;gap:48px;padding:48px 0;border-bottom:1px solid var(--line-soft);align-items:center}
 .record:first-of-type{border-top:1px solid var(--line);margin-top:56px}
 .record:last-of-type{border-bottom:1px solid var(--line)}
-.record .rec-num{font-size:clamp(48px,7vw,84px);line-height:.85;color:var(--accent);letter-spacing:-.02em}
-.record .rec-body h4{font-size:clamp(24px,3vw,32px);margin-bottom:12px;font-weight:400}
+.record .rec-body h4{font-size:clamp(24px,3vw,32px);margin-bottom:14px;font-weight:400}
 .record .rec-body p{color:var(--soft);font-size:19px;max-width:560px}
-.record .rec-plat{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-left:10px;vertical-align:middle}
-.record .rec-num.rec-soon{font-size:clamp(26px,3vw,34px);color:var(--muted);line-height:1.1}
+.record .rec-figure{font-size:clamp(40px,6vw,64px);line-height:.9;color:var(--accent);letter-spacing:-.02em;margin-bottom:16px}
+.record .rec-figure.rec-soon{font-size:clamp(24px,3vw,30px);color:var(--muted);line-height:1.1}
+.rec-figure .rec-views{display:block;font-size:13px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink);margin-top:12px;background:rgba(47,107,79,.12);padding:5px 12px;border-radius:6px;
+  width:fit-content}
+
+/* plattformsflagga med logotyp */
+.rec-plat{display:inline-flex;align-items:center;gap:9px;padding:7px 16px 7px 12px;border-radius:999px;
+  border:1px solid var(--line);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);
+  vertical-align:middle;margin-left:14px}
+.rec-plat img{height:22px;width:auto;display:block}
+.rec-plat.yt{background:rgba(255,0,0,.06);border-color:rgba(255,0,0,.22)}
+.rec-plat.tt{background:rgba(26,24,21,.05)}
+
+/* omslag som en trave (serien) */
+.rec-cover{position:relative}
+.rec-cover .cover-stack{position:relative;border-radius:12px}
+.rec-cover .cover-stack::before,
+.rec-cover .cover-stack::after{content:"";position:absolute;inset:0;border-radius:12px;z-index:0;
+  background:var(--paper-2);border:1px solid var(--line)}
+.rec-cover .cover-stack::before{transform:translate(10px,10px)}
+.rec-cover .cover-stack::after{transform:translate(5px,5px)}
+.rec-cover img.cover-img{position:relative;z-index:1;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;
+  border:1px solid var(--line);box-shadow:0 14px 34px rgba(26,24,21,.16);display:block}
+.rec-watch{display:inline-flex;align-items:center;gap:9px;margin-top:22px;
+  padding:12px 22px;border-radius:999px;background:var(--ink);color:var(--paper);
+  text-decoration:none;font-size:15px;letter-spacing:.02em;transition:opacity .2s}
+.rec-watch:hover{opacity:.86}
 .profile-ph{aspect-ratio:4/5;border-radius:14px;border:1px solid var(--line);background:var(--paper-2);
   position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;max-width:360px}
 .profile-ph::before{content:"";position:absolute;inset:0;
   background:repeating-linear-gradient(135deg,transparent,transparent 11px,rgba(0,0,0,.025) 11px,rgba(0,0,0,.025) 22px)}
 .profile-ph span{position:relative;font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+
+/* overlappande collage — fyra kort, tydlig storlekshierarki */
+.collage{position:relative;width:100%;max-width:470px;aspect-ratio:1/1.12;margin:24px auto 0}
+.collage .ph{position:absolute;display:block;object-fit:cover;border-radius:12px;
+  border:5px solid var(--paper);background:var(--paper-2);
+  box-shadow:0 14px 34px rgba(26,24,21,.18)}
+/* äventyr 1 — bakre, uppe vänster */
+.collage .ph-adventure{width:52%;aspect-ratio:4/5;top:0;left:8%;transform:rotate(-6deg);z-index:1}
+/* äventyr 2 — bakre, uppe höger */
+.collage .ph-adventure2{width:50%;aspect-ratio:4/5;top:3%;right:0;transform:rotate(5deg);z-index:2}
+/* familj — mindre, nere höger */
+.collage .ph-family{width:48%;aspect-ratio:4/5;bottom:0;right:0;transform:rotate(4deg);z-index:3}
+/* varm profil — främst, störst, ankaret, nere vänster */
+.collage .ph-portrait{width:60%;aspect-ratio:4/5;bottom:3%;left:0;transform:rotate(-1deg);z-index:4}
 
 .tradera-h{display:flex;flex-wrap:wrap;align-items:center;gap:0 .25em}
 .inline-logo{height:.78em;width:auto;display:block}
@@ -182,7 +225,7 @@ section{padding:clamp(90px,13vw,150px) 0;border-bottom:1px solid var(--line)}
   .stop{border-right:none;border-bottom:1px solid var(--line-soft);padding-right:0}
   .stop:last-child{border-bottom:none}
   .srow{grid-template-columns:1fr;gap:8px}
-  .record{grid-template-columns:1fr;gap:14px}
+  .record{grid-template-columns:1fr;gap:22px}
   .rm-step{flex-direction:column;align-items:flex-start;gap:10px}
   .rm-no{min-width:0}
   .beat{grid-template-columns:50px 1fr;gap:20px}
@@ -200,7 +243,7 @@ section{padding:clamp(90px,13vw,150px) 0;border-bottom:1px solid var(--line)}
 <!-- HERO -->
 <header class="hero">
   <div class="wrap">
-    <div class="label tag" data-r>TikTok · Återkommande serie</div>
+    <div class="label tag" data-r><img class="label-logo" src="https://i.ibb.co/MkYz9fGt/tiktok-logo-png-seeklogo-340606.png" alt="TikTok">TikTok · Återkommande serie</div>
     <h1 data-r><span id="debtCounter" data-from="349000" data-to="204182.83">349 000,00</span><span class="kr">kr</span></h1>
     <p class="daysub" data-r>Dag 1 av att bli skuldfri.</p>
     <p class="sub" data-r>En serie om vardagsekonomi och att betala av en skuld inför öppen ridå. Ett tal som ska ner, månad för månad.</p>
@@ -259,38 +302,55 @@ section{padding:clamp(90px,13vw,150px) 0;border-bottom:1px solid var(--line)}
     <h2 class="h2" data-r>Räckvidd från <em>tidigare serier.</em></h2>
 
     <div class="record" data-r>
-      <div class="rec-num">5,12M</div>
+      <div class="rec-cover">
+        <div class="cover-stack">
+          <img class="cover-img" src="https://i.ibb.co/nNrPtVGz/maxresdefault-4.jpg" alt="Träningsserien omslag">
+        </div>
+      </div>
       <div class="rec-body">
-        <h4>Träningsserien <span class="rec-plat">TikTok</span></h4>
+        <div class="rec-figure">5 120 000<span class="rec-views">Visningar</span></div>
+        <h4>Träningsserien <span class="rec-plat tt"><img src="https://i.ibb.co/MkYz9fGt/tiktok-logo-png-seeklogo-340606.png" alt="">TikTok</span></h4>
         <p>Visningar över serien, snitt runt 640K per inlägg med en topp på 3,3M. Bevisad sponsorserie med RVRC, MMSports och ProPud inbäddade.</p>
+        <a class="rec-watch" href="https://www.tiktok.com/@rezdar/playlist/Tr%C3%A4ningsresan-7603090764851153686" target="_blank" rel="noopener">Se avsnitten här</a>
       </div>
     </div>
     <div class="record" data-r>
-      <div class="rec-num rec-soon">Spelas in</div>
+      <div class="rec-cover">
+        <div class="cover-stack">
+          <img class="cover-img" src="https://i.ibb.co/PZL3GfFp/maxresdefault-1.jpg" alt="Reseserien omslag">
+        </div>
+      </div>
       <div class="rec-body">
-        <h4>Renoveringsserien <span class="rec-plat">YouTube</span></h4>
-        <p>Långform där varje avsnitt följer ett rum från start till färdigt. Siffror fylls i.</p>
+        <div class="rec-figure">4 991 000<span class="rec-views">Visningar</span></div>
+        <h4>Reseserien <span class="rec-plat yt"><img src="https://i.ibb.co/bgF6HvX1/Youtube-logo.png" alt="">YouTube</span></h4>
+        <p>Visningar över serien, med ett toppavsnitt på 880K. Presenterledd expedition, formatet som byggt hela kanalen, ett nytt ekosystem för varje avsnitt.</p>
+        <a class="rec-watch" href="https://www.youtube.com/playlist?list=PLQBkpIiKUg0y-MXsfL5qrMVPnizlW3czk" target="_blank" rel="noopener">Se avsnitten här</a>
       </div>
     </div>
     <div class="record" data-r>
-      <div class="rec-num rec-soon">Spelas in</div>
-      <div class="rec-body">
-        <h4>Sketchserien <span class="rec-plat">TikTok</span></h4>
-        <p>Återkommande kortformat byggt på samma logik som driver allt jag gör. Siffror fylls i.</p>
+      <div class="rec-cover">
+        <div class="cover-stack">
+          <img class="cover-img" src="https://i.ibb.co/wr2nxpH5/maxresdefault-2.jpg" alt="Matserien omslag">
+        </div>
       </div>
-    </div>
-    <div class="record" data-r>
-      <div class="rec-num rec-soon">Spelas in</div>
       <div class="rec-body">
-        <h4>Reseserien <span class="rec-plat">YouTube</span></h4>
-        <p>Presenterledd expedition, formatet som byggt hela kanalen. Siffror fylls i.</p>
-      </div>
-    </div>
-    <div class="record" data-r>
-      <div class="rec-num">2,7M</div>
-      <div class="rec-body">
-        <h4>Matserien <span class="rec-plat">YouTube</span></h4>
+        <div class="rec-figure">2 700 000<span class="rec-views">Visningar</span></div>
+        <h4>Matserien <span class="rec-plat yt"><img src="https://i.ibb.co/bgF6HvX1/Youtube-logo.png" alt="">YouTube</span></h4>
         <p>Visningar över serien, med ett toppavsnitt på 1,5M. Ikoniska lokala rätter, lagade för dem som uppfann dem.</p>
+        <a class="rec-watch" href="https://youtube.com/watch?v=ZLd1KRkZgh4" target="_blank" rel="noopener">Se avsnitten här</a>
+      </div>
+    </div>
+    <div class="record" data-r>
+      <div class="rec-cover">
+        <div class="cover-stack">
+          <img class="cover-img" src="https://i.ibb.co/xSZJgD5K/maxresdefault.jpg" alt="Renoveringsserien omslag">
+        </div>
+      </div>
+      <div class="rec-body">
+        <div class="rec-figure">5 900 000<span class="rec-views">Visningar</span></div>
+        <h4>Renoveringsserien <span class="rec-plat yt"><img src="https://i.ibb.co/bgF6HvX1/Youtube-logo.png" alt="">YouTube</span></h4>
+        <p>Visningar över serien, med ett toppavsnitt på 2M. Långform där varje avsnitt följer ett rum från start till färdigt.</p>
+        <a class="rec-watch" href="https://www.youtube.com/playlist?list=PLQBkpIiKUg0zqTA4PUY1I9zP-oc1q-NrQ" target="_blank" rel="noopener">Se avsnitten här</a>
       </div>
     </div>
   </div>
@@ -303,7 +363,16 @@ section{padding:clamp(90px,13vw,150px) 0;border-bottom:1px solid var(--line)}
     <h2 class="h2" data-r>Vem är <em>Rezdar?</em></h2>
     <div class="why why-bio" data-r>
       <div>
-        <div class="profile-ph"><span>Profilbild</span></div>
+        <div class="collage">
+          <!-- ÄVENTYR 2 (bakre, uppe höger) -->
+          <img class="ph ph-adventure2" src="https://i.ibb.co/vCY1TgKm/DSC02181.jpg" alt="Rezdar på expedition">
+          <!-- ÄVENTYR 1 (bakre, uppe, roterad vänster) -->
+          <img class="ph ph-adventure" src="https://i.ibb.co/NgN1YczD/629e0a069cdc6ee9715159e3-Rezdar-bakri-Youtuber-i-afrika-1-p-800.jpg" alt="Rezdar på expedition">
+          <!-- FAMILJ (mindre, nedre höger) -->
+          <img class="ph ph-family" src="https://i.ibb.co/rKLD5x79/IMG-4256.jpg" alt="Rezdar med familjen">
+          <!-- VARM PROFIL (främst, störst, ankaret) -->
+          <img class="ph ph-portrait" src="https://i.ibb.co/234whvxZ/ACE03673.avif" alt="Rezdar">
+        </div>
       </div>
       <div>
         <p class="lede" style="margin-top:0">Tvåbarnspappa med ett dubbelliv. Hemma i Sverige är jag en vanlig pappa i vardagen. Ute i världen leder jag expeditioner till planetens mest extrema ekosystem. Samma person, två tempon, och en publik som följer med i båda.</p>
@@ -323,7 +392,6 @@ section{padding:clamp(90px,13vw,150px) 0;border-bottom:1px solid var(--line)}
     <h2 class="h2" data-r>Var med och inspirera till en <em>bättre vardagsekonomi.</em></h2>
     <p data-r>Hör av dig så pratar vi om hur du kan vara med.</p>
     <div class="contact" data-r>
-      <a class="btn fill" href="mailto:rezdar@rezdar.com">Boka nedslag!</a>
     </div>
   </div>
 </section>
