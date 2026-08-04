@@ -234,13 +234,22 @@
     .toc-grid { grid-template-columns: 1fr; gap: 0; }
     .footer-inner { flex-direction: column; text-align: center; }
   }
+
+  .price-was { font-family: 'Instrument Sans', sans-serif; font-weight: 500; font-size: 1.05rem;
+    color: rgba(244,240,234,0.4); text-decoration: line-through; margin-right: 0.6rem; }
+  .price-badge { display: inline-block; background: #c0392b; color: #fff;
+    font-family: 'Instrument Sans', sans-serif; font-weight: 700; font-size: 0.62rem;
+    letter-spacing: 0.1em; text-transform: uppercase; padding: 0.3rem 0.7rem;
+    border-radius: 100px; margin-left: 0.7rem; vertical-align: middle; }
+  .buy-note { margin-top: 0.5rem; font-size: 0.78rem; font-weight: 600; color: #e08a7d; }
+
 </style>
 </head>
 <body>
 
 <nav id="navbar">
   <a href="index.html" class="nav-back">← 100WILD</a>
-  <a href="https://buy.stripe.com/8x28wO4VH4Fd7cX0uwdZ602" class="nav-buy">Köp guiden — 299 kr</a>
+  <a href="https://buy.stripe.com/dRm4gy9bX5Jh0Oz5OQdZ604" class="nav-buy">Köp guiden — 120 kr</a>
 </nav>
 
 <!-- HERO -->
@@ -268,10 +277,10 @@
         för att göra samma resa själv, utan att gissa dig fram.
       </p>
       <div class="buy-row reveal reveal-d3">
-        <div class="buy-price">299 kr</div>
-        <a href="https://buy.stripe.com/8x28wO4VH4Fd7cX0uwdZ602" class="btn-buy">Köp guiden →</a>
+        <div class="buy-price"><span class="price-was">299 kr</span>120 kr<span class="price-badge">Spara 60%</span></div>
+        <a href="https://buy.stripe.com/dRm4gy9bX5Jh0Oz5OQdZ604" class="btn-buy">Köp guiden →</a>
       </div>
-      <div class="buy-meta reveal reveal-d3">Engångsköp · läs direkt i mobilen · livstidsåtkomst</div>
+      <div class="buy-meta reveal reveal-d3">Engångsköp · läs direkt i mobilen · livstidsåtkomst<div class="buy-note">Introduktionspris — ordinarie 299 kr</div></div>
     </div>
   </div>
 </section>
@@ -418,8 +427,8 @@
       för att boka: visum och vaccin, vägen fram steg för steg, boenden, aktiviteter,
       packlista och vad allt kostar i svenska kronor.
     </p>
-    <a href="https://buy.stripe.com/8x28wO4VH4Fd7cX0uwdZ602" class="btn-buy reveal reveal-d2">Köp guiden — 299 kr →</a>
-    <div class="final-meta reveal reveal-d3">Engångsköp · läs direkt i mobilen · livstidsåtkomst</div>
+    <a href="https://buy.stripe.com/dRm4gy9bX5Jh0Oz5OQdZ604" class="btn-buy reveal reveal-d2">Köp guiden — 120 kr →</a>
+    <div class="final-meta reveal reveal-d3">Ordinarie pris 299 kr · Engångsköp · läs direkt i mobilen · livstidsåtkomst</div>
   </div>
 </section>
 
@@ -450,6 +459,6 @@
   });
 </script>
 
-<div style="position:fixed;bottom:6px;right:6px;z-index:99999;font-family:monospace;font-size:9px;color:rgba(244,240,234,.75);background:rgba(20,20,16,.55);padding:3px 7px;border-radius:4px;pointer-events:none">build 2026-07-29 13:21 UTC</div>
+<div style="position:fixed;bottom:6px;right:6px;z-index:99999;font-family:monospace;font-size:9px;color:rgba(244,240,234,.75);background:rgba(20,20,16,.55);padding:3px 7px;border-radius:4px;pointer-events:none">build 2026-08-04 10:54 UTC</div>
 </body>
 </html>
