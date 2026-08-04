@@ -234,13 +234,22 @@
     .toc-grid { grid-template-columns: 1fr; gap: 0; }
     .footer-inner { flex-direction: column; text-align: center; }
   }
+
+  .price-was { font-family: 'Instrument Sans', sans-serif; font-weight: 500; font-size: 1.05rem;
+    color: rgba(244,240,234,0.4); text-decoration: line-through; margin-right: 0.6rem; }
+  .price-badge { display: inline-block; background: #c0392b; color: #fff;
+    font-family: 'Instrument Sans', sans-serif; font-weight: 700; font-size: 0.62rem;
+    letter-spacing: 0.1em; text-transform: uppercase; padding: 0.3rem 0.7rem;
+    border-radius: 100px; margin-left: 0.7rem; vertical-align: middle; }
+  .buy-note { margin-top: 0.5rem; font-size: 0.78rem; font-weight: 600; color: #e08a7d; }
+
 </style>
 </head>
 <body>
 
 <nav id="navbar">
-  <a href="index.html" class="nav-back">← 100WILD</a>
-  <a href="https://buy.stripe.com/8x28wO4VH4Fd7cX0uwdZ602" class="nav-buy">Buy the guide — $29</a>
+  <a href="../index.html" class="nav-back">← 100WILD</a>
+  <a href="https://buy.stripe.com/5kQ6oG9bX3B9btdb9adZ605" class="nav-buy">Buy the guide — $12</a>
 </nav>
 
 <!-- HERO -->
@@ -268,10 +277,10 @@
         Everything you need to make the same trip yourself, without guessing.
       </p>
       <div class="buy-row reveal reveal-d3">
-        <div class="buy-price">$29</div>
-        <a href="https://buy.stripe.com/8x28wO4VH4Fd7cX0uwdZ602" class="btn-buy">Buy the guide →</a>
+        <div class="buy-price"><span class="price-was">$29</span>$12<span class="price-badge">Save 60%</span></div>
+        <a href="https://buy.stripe.com/5kQ6oG9bX3B9btdb9adZ605" class="btn-buy">Buy the guide →</a>
       </div>
-      <div class="buy-meta reveal reveal-d3">One-time purchase · read on your phone · lifetime access</div>
+      <div class="buy-meta reveal reveal-d3">One-time purchase · read on your phone · lifetime access<div class="buy-note">Launch price — regular $29</div></div>
     </div>
   </div>
 </section>
@@ -418,8 +427,8 @@
       to book: visa and vaccines, the journey there step by step, accommodation,
       activities, packing list, and exactly what everything costs.
     </p>
-    <a href="https://buy.stripe.com/8x28wO4VH4Fd7cX0uwdZ602" class="btn-buy reveal reveal-d2">Buy the guide — $29 →</a>
-    <div class="final-meta reveal reveal-d3">One-time purchase · read on your phone · lifetime access</div>
+    <a href="https://buy.stripe.com/5kQ6oG9bX3B9btdb9adZ605" class="btn-buy reveal reveal-d2">Buy the guide — $12 →</a>
+    <div class="final-meta reveal reveal-d3">Regular price $29 · One-time purchase · read on your phone · lifetime access</div>
   </div>
 </section>
 
@@ -450,6 +459,6 @@
   });
 </script>
 
-<div style="position:fixed;bottom:6px;right:6px;z-index:99999;font-family:monospace;font-size:9px;color:rgba(244,240,234,.75);background:rgba(20,20,16,.55);padding:3px 7px;border-radius:4px;pointer-events:none">build 2026-07-29 16:19 UTC</div>
+<div style="position:fixed;bottom:6px;right:6px;z-index:99999;font-family:monospace;font-size:9px;color:rgba(244,240,234,.75);background:rgba(20,20,16,.55);padding:3px 7px;border-radius:4px;pointer-events:none">build 2026-08-04 11:01 UTC</div>
 </body>
 </html>
