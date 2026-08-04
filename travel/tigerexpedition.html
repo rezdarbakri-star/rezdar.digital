@@ -241,7 +241,29 @@
     font-family: 'Instrument Sans', sans-serif; font-weight: 700; font-size: 0.62rem;
     letter-spacing: 0.1em; text-transform: uppercase; padding: 0.3rem 0.7rem;
     border-radius: 100px; margin-left: 0.7rem; vertical-align: middle; }
-  .buy-note { margin-top: 0.5rem; font-size: 0.78rem; font-weight: 600; color: #e08a7d; }
+
+
+  /* ===== DJUPDYK ===== */
+  .deepdive { background: var(--bg-warm); border-top: 1px solid var(--border); }
+  .dd-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
+  .dd-card { background: var(--white); border: 1px solid var(--border); border-radius: 12px;
+    overflow: hidden; transition: transform 0.35s, box-shadow 0.35s; }
+  .dd-card:hover { transform: translateY(-4px); box-shadow: 0 14px 38px rgba(0,0,0,0.09); }
+  .dd-img { position: relative; width: 100%; aspect-ratio: 4/3; overflow: hidden; background: var(--bark); }
+  .dd-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s; }
+  .dd-card:hover .dd-img img { transform: scale(1.06); }
+  .dd-tx { padding: 1.3rem 1.4rem 1.5rem; }
+  .dd-kicker { font-family: 'Instrument Sans', sans-serif; font-weight: 600; font-size: 0.62rem;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.5rem; }
+  .dd-tx h3 { font-family: 'Playfair Display', serif; font-weight: 400; font-size: 1.25rem;
+    line-height: 1.2; margin-bottom: 0.55rem; }
+  .dd-tx p { font-weight: 300; font-size: 0.88rem; line-height: 1.65; color: var(--stone); }
+  .dd-note { text-align: center; margin-top: 2.2rem; font-family: 'Playfair Display', serif;
+    font-style: italic; font-size: 1rem; color: var(--light-text); max-width: 52ch;
+    margin-left: auto; margin-right: auto; }
+  @media (max-width: 900px) {
+    .dd-grid { grid-template-columns: 1fr; }
+  }
 
 </style>
 </head>
@@ -280,8 +302,139 @@
         <div class="buy-price"><span class="price-was">299 kr</span>120 kr<span class="price-badge">Spara 60%</span></div>
         <a href="https://buy.stripe.com/dRm4gy9bX5Jh0Oz5OQdZ604" class="btn-buy">Köp guiden →</a>
       </div>
-      <div class="buy-meta reveal reveal-d3">Engångsköp · läs direkt i mobilen · livstidsåtkomst<div class="buy-note">Introduktionspris — ordinarie 299 kr</div></div>
+      <div class="buy-meta reveal reveal-d3">Engångsköp · läs direkt i mobilen · livstidsåtkomst</div>
     </div>
+  </div>
+</section>
+
+<!-- DISCOVER BARDIA -->
+<section class="block discover">
+  <div class="wrap">
+    <div class="block-head">
+      <div class="tag reveal">Upptäck Bardiya</div>
+      <h2 class="reveal reveal-d1">Nepals vildaste hörn<br><em>— och minst kända</em></h2>
+      <p class="reveal reveal-d2">Långt västerut, nära gränsen mot Indien, ligger en nationalpark de flesta aldrig hört talas om.</p>
+    </div>
+    <div class="disc-grid">
+      <div class="disc-photo reveal">
+        <img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/EN%20MAN%20MED%20SIN%20KO%20O%20SITT%20HUS.jpg" alt="Byliv i Bardiya">
+      </div>
+      <ul class="disc-facts reveal reveal-d1">
+        <li>
+          <span class="disc-num">~5 574</span>
+          <span class="disc-tx"><b>Vilda tigrar kvar i världen</b>Ett av få ställen där chansen att faktiskt se en är på riktigt.</span>
+        </li>
+        <li>
+          <span class="disc-num">-93%</span>
+          <span class="disc-tx"><b>Av tigerns historiska utbredning är borta</b>Det som finns kvar är platser som Bardiya.</span>
+        </li>
+        <li>
+          <span class="disc-num">400+</span>
+          <span class="disc-tx"><b>Fågelarter</b>Från jättehornkorpen till dansande floricaner.</span>
+        </li>
+        <li>
+          <span class="disc-num">Till fots</span>
+          <span class="disc-tx"><b>Inte bara från jeep</b>Här spårar du tiger till fots med en guide, något få platser i världen tillåter.</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- DJUPDYK -->
+<section class="block deepdive">
+  <div class="wrap">
+    <div class="block-head">
+      <div class="tag reveal">Djupdyk</div>
+      <h2 class="reveal reveal-d1">Sex saker <em>få känner till</em></h2>
+      <p class="reveal reveal-d2">Ett smakprov på världen guiden tar dig in i. Varje kapitel går djupare än så här.</p>
+    </div>
+    <div class="dd-grid">
+      <div class="dd-card reveal">
+        <div class="dd-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/SAVANNEN.jpg" alt="Gräs högre än en människa" loading="lazy"></div>
+        <div class="dd-tx">
+          <div class="dd-kicker">Savannen</div>
+          <h3>Gräs högre än en människa</h3>
+          <p>Bardiya kallar dem phantas: hav av elefantgräs där en 250-kilos hane kan stå tio meter bort utan att du ser honom. Det är också därför sikten här är bland de bästa i Nepal när gräset bränts av.</p>
+        </div>
+      </div>
+      <div class="dd-card reveal reveal-d1">
+        <div class="dd-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/WALKING_SAFARI_TIGERFOOT_PRINT.jpg" alt="Du läser marken, inte kartan" loading="lazy"></div>
+        <div class="dd-tx">
+          <div class="dd-kicker">Spåren</div>
+          <h3>Du läser marken, inte kartan</h3>
+          <p>Ett färskt avtryck i leran betyder att hon gick här i morse. Guiderna läser djup, riktning och kanter för att veta hur långt bort hon är, och åt vilket håll ni inte ska gå.</p>
+        </div>
+      </div>
+      <div class="dd-card reveal reveal-d2">
+        <div class="dd-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/FLODEN%20KARNALI.jpg" alt="Glaciärvatten från Himalaya" loading="lazy"></div>
+        <div class="dd-tx">
+          <div class="dd-kicker">Karnali</div>
+          <h3>Glaciärvatten från Himalaya</h3>
+          <p>Floden är parkens ådra. På sandbankarna ligger ghavialen, en av jordens sällsyntaste krokodiler, och någonstans i strömmen bryter en nästan blind sötvattensdelfin ytan för att andas.</p>
+        </div>
+      </div>
+      <div class="dd-card reveal">
+        <div class="dd-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/VARNING%20FO%CC%88R%20TIGERSKYLT.jpg" alt="Där byn slutar och vildmarken tar vid" loading="lazy"></div>
+        <div class="dd-tx">
+          <div class="dd-kicker">Gränsen</div>
+          <h3>Där byn slutar och vildmarken tar vid</h3>
+          <p>Det finns inget stängsel. En skylt, ett dike, sedan djungeln. Familjer odlar ris hundra meter från tigrarnas revir, och har gjort det i generationer.</p>
+        </div>
+      </div>
+      <div class="dd-card reveal reveal-d1">
+        <div class="dd-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/INDISK%20PANSARNOSHO%CC%88RNING.jpg" alt="Två ton urtidsdjur" loading="lazy"></div>
+        <div class="dd-tx">
+          <div class="dd-kicker">Pansarnoshörningen</div>
+          <h3>Två ton urtidsdjur</h3>
+          <p>Nästan utrotad i Nepal för femtio år sedan. Idag betar den i Bardiyas våtmarker igen, i en hud som ligger i veck som nitad rustning.</p>
+        </div>
+      </div>
+      <div class="dd-card reveal reveal-d2">
+        <div class="dd-img"><img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/MARKNADEN.jpg" alt="Livet runt vildmarken" loading="lazy"></div>
+        <div class="dd-tx">
+          <div class="dd-kicker">Byn</div>
+          <h3>Livet runt vildmarken</h3>
+          <p>Lerhus målade med blommor och djur, dal bhat över öppen eld, marknadsdagar där hela byn möts. Att bo mitt i det här är halva resan.</p>
+        </div>
+      </div>
+    </div>
+    <p class="dd-note reveal">Och det här är bara ytan. Guiden går igenom alla fyra ekosystem, invånarna i dem, och människorna som lever mitt i alltihop.</p>
+  </div>
+</section>
+
+<!-- SNEAK PEEK -->
+<section class="block peek">
+  <div class="wrap">
+    <div class="block-head">
+      <div class="tag reveal">Smygtitt</div>
+      <h2 class="reveal reveal-d1">En titt <em>inuti guiden</em></h2>
+      <p class="reveal reveal-d2">Bilderna är mina egna, tagna under resan. Så här ser världen ut du kliver in i.</p>
+    </div>
+    <div class="peek-grid">
+      <div class="peek-item wide reveal">
+        <img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/TIGER%20PA%CC%8A%20A%CC%88NGEN%20O%CC%88GA%20MOT%20O%CC%88GA.jpg" alt="Tiger på ängen">
+        <div class="peek-cap">Öga mot öga på ängen</div>
+      </div>
+      <div class="peek-item reveal reveal-d1">
+        <img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/WALKING_SAFARI_TIGERFOOT_PRINT.jpg" alt="Tigerspår">
+        <div class="peek-cap">Spåra till fots</div>
+      </div>
+      <div class="peek-item reveal">
+        <img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/TREEHOUSE.jpg" alt="Trädkoja">
+        <div class="peek-cap">Natt i trädkoja</div>
+      </div>
+      <div class="peek-item reveal reveal-d1">
+        <img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/VILLGAGE%20BARDIA%20HOUSES.jpg" alt="Byn i Bardiya">
+        <div class="peek-cap">Livet i byn</div>
+      </div>
+      <div class="peek-item reveal reveal-d2">
+        <img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/INFINITY%20POOL%20MOT%20DJUNGELN.jpg" alt="Poolen mot djungeln">
+        <div class="peek-cap">Lodgen mot djungeln</div>
+      </div>
+    </div>
+    <p class="peek-note reveal">Guiden innehåller över 60 bilder från resan.</p>
   </div>
 </section>
 
@@ -326,74 +479,6 @@
   </div>
 </section>
 
-<!-- SNEAK PEEK -->
-<section class="block peek">
-  <div class="wrap">
-    <div class="block-head">
-      <div class="tag reveal">Smygtitt</div>
-      <h2 class="reveal reveal-d1">En titt <em>inuti guiden</em></h2>
-      <p class="reveal reveal-d2">Bilderna är mina egna, tagna under resan. Så här ser världen ut du kliver in i.</p>
-    </div>
-    <div class="peek-grid">
-      <div class="peek-item wide reveal">
-        <img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/TIGER%20PA%CC%8A%20A%CC%88NGEN%20O%CC%88GA%20MOT%20O%CC%88GA.jpg" alt="Tiger på ängen">
-        <div class="peek-cap">Öga mot öga på ängen</div>
-      </div>
-      <div class="peek-item reveal reveal-d1">
-        <img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/WALKING_SAFARI_TIGERFOOT_PRINT.jpg" alt="Tigerspår">
-        <div class="peek-cap">Spåra till fots</div>
-      </div>
-      <div class="peek-item reveal">
-        <img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/TREEHOUSE.jpg" alt="Trädkoja">
-        <div class="peek-cap">Natt i trädkoja</div>
-      </div>
-      <div class="peek-item reveal reveal-d1">
-        <img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/VILLGAGE%20BARDIA%20HOUSES.jpg" alt="Byn i Bardiya">
-        <div class="peek-cap">Livet i byn</div>
-      </div>
-      <div class="peek-item reveal reveal-d2">
-        <img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/INFINITY%20POOL%20MOT%20DJUNGELN.jpg" alt="Poolen mot djungeln">
-        <div class="peek-cap">Lodgen mot djungeln</div>
-      </div>
-    </div>
-    <p class="peek-note reveal">Guiden innehåller över 60 bilder från resan.</p>
-  </div>
-</section>
-
-<!-- DISCOVER BARDIA -->
-<section class="block discover">
-  <div class="wrap">
-    <div class="block-head">
-      <div class="tag reveal">Upptäck Bardiya</div>
-      <h2 class="reveal reveal-d1">Nepals vildaste hörn<br><em>— och minst kända</em></h2>
-      <p class="reveal reveal-d2">Långt västerut, nära gränsen mot Indien, ligger en nationalpark de flesta aldrig hört talas om.</p>
-    </div>
-    <div class="disc-grid">
-      <div class="disc-photo reveal">
-        <img src="https://raw.githubusercontent.com/rezdarbakri-star/bardiabilder/main/EN%20MAN%20MED%20SIN%20KO%20O%20SITT%20HUS.jpg" alt="Byliv i Bardiya">
-      </div>
-      <ul class="disc-facts reveal reveal-d1">
-        <li>
-          <span class="disc-num">~5 574</span>
-          <span class="disc-tx"><b>Vilda tigrar kvar i världen</b>Ett av få ställen där chansen att faktiskt se en är på riktigt.</span>
-        </li>
-        <li>
-          <span class="disc-num">-93%</span>
-          <span class="disc-tx"><b>Av tigerns historiska utbredning är borta</b>Det som finns kvar är platser som Bardiya.</span>
-        </li>
-        <li>
-          <span class="disc-num">400+</span>
-          <span class="disc-tx"><b>Fågelarter</b>Från jättehornkorpen till dansande floricaner.</span>
-        </li>
-        <li>
-          <span class="disc-num">Till fots</span>
-          <span class="disc-tx"><b>Inte bara från jeep</b>Här spårar du tiger till fots med en guide, något få platser i världen tillåter.</span>
-        </li>
-      </ul>
-    </div>
-  </div>
-</section>
-
 <!-- CONTENTS -->
 <section class="block contents">
   <div class="wrap">
@@ -428,7 +513,7 @@
       packlista och vad allt kostar i svenska kronor.
     </p>
     <a href="https://buy.stripe.com/dRm4gy9bX5Jh0Oz5OQdZ604" class="btn-buy reveal reveal-d2">Köp guiden — 120 kr →</a>
-    <div class="final-meta reveal reveal-d3">Ordinarie pris 299 kr · Engångsköp · läs direkt i mobilen · livstidsåtkomst</div>
+    <div class="final-meta reveal reveal-d3">Engångsköp · läs direkt i mobilen · livstidsåtkomst</div>
   </div>
 </section>
 
@@ -459,6 +544,6 @@
   });
 </script>
 
-<div style="position:fixed;bottom:6px;right:6px;z-index:99999;font-family:monospace;font-size:9px;color:rgba(244,240,234,.75);background:rgba(20,20,16,.55);padding:3px 7px;border-radius:4px;pointer-events:none">build 2026-08-04 10:54 UTC</div>
+<div style="position:fixed;bottom:6px;right:6px;z-index:99999;font-family:monospace;font-size:9px;color:rgba(244,240,234,.75);background:rgba(20,20,16,.55);padding:3px 7px;border-radius:4px;pointer-events:none">build 2026-08-04 11:43 UTC</div>
 </body>
 </html>
