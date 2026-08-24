@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stolt Gym — Digital Marknadsföring</title>
+<title>Stolt Gym — Löpande produktion & marknadsföring</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -288,56 +288,67 @@
     line-height: 1.5;
   }
 
-  /* ── COMPARE ── */
-  .compare-box {
-    background: var(--red-bg);
-    border: 1px solid #EACAC8;
+  /* ── SCOPE ── */
+  .scope-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .scope-box {
     border-radius: 14px;
-    padding: 28px;
+    padding: 24px 24px 24px 24px;
     position: relative;
   }
 
-  .compare-box::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: var(--red-muted);
-    border-radius: 14px 14px 0 0;
+  .scope-box.included {
+    background: var(--accent-light);
+    border: 1px solid #C9E5D6;
   }
 
-  .compare-label {
+  .scope-box.extra {
+    background: var(--red-bg);
+    border: 1px solid #EACAC8;
+  }
+
+  .scope-label {
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    color: var(--red-muted);
-    margin-bottom: 12px;
+    margin-bottom: 14px;
   }
 
-  .compare-row {
+  .scope-box.included .scope-label { color: var(--accent); }
+  .scope-box.extra .scope-label { color: var(--red-muted); }
+
+  .scope-list {
+    list-style: none;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid #EACAC8;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .scope-list li {
     font-size: 14.5px;
+    padding-left: 20px;
+    position: relative;
+    color: var(--text);
   }
 
-  .compare-row:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-  }
-
-  .compare-row .them {
-    color: var(--red-muted);
-    font-weight: 700;
-    text-decoration: line-through;
-    opacity: 0.7;
-  }
-
-  .compare-row .us {
+  .scope-box.included .scope-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
     color: var(--accent);
+    font-weight: 700;
+  }
+
+  .scope-box.extra .scope-list li::before {
+    content: '+';
+    position: absolute;
+    left: 0;
+    color: var(--red-muted);
     font-weight: 700;
   }
 
@@ -374,33 +385,50 @@
     letter-spacing: 0;
   }
 
-  /* ── GUARANTEE ── */
+  /* ── GUARANTEE / RESPONSIBILITY ── */
   .guarantee {
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 14px;
     padding: 32px;
-    text-align: center;
     margin: 40px 0;
   }
 
   .guarantee-icon {
     font-size: 32px;
     margin-bottom: 12px;
+    text-align: center;
   }
 
   .guarantee h3 {
     font-family: 'Playfair Display', serif;
     font-size: 20px;
-    margin-bottom: 8px;
+    margin-bottom: 16px;
+    text-align: center;
   }
 
-  .guarantee p {
-    color: var(--muted);
-    font-size: 14.5px;
-    max-width: 440px;
+  .guarantee ul {
+    list-style: none;
+    columns: 2;
+    column-gap: 24px;
+    max-width: 480px;
     margin: 0 auto;
-    line-height: 1.6;
+  }
+
+  .guarantee ul li {
+    font-size: 14px;
+    color: var(--muted);
+    padding-left: 16px;
+    position: relative;
+    margin-bottom: 8px;
+    break-inside: avoid;
+  }
+
+  .guarantee ul li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
   }
 
   /* ── FOOTER ── */
@@ -431,7 +459,7 @@
 
   @media (max-width: 520px) {
     .pricing-section { padding: 36px 20px; }
-    .compare-row { font-size: 13px; }
+    .guarantee ul { columns: 1; }
   }
 </style>
 </head>
@@ -441,82 +469,120 @@
 
   <!-- HERO -->
   <div class="hero">
-    <div class="badge">Förslag till Stolt Gym</div>
-    <h1>Äntligen. Någon som <span>fixar det.</span></h1>
-    <p>En enkel plan för att få din digitala marknadsföring att fungera — utan krångel, utan luft, utan överpriser.</p>
+    <div class="badge">Förslag till STOLT-GYM</div>
+    <h1>Ett komplett grepp om <span>hösten.</span></h1>
+    <p>Planering, manus, produktion och uppföljning av annonser och kampanjer, samlat i ett löpande uppdrag från september till december 2026.</p>
   </div>
 
-  <!-- WHAT I WILL DO -->
+  <!-- WHAT'S INCLUDED -->
   <section>
-    <div class="section-label">Det här bygger jag åt dig</div>
-    <div class="section-title">Allt du behöver för att<br>nå nya medlemmar</div>
+    <div class="section-label">Det här ingår</div>
+    <div class="section-title">Allt som krävs för att<br>annonserna och kampanjerna ska fungera</div>
 
     <div class="benefits-grid">
       <div class="benefit-card">
-        <div class="benefit-icon">🔧</div>
-        <h3>Fixar din Facebook-sida</h3>
-        <p>Löser varningar, återställer kontot och ser till att allt är rent och redo att köra annonser igen.</p>
+        <div class="benefit-icon">📅</div>
+        <h3>Planering av annonser & kampanjer</h3>
+        <p>Tre planeringsdagar för oktober, november, december och Trångsund. Struktur, tidsplan och samordning av vad som ska levereras och när.</p>
       </div>
 
       <div class="benefit-card">
-        <div class="benefit-icon">📊</div>
-        <h3>Meta Pixel & spårning</h3>
-        <p>Installerar spårning på stoltgym.se så vi ser exakt vilka som klickar, besöker och registrerar sig.</p>
+        <div class="benefit-icon">✍️</div>
+        <h3>Manus & kreativt arbete</h3>
+        <p>6st manus- och VO-koncept, från cinematisk PT-annons till iPhone-klipp. Hook, struktur och budskap anpassat till varje format.</p>
       </div>
 
       <div class="benefit-card">
-        <div class="benefit-icon">🎯</div>
-        <h3>Annonskampanjer som konverterar</h3>
-        <p>Bygger kampanjer riktade mot Skogås och Trångsund — rätt personer, rätt budskap, rätt tid.</p>
+        <div class="benefit-icon">🎥</div>
+        <h3>Produktion på plats</h3>
+        <p>Tre separata inspelningstillfällen, ett vardera för Trångsund, november och december.</p>
       </div>
 
       <div class="benefit-card">
-        <div class="benefit-icon">🗓️</div>
-        <h3>Helgdagskampanjer</h3>
-        <p>Färdiga kampanjer för säsongens erbjudanden — sommar, nyår, höststart — redo att trycka på play.</p>
+        <div class="benefit-icon">✂️</div>
+        <h3>Videoredigering</h3>
+        <p>6st videoleveranser: 5 nyproducerade och 1 redigerad från befintligt material. Klippning, musik, text, färganpassning och export.</p>
       </div>
 
       <div class="benefit-card">
-        <div class="benefit-icon">📈</div>
-        <h3>Månadsrapport</h3>
-        <p>Tydlig rapport varje månad: vad vi spenderade, hur många som såg annonsen, och hur många som agerade.</p>
+        <div class="benefit-icon">📣</div>
+        <h3>Publicering & Meta</h3>
+        <p>Material för annonser och kampanjer publiceras, annonser sätts upp och kontrolleras vid start. Justeringar hanteras löpande under hela perioden.</p>
+      </div>
+
+      <div class="benefit-card">
+        <div class="benefit-icon">🌐</div>
+        <h3>Hemsidan hänger med</h3>
+        <p>Erbjudanden, texter och bilder uppdateras i takt med annonserna och kampanjerna, så att den som klickar från annonsen möts av rätt budskap.</p>
       </div>
 
       <div class="benefit-card">
         <div class="benefit-icon">💬</div>
-        <h3>En person att ringa</h3>
-        <p>Inga ärendenummer, inga tröga mailkedjor. Du skriver till mig, jag svarar.</p>
+        <h3>Löpande annons- och kampanjsupport</h3>
+        <p>Kontakt, mindre text- och webbjusteringar, och närvaro runt varje lansering under hela perioden.</p>
       </div>
     </div>
   </section>
 
-  <!-- HOW WE START -->
+  <!-- HOW WE WORK -->
   <section>
-    <div class="section-label">Så här startar vi</div>
-    <div class="section-title">Tre steg. Inget krångel.</div>
+    <div class="section-label">Så är arbetet upplagt</div>
+    <div class="section-title">Sju steg.</div>
 
     <div class="steps">
       <div class="step">
         <div class="step-number">1</div>
         <div class="step-content">
-          <h3>Google Meet — 30 min</h3>
-          <p>Vi loggar in tillsammans. Jag ser vad Facebook säger, vad som behöver fixas, och gör en plan.</p>
+          <h3>Planering</h3>
+          <p>Tre dedikerade dagar läggs på struktur, innehållsplan och publiceringsschema för hela perioden.</p>
         </div>
       </div>
 
       <div class="step">
         <div class="step-number">2</div>
         <div class="step-content">
-          <h3>Du gör mig till admin</h3>
-          <p>Du lägger till mig i Meta Business Suite. Tar 30 sekunder. Sedan sköter jag resten.</p>
+          <h3>Manus</h3>
+          <p>6st manus- och VO-koncept tar fram hook, struktur och budskap för annonser och kampanjer.</p>
         </div>
       </div>
 
       <div class="step">
         <div class="step-number">3</div>
         <div class="step-content">
-          <h3>Jag sätter upp allt</h3>
-          <p>Fixar sidan, installerar pixel, bygger första kampanjen, och skickar den till dig för godkännande innan den går live.</p>
+          <h3>Inspelning</h3>
+          <p>Trångsund i augusti, november och december.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <h3>Redigering</h3>
+          <p>Klippning, musik, text, färganpassning och export för samtliga videoleveranser.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">5</div>
+        <div class="step-content">
+          <h3>Revidering</h3>
+          <p>Varje video färdigställs och godkänns innan den sätts som annons.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">6</div>
+        <div class="step-content">
+          <h3>Live</h3>
+          <p>Annonser sätts upp och kontrolleras vid lansering.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">7</div>
+        <div class="step-content">
+          <h3>Uppföljning</h3>
+          <p>Resultat kontrolleras och justeringar görs löpande under hela perioden.</p>
         </div>
       </div>
     </div>
@@ -525,48 +591,46 @@
   <!-- PRICING -->
   <div class="pricing-section">
     <div class="section-label">Prissättning</div>
-    <div class="section-title">Tydligt. Rakt. Inga överraskningar.</div>
+    <div class="section-title">Ett tydligt fast pris<br>för hela perioden.</div>
 
     <div class="pricing-cards">
-      <div class="price-card">
-        <div class="price-label">Uppstart & setup</div>
-        <div class="price-amount">5 000 <span>kr</span></div>
-        <div class="price-note">Fixa sidan, pixel, första kampanjen — en engångskostnad.</div>
-      </div>
-
       <div class="price-card featured">
-        <div class="price-tag">Testperiod</div>
-        <div class="price-label">Löpande förvaltning</div>
-        <div class="price-amount">5 000 <span>kr/mån</span></div>
-        <div class="price-note">3 månader. Kampanjer, optimering, rapportering. Vi utvärderar efter perioden.</div>
+        <div class="price-tag">September–december 2026</div>
+        <div class="price-label">Löpande uppdrag</div>
+        <div class="price-amount">12 500 <span>kr/mån</span></div>
+        <div class="price-note">Faktureras månadsvis, exkl. moms.</div>
       </div>
     </div>
 
-    <!-- COMPARE -->
-    <div class="compare-box">
-      <div class="compare-label">Jämförelse</div>
-      <div class="compare-row">
-        <span>Setup</span>
-        <span class="them">Okänd</span>
-        <span class="us">5 000 kr</span>
-      </div>
-      <div class="compare-row">
-        <span>Per månad</span>
-        <span class="them">15 000 kr</span>
-        <span class="us">5 000 kr</span>
-      </div>
-      <div class="compare-row">
-        <span>Resultat</span>
-        <span class="them">Ingenting</span>
-        <span class="us">Mätbart</span>
-      </div>
-      <div class="compare-row">
-        <span>Kontakt</span>
-        <span class="them">Långsam</span>
-        <span class="us">Direkt</span>
+    <!-- SCOPE -->
+    <div class="scope-grid">
+      <div class="scope-box included">
+        <div class="scope-label">Ingår i priset</div>
+        <ul class="scope-list">
+          <li>5 nyproducerade videor</li>
+          <li>1 videoredigering från befintligt material</li>
+          <li>3 planerade inspelningstillfällen</li>
+          <li>Publicering och annonsuppsättning på Meta</li>
+          <li>Hemsideuppdateringar kopplade till annonser och kampanjer</li>
+          <li>Löpande annons- och kampanjsupport under perioden</li>
+        </ul>
       </div>
     </div>
 
+  </div>
+
+  <!-- CARRO'S RESPONSIBILITY -->
+  <div class="guarantee">
+    <div class="guarantee-icon">🤝</div>
+    <h3>Det här bidrar STOLT-GYM med</h3>
+    <ul>
+      <li>Villkor för annonser och kampanjer</li>
+      <li>Presentkort</li>
+      <li>Rekvisita</li>
+      <li>Färdiga bilder & video</li>
+      <li>Medverkande personer</li>
+      <li>Godkännande i tid</li>
+    </ul>
   </div>
 
   <!-- FOOTER -->
