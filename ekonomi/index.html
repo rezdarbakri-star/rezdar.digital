@@ -109,6 +109,8 @@ Rocket:()=><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="c
 List:()=><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>,
 Clock:()=><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
 Chev:()=><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="6 9 12 15 18 9"/></svg>,
+ChevL:()=><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>,
+ChevR:()=><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="9 6 15 12 9 18"/></svg>,
 Auto:()=><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M21 12a9 9 0 1 1-6.22-8.56"/><polyline points="22 2 22 8 16 8"/></svg>,
 Var:()=><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/></svg>,
 Piggy:()=><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h2v-4h-2c0-1-.5-1.5-1-2"/><circle cx="15" cy="11" r="1"/></svg>,
@@ -292,7 +294,11 @@ function App({user}){
   const[salaryMult,setSalaryMult]=useState(2.0); // Lönekostnadsmultiplikator
   const[eMult,setEMult]=useState(false);const[multI,setMultI]=useState("");
 
-  const ck=mkey(),cm=months[ck];
+  const[selMonth,setSelMonth]=useState(mkey()); // navigerbar månad
+  const ck=selMonth,cm=months[ck];
+  const prevMonth=()=>{const[y,m]=ck.split("-").map(Number);const pm=m===1?12:m-1;const py=m===1?y-1:y;setSelMonth(`${py}-${String(pm).padStart(2,"0")}`);}
+  const nextMonth=()=>{const[y,m]=ck.split("-").map(Number);const nm=m===12?1:m+1;const ny=m===12?y+1:y;setSelMonth(`${ny}-${String(nm).padStart(2,"0")}`);}
+  const isCurrentMonth=ck===mkey();
 
   // Load
   useEffect(()=>{(async()=>{
@@ -390,7 +396,13 @@ function App({user}){
     {/* Header */}
     <header style={{padding:"24px 20px 14px",borderBottom:"1px solid rgba(255,255,255,.04)"}}>
       <div style={{maxWidth:560,margin:"0 auto",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-        <div><div style={{display:"flex",alignItems:"center",gap:8,color:"#c4b5fd"}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.25 3.75 3.25 4.75"/></svg><h1 style={{fontSize:22,fontWeight:300,color:"#e2ddf0",letterSpacing:".04em",textTransform:"lowercase"}}>räkningskollen</h1></div><p style={{fontSize:12,color:"#7c6f9b",marginTop:6,letterSpacing:".06em",textTransform:"uppercase",fontWeight:500}}>{fmtM(ck)}</p></div>
+        <div><div style={{display:"flex",alignItems:"center",gap:8,color:"#c4b5fd"}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.25 3.75 3.25 4.75"/></svg><h1 style={{fontSize:22,fontWeight:300,color:"#e2ddf0",letterSpacing:".04em",textTransform:"lowercase"}}>räkningskollen</h1></div>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginTop:6}}>
+              <button onClick={prevMonth} style={{border:"none",background:"transparent",color:"#7c6f9b",padding:2,display:"flex",alignItems:"center"}}><Ic.ChevL/></button>
+              <p style={{fontSize:12,color:isCurrentMonth?"#c4b5fd":"#dbb778",letterSpacing:".06em",textTransform:"uppercase",fontWeight:500,minWidth:120,textAlign:"center"}}>{fmtM(ck)}{!isCurrentMonth&&" ●"}</p>
+              <button onClick={nextMonth} style={{border:"none",background:"transparent",color:"#7c6f9b",padding:2,display:"flex",alignItems:"center"}}><Ic.ChevR/></button>
+              {!isCurrentMonth&&<button onClick={()=>setSelMonth(mkey())} style={{border:"1px solid rgba(196,181,253,.15)",borderRadius:8,background:"rgba(196,181,253,.06)",color:"#c4b5fd",fontSize:10,padding:"3px 8px",fontWeight:500}}>Idag</button>}
+            </div></div>
         <div style={{display:"flex",alignItems:"center",gap:8}}><span style={{fontSize:12,color:"#7c6f9b"}}>{dn}</span><button onClick={()=>auth.signOut()} style={S.btnT} title="Logga ut"><Ic.Out/></button></div>
       </div>
     </header>
@@ -470,7 +482,10 @@ function App({user}){
             {tSv>0&&<div style={{textAlign:"right",padding:"10px 4px 0",fontSize:13,color:"#8a80a8",borderTop:"1px solid rgba(255,255,255,.04)",marginTop:6}}>Totalt: <strong>{fk(tSv)} kr</strong> <span style={{marginLeft:10,color:spend>=0?"#a8e6cf":"#f4a4a4"}}>→ {fk(Math.abs(spend))} kr {spend>=0?"kvar":"över"}</span></div>}
           </div>}
         </div>}
-        <div style={{textAlign:"center",marginTop:28}}><button style={S.btnGh} onClick={resetM}>Återställ månad</button></div>
+        <div style={{textAlign:"center",marginTop:28,display:"flex",flexDirection:"column",gap:10,alignItems:"center"}}>
+          {chkC===totC&&totC>0&&<button style={{...S.btnPri,gap:8}} onClick={()=>{nextMonth();}}><Ic.ChevR/> Starta nästa månad</button>}
+          <button style={S.btnGh} onClick={resetM}>Nollställ {fmtM(ck)}</button>
+        </div>
       </>}
     </div>}
 
@@ -622,12 +637,13 @@ function App({user}){
     </main></div>
 
     {/* Celebrate */}
-    {cel&&<div style={{position:"fixed",inset:0,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(13,12,29,.8)",backdropFilter:"blur(16px)",zIndex:100,animation:"celIn .5s ease-out"}}>
+    {cel&&<div style={{position:"fixed",inset:0,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(13,12,29,.8)",backdropFilter:"blur(16px)",zIndex:100,animation:"celIn .5s ease-out"}} onClick={()=>setCel(false)}>
       <div style={{textAlign:"center",padding:40,position:"relative"}}><div style={{position:"absolute",width:120,height:120,borderRadius:"50%",background:"radial-gradient(circle,rgba(168,230,207,.4),rgba(196,181,253,.2),transparent)",animation:"bloom 2s ease-out infinite",top:"50%",left:"50%",marginLeft:-60,marginTop:-60}}/>
         <span style={{fontSize:56,display:"block",marginBottom:12}}>✨</span>
         <h2 style={{fontSize:28,fontWeight:300,color:"#e2ddf0",marginBottom:8}}>Allt avbockat</h2>
-        <p style={{fontSize:14,color:"#c4b5fd",fontWeight:300}}>Andas ut, {dn}</p>
+        <p style={{fontSize:14,color:"#c4b5fd",fontWeight:300}}>Andas ut, {dn} — {fmtM(ck)} är klar</p>
         {mI>0&&<p style={{fontSize:20,fontWeight:700,marginTop:8,color:spend>=0?"#a8e6cf":"#f4a4a4"}}>{spend>=0?`${fk(spend)} kr kvar`:`${fk(Math.abs(spend))} kr över`}</p>}
+        <button onClick={(e)=>{e.stopPropagation();setCel(false);nextMonth();}} style={{...S.btnPri,marginTop:24}}>Starta nästa månad →</button>
       </div>
     </div>}
     </>
