@@ -1,1 +1,881 @@
-.
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expedition Amazonas — 100WILD by Rezdar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f4f0ea;
+  --bg-warm: #ece6db;
+  --card: #fefcf8;
+  --dark: #1a1a16;
+  --forest: #3d5a3e;
+  --forest-light: #4e7350;
+  --moss: #6b8f5e;
+  --sand: #c4a96a;
+  --clay: #b07a4a;
+  --earth: #8b6d4c;
+  --stone: #7a7468;
+  --muted: #9a9488;
+  --light-text: #5c5850;
+  --white: #fefcf8;
+  --border: rgba(26,26,22,0.08);
+  --radius: 8px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--dark); -webkit-font-smoothing: antialiased; }
+
+/* === NAV === */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 1rem 1.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.nav.scrolled { background: rgba(244,240,234,0.95); backdrop-filter: blur(16px); box-shadow: 0 1px 12px rgba(0,0,0,0.04); }
+.nav-brand { display: flex; align-items: baseline; gap: 0.1rem; text-decoration: none; }
+.nav-brand .n100 { font-family: 'Instrument Sans', sans-serif; font-weight: 700; font-size: 1.15rem; color: var(--dark); }
+.nav-brand .nwild { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.15rem; color: var(--forest); }
+.nav-cta { font-size: 0.78rem; font-weight: 600; padding: 0.55rem 1.3rem; background: var(--forest); color: var(--white); border: none; border-radius: 99px; text-decoration: none; transition: background 0.3s; }
+.nav-cta:hover { background: var(--forest-light); }
+
+/* === HERO === */
+.hero {
+  min-height: 100vh; min-height: 100svh;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 0 1.5rem 2.5rem;
+  position: relative;
+  background: linear-gradient(175deg, #2a3a20 0%, #1a2416 40%, #0f1a0c 100%);
+  color: var(--white);
+  overflow: hidden;
+}
+
+.hero-img-placeholder {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(15,26,12,0) 30%, rgba(15,26,12,0.85) 75%, rgba(15,26,12,1) 100%),
+    linear-gradient(175deg, #2a3a20, #1a2416);
+  /* Replace background with: background-image: url('your-image.jpg'); background-size: cover; background-position: center; */
+}
+
+.hero-img-note {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  font-size: 0.7rem; color: rgba(255,255,255,0.2); letter-spacing: 0.1em;
+  text-align: center; pointer-events: none;
+}
+
+.hero-content { position: relative; z-index: 2; max-width: 600px; }
+
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-size: 0.65rem; font-weight: 600; letter-spacing: 0.15em;
+  color: var(--sand); margin-bottom: 1rem;
+}
+.hero-tag .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--sand); }
+
+.hero h1 {
+  font-family: 'Playfair Display', serif; font-weight: 400;
+  font-size: clamp(2.2rem, 7vw, 3.8rem); line-height: 1.08;
+  margin-bottom: 1rem;
+}
+
+.hero-sub {
+  font-weight: 300; font-size: 1rem; line-height: 1.7;
+  color: rgba(255,255,255,0.7); margin-bottom: 1.5rem;
+  max-width: 440px;
+}
+
+.hero-facts {
+  display: flex; gap: 1.5rem; flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.hero-fact { display: flex; flex-direction: column; }
+.hero-fact .val { font-family: 'Instrument Sans', sans-serif; font-weight: 700; font-size: 1.1rem; color: var(--white); line-height: 1.2; }
+.hero-fact .label { font-size: 0.6rem; font-weight: 500; color: rgba(255,255,255,0.4); letter-spacing: 0.08em; }
+
+.hero-cta {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-weight: 600; font-size: 0.9rem;
+  padding: 0.9rem 2.2rem;
+  background: var(--sand); color: var(--dark);
+  border: none; border-radius: 99px;
+  text-decoration: none; cursor: pointer;
+  transition: all 0.3s;
+}
+.hero-cta:hover { background: #d4b060; transform: translateY(-1px); }
+
+/* === QUICK STRIP === */
+.strip {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+}
+
+.strip-item {
+  padding: 1.2rem 1rem;
+  text-align: center;
+  border-right: 1px solid var(--border);
+}
+.strip-item:last-child { border-right: none; }
+.strip-item .ico { font-size: 1.3rem; margin-bottom: 0.3rem; }
+.strip-item .s-val { font-family: 'Instrument Sans', sans-serif; font-weight: 700; font-size: 0.85rem; color: var(--dark); }
+.strip-item .s-label { font-size: 0.6rem; font-weight: 400; color: var(--muted); margin-top: 0.15rem; }
+
+/* === SECTIONS === */
+.section { padding: 3.5rem 1.5rem; }
+.section-white { background: var(--white); }
+.section-warm { background: var(--bg-warm); }
+.section-dark { background: var(--dark); color: var(--white); }
+
+.section-head { max-width: 600px; margin-bottom: 2rem; }
+.section-head .tag { font-size: 0.6rem; font-weight: 600; letter-spacing: 0.18em; color: var(--forest); margin-bottom: 0.6rem; }
+.section-dark .section-head .tag { color: var(--sand); }
+.section-head h2 { font-family: 'Playfair Display', serif; font-weight: 400; font-size: clamp(1.6rem, 4vw, 2.2rem); line-height: 1.2; margin-bottom: 0.6rem; }
+.section-head h2 em { font-style: italic; color: var(--forest); }
+.section-dark .section-head h2 em { color: var(--sand); }
+.section-head p { font-weight: 300; font-size: 0.92rem; line-height: 1.7; color: var(--stone); }
+.section-dark .section-head p { color: rgba(255,255,255,0.5); }
+
+.inner { max-width: 720px; margin: 0 auto; }
+
+/* === INTRO === */
+.intro-text { font-weight: 300; font-size: 1rem; line-height: 1.85; color: var(--light-text); }
+.intro-text strong { font-weight: 600; color: var(--dark); }
+
+/* === DAY-BY-DAY === */
+.day {
+  border-bottom: 1px solid var(--border);
+}
+
+.day-header {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 1.2rem 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.day-num {
+  width: 40px; height: 40px;
+  background: var(--forest);
+  color: var(--white);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Instrument Sans', sans-serif;
+  font-weight: 700; font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.day-header-text { flex: 1; }
+.day-date { font-size: 0.6rem; font-weight: 500; color: var(--muted); letter-spacing: 0.08em; }
+.day-title { font-family: 'Playfair Display', serif; font-weight: 400; font-size: 1.1rem; color: var(--dark); line-height: 1.3; }
+
+.day-toggle {
+  font-size: 1.2rem; color: var(--muted);
+  transition: transform 0.3s;
+  flex-shrink: 0;
+}
+.day.open .day-toggle { transform: rotate(180deg); }
+
+.day-body {
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.day-body-inner {
+  padding: 0 0 1.5rem 3.4rem;
+}
+
+.day-body p {
+  font-weight: 300; font-size: 0.9rem; line-height: 1.75; color: var(--stone);
+  margin-bottom: 0.8rem;
+}
+
+.day-meals {
+  display: flex; gap: 0.4rem; flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.day-meal {
+  font-size: 0.6rem; font-weight: 500;
+  padding: 0.25rem 0.6rem;
+  background: rgba(61,90,62,0.08);
+  color: var(--forest);
+  border-radius: 99px;
+}
+
+.day-img-placeholder {
+  width: 100%; height: 180px;
+  background: linear-gradient(135deg, rgba(61,90,62,0.08), rgba(196,169,106,0.08));
+  border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; color: var(--muted); text-align: center;
+  margin-bottom: 1rem;
+  border: 1px dashed var(--border);
+}
+
+/* === INCLUDES === */
+.inc-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+}
+
+.inc-col h3 {
+  font-family: 'Instrument Sans', sans-serif; font-weight: 600;
+  font-size: 0.85rem; margin-bottom: 0.8rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid;
+}
+
+.inc-col.yes h3 { color: var(--forest); border-color: var(--forest); }
+.inc-col.no h3 { color: var(--stone); border-color: var(--border); }
+
+.inc-list { list-style: none; }
+.inc-list li {
+  font-size: 0.85rem; font-weight: 300; color: var(--light-text);
+  padding: 0.4rem 0;
+  display: flex; align-items: flex-start; gap: 0.5rem;
+  line-height: 1.5;
+}
+.inc-list .ico { flex-shrink: 0; margin-top: 0.1rem; }
+.inc-col.yes .ico { color: var(--moss); }
+.inc-col.no .ico { color: var(--muted); }
+
+/* === GUIDE === */
+.guide-card {
+  display: grid; grid-template-columns: 100px 1fr; gap: 1.5rem;
+  align-items: start;
+}
+
+.guide-photo {
+  width: 100px; height: 120px;
+  background: linear-gradient(135deg, rgba(61,90,62,0.1), rgba(196,169,106,0.1));
+  border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.55rem; color: var(--muted);
+  border: 1px dashed var(--border);
+}
+
+.guide-info h3 { font-family: 'Playfair Display', serif; font-weight: 400; font-size: 1.3rem; color: var(--dark); margin-bottom: 0.15rem; }
+.guide-info .role { font-size: 0.7rem; font-weight: 500; color: var(--forest); margin-bottom: 0.8rem; }
+.guide-info p { font-size: 0.88rem; font-weight: 300; line-height: 1.7; color: var(--stone); }
+
+.guide-socials {
+  display: flex; gap: 1rem; margin-top: 0.8rem;
+}
+.guide-socials a {
+  font-size: 0.75rem; font-weight: 500; color: var(--forest);
+  text-decoration: none;
+}
+.guide-socials a:hover { text-decoration: underline; }
+
+/* === PRICE === */
+.price-box {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.price-box .from { font-size: 0.7rem; font-weight: 400; color: var(--muted); margin-bottom: 0.2rem; }
+.price-box .amount { font-family: 'Instrument Sans', sans-serif; font-weight: 700; font-size: 2.4rem; color: var(--dark); line-height: 1; }
+.price-box .per { font-size: 0.8rem; font-weight: 400; color: var(--stone); margin-bottom: 1rem; }
+.price-box .note { font-size: 0.78rem; font-weight: 300; color: var(--muted); line-height: 1.6; margin-bottom: 1.5rem; }
+
+.price-cta {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-weight: 600; font-size: 0.9rem;
+  padding: 0.95rem 2.5rem;
+  background: var(--forest); color: var(--white);
+  border: none; border-radius: 99px;
+  text-decoration: none; cursor: pointer;
+  transition: all 0.3s;
+}
+.price-cta:hover { background: var(--forest-light); transform: translateY(-1px); }
+
+.price-spots {
+  margin-top: 0.8rem;
+  font-size: 0.68rem; font-weight: 500; color: var(--clay);
+}
+
+/* === FAQ === */
+.faq-item { border-bottom: 1px solid var(--border); }
+
+.faq-q {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1rem 0;
+  cursor: pointer;
+  font-weight: 500; font-size: 0.92rem; color: var(--dark);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.faq-q .faq-toggle { font-size: 1.2rem; color: var(--muted); transition: transform 0.3s; flex-shrink: 0; margin-left: 1rem; }
+.faq-item.open .faq-toggle { transform: rotate(180deg); }
+
+.faq-a {
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.faq-a-inner {
+  padding: 0 0 1rem;
+  font-size: 0.88rem; font-weight: 300; line-height: 1.7; color: var(--stone);
+}
+
+/* === BOOKING FORM === */
+.form-group { margin-bottom: 1rem; }
+.form-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; color: var(--dark); display: block; margin-bottom: 0.3rem; }
+.form-input, .form-textarea, .form-select {
+  width: 100%; font-family: 'DM Sans', sans-serif; font-size: 0.92rem;
+  padding: 0.85rem 1rem; background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: var(--radius); color: var(--dark); outline: none;
+  transition: border-color 0.3s;
+}
+.form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--moss); box-shadow: 0 0 0 3px rgba(107,143,94,0.1); }
+.form-input::placeholder, .form-textarea::placeholder { color: var(--muted); }
+.form-select { appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239a9488' fill='none' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; }
+.form-textarea { min-height: 90px; resize: vertical; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+.btn-book {
+  width: 100%; font-weight: 600; font-size: 0.92rem;
+  padding: 0.95rem; background: var(--forest); color: var(--white); border: none;
+  border-radius: 99px; cursor: pointer; margin-top: 0.5rem;
+  transition: all 0.3s;
+}
+.btn-book:hover { background: var(--forest-light); }
+
+/* === FOOTER === */
+.foot {
+  padding: 2rem 1.5rem;
+  font-size: 0.7rem; font-weight: 300; color: var(--muted);
+  text-align: center;
+  border-top: 1px solid var(--border);
+}
+.foot a { color: var(--stone); text-decoration: none; }
+.foot a:hover { color: var(--forest); }
+
+/* === STICKY MOBILE CTA === */
+.sticky-cta {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0;
+  padding: 0.8rem 1.5rem;
+  background: rgba(244,240,234,0.97);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border);
+  z-index: 90;
+}
+.sticky-cta-inner {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+.sticky-price { font-family: 'Instrument Sans', sans-serif; font-weight: 700; font-size: 1rem; color: var(--dark); line-height: 1.1; }
+.sticky-price .sp-label { font-size: 0.55rem; font-weight: 400; color: var(--muted); display: block; }
+.sticky-btn { font-weight: 600; font-size: 0.82rem; padding: 0.7rem 1.5rem; background: var(--forest); color: var(--white); border: none; border-radius: 99px; text-decoration: none; flex-shrink: 0; }
+
+/* === RESPONSIVE === */
+@media (max-width: 640px) {
+  .strip { grid-template-columns: repeat(2, 1fr); }
+  .strip-item:nth-child(2) { border-right: none; }
+  .strip-item:nth-child(1), .strip-item:nth-child(2) { border-bottom: 1px solid var(--border); }
+  .inc-grid { grid-template-columns: 1fr; }
+  .guide-card { grid-template-columns: 80px 1fr; gap: 1rem; }
+  .guide-photo { width: 80px; height: 100px; }
+  .form-row { grid-template-columns: 1fr; }
+  .sticky-cta { display: block; }
+  .section { padding-bottom: 5rem; }
+}
+
+@media (min-width: 641px) {
+  .nav { padding: 1.2rem 2.5rem; }
+  .section { padding: 4.5rem 2.5rem; }
+  .hero { padding: 0 2.5rem 3.5rem; }
+  .day-body-inner { padding-left: 3.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <a href="#" class="nav-brand">
+    <span class="n100">100</span><span class="nwild">WILD</span>
+  </a>
+  <a href="#booking" class="nav-cta">Boka din plats</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-img-placeholder"></div>
+  <div class="hero-img-note">[ PLACEHOLDER: Bakgrundsbild — Rio Negro, djungel från båten, eller Rezdar i Amazonas ]</div>
+  <div class="hero-content">
+    <div class="hero-tag">
+      <span class="dot"></span> 100WILD Gruppresa
+    </div>
+    <h1>Expedition<br>Amazonas</h1>
+    <p class="hero-sub">7 dagar i världens största regnskog. Från Manaus gator till nätter i hängmatta under djungelns stjärnhimmel — med Rezdar som guide.</p>
+    <div class="hero-facts">
+      <div class="hero-fact">
+        <span class="val">17–23 okt</span>
+        <span class="label">2027</span>
+      </div>
+      <div class="hero-fact">
+        <span class="val">7 dagar</span>
+        <span class="label">6 nätter</span>
+      </div>
+      <div class="hero-fact">
+        <span class="val">Max 12</span>
+        <span class="label">Resenärer</span>
+      </div>
+      <div class="hero-fact">
+        <span class="val">Manaus</span>
+        <span class="label">Brasilien</span>
+      </div>
+    </div>
+    <a href="#booking" class="hero-cta">Boka din plats</a>
+  </div>
+</section>
+
+<!-- QUICK STRIP -->
+<div class="strip">
+  <div class="strip-item">
+    <div class="ico">📅</div>
+    <div class="s-val">17–23 okt 2027</div>
+    <div class="s-label">Datum</div>
+  </div>
+  <div class="strip-item">
+    <div class="ico">👥</div>
+    <div class="s-val">Max 12 pers</div>
+    <div class="s-label">Gruppstorlek</div>
+  </div>
+  <div class="strip-item">
+    <div class="ico">🏕️</div>
+    <div class="s-val">Normal kondition</div>
+    <div class="s-label">Kravnivå</div>
+  </div>
+  <div class="strip-item">
+    <div class="ico">🏨</div>
+    <div class="s-val">Hotell + djungel</div>
+    <div class="s-label">Boende</div>
+  </div>
+</div>
+
+<!-- INTRO -->
+<section class="section section-white">
+  <div class="inner">
+    <p class="intro-text">
+      Lämna civilisationen bakom dig och glid fram på Rio Negros mörka, spegelblanka vatten medan regnskogen tätnar runt dig för varje mil.
+      <br><br>
+      Det här är <strong>Amazonas som få får uppleva</strong> — inte bakom glasrutor på en turistbåt, utan mitt i djungelns puls. Du lär dig tända eld i fuktig regnskog, dricker vatten ur lianer, fiskar piraya för hand och sover i hängmatta under en stjärnhimmel helt utan ljusföroreningar.
+      <br><br>
+      Mellan äventyren väntar genuina möten med Amazonas smaker, kultur och historia — från gummiboomens glansdagar i Manaus till kristallklara vattenfall i Presidente Figueiredo.
+      <br><br>
+      <strong>Rezdar</strong> är med genom hela resan och delar med sig av sina bästa tips för foto och film — hur du fångar ljuset, hittar rätt vinklar och vågar gå nära. Guiderna på plats är före detta soldater ur brasilianska armén med djungeln som sitt andra hem.
+    </p>
+  </div>
+</section>
+
+<!-- DAY BY DAY -->
+<section class="section" id="program">
+  <div class="inner">
+    <div class="section-head">
+      <div class="tag">Program dag för dag</div>
+      <h2>Sju dagar i <em>Amazonas</em></h2>
+    </div>
+
+    <div class="day open" data-day>
+      <div class="day-header" onclick="toggleDay(this)">
+        <div class="day-num">1</div>
+        <div class="day-header-text">
+          <div class="day-date">Fredag 17 oktober</div>
+          <div class="day-title">Välkommen till Amazonas</div>
+        </div>
+        <div class="day-toggle">▾</div>
+      </div>
+      <div class="day-body">
+        <div class="day-body-inner">
+          <div class="day-img-placeholder">[ Bild: Manaus gatuliv eller hotell ]</div>
+          <p>Ankomst till Manaus under dagen. Incheckning på centralt belägna Hotel Casa Do Bispo — tid att landa och ta in första känslan av Amazonas.</p>
+          <p>På kvällen samlas vi i hotellets reception där du möts av Rezdar — och nu börjar äventyret på riktigt. Välkomstdrink på Bar do Armando, en av Manaus klassiska barer alldeles intill Teatro Amazonas, följt av middag på Caxiri med Amazonas lokala smaker.</p>
+          <div class="day-meals"><span class="day-meal">Middag</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day" data-day>
+      <div class="day-header" onclick="toggleDay(this)">
+        <div class="day-num">2</div>
+        <div class="day-header-text">
+          <div class="day-date">Lördag 18 oktober</div>
+          <div class="day-title">Stadsrundtur i Manaus</div>
+        </div>
+        <div class="day-toggle">▾</div>
+      </div>
+      <div class="day-body">
+        <div class="day-body-inner">
+          <div class="day-img-placeholder">[ Bild: Teatro Amazonas eller marknad ]</div>
+          <p>Stadsrundtur i Amazonas pulserande huvudstad. Vi besöker det praktfulla Teatro Amazonas, promenerar genom de historiska kvarteren och stannar på en lokal marknad fylld med tropiska frukter, fisk och kryddor.</p>
+          <p>En dag att fånga stadens färger, dofter och ljud — och den perfekta kontrasten till djungeldagarna som väntar.</p>
+          <div class="day-meals"><span class="day-meal">Frukost</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day" data-day>
+      <div class="day-header" onclick="toggleDay(this)">
+        <div class="day-num">3</div>
+        <div class="day-header-text">
+          <div class="day-date">Söndag 19 oktober</div>
+          <div class="day-title">Expedition Amazonas</div>
+        </div>
+        <div class="day-toggle">▾</div>
+      </div>
+      <div class="day-body">
+        <div class="day-body-inner">
+          <div class="day-img-placeholder">[ Bild: Båt på Rio Negro eller djungelstig ]</div>
+          <p>Vi lämnar civilisationen. Båten tar oss ut på Rio Negros mörka vatten till Base Jaguar — lägret vid flodstranden som blir vårt hem. Första vandringen rakt in i regnskogen: guiderna lär dig hur man rör sig i tät djungel, hittar väderstreck utan kompass, vilka växter som går att äta och vilka man inte ska röra.</p>
+          <p>Vi dricker vatten ur lianer, äter lunch lagad över öppen eld och serverad på palmblad. Eftermiddagen avslutas med bad i en bäck med kristallklart källvatten. På kvällen tänder vi eld i fuktig regnskog och somnar i hängmatta till djungelns ljudlandskap.</p>
+          <div class="day-meals"><span class="day-meal">Frukost</span><span class="day-meal">Lunch</span><span class="day-meal">Middag</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day" data-day>
+      <div class="day-header" onclick="toggleDay(this)">
+        <div class="day-num">4</div>
+        <div class="day-header-text">
+          <div class="day-date">Måndag 20 oktober</div>
+          <div class="day-title">Livet vid floden</div>
+        </div>
+        <div class="day-toggle">▾</div>
+      </div>
+      <div class="day-body">
+        <div class="day-body-inner">
+          <div class="day-img-placeholder">[ Bild: Rosa floddelfin, piraya-fiske eller urfolkssamhälle ]</div>
+          <p>Upp innan solen. Kaffe vid elden medan dimman lättar. Vi besöker ett urfolkssamhälle och möter människor som levt med skogen i generationer — maten, hantverket, traditionerna och en kunskap om djungeln som ingen kurs i världen slår.</p>
+          <p>På eftermiddagen: piraya-fiske med handlina. Vi spanar efter den sällsynta rosa floddelfinen och håller utkik efter apor och papegojor. Rezdar visar hur man filmar från båt. Kvällen: ut på floden med ficklampor och spana efter djungelns nattliv under en stjärnhimmel helt utan ljusföroreningar.</p>
+          <div class="day-meals"><span class="day-meal">Frukost</span><span class="day-meal">Lunch</span><span class="day-meal">Middag</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day" data-day>
+      <div class="day-header" onclick="toggleDay(this)">
+        <div class="day-num">5</div>
+        <div class="day-header-text">
+          <div class="day-date">Tisdag 21 oktober</div>
+          <div class="day-title">Sista morgonen i djungeln</div>
+        </div>
+        <div class="day-toggle">▾</div>
+      </div>
+      <div class="day-body">
+        <div class="day-body-inner">
+          <div class="day-img-placeholder">[ Bild: Gryning vid floden, dimma, hängmatta ]</div>
+          <p>Den sista morgonen i djungeln får gå långsamt. Frukost vid elden, en sista vandring genom skogen, tid att suga in ljuden och lukterna. Vi packar ihop lägret, tar ett sista dopp och sätter oss i båten mot Manaus.</p>
+          <p>Tillbaka i civilisationen med kläder som luktar lägereld och en kamera full av minnen. Incheckning Hotel Casa Do Bispo.</p>
+          <div class="day-meals"><span class="day-meal">Frukost</span><span class="day-meal">Lunch</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day" data-day>
+      <div class="day-header" onclick="toggleDay(this)">
+        <div class="day-num">6</div>
+        <div class="day-header-text">
+          <div class="day-date">Onsdag 22 oktober</div>
+          <div class="day-title">Vattenfallens land</div>
+        </div>
+        <div class="day-toggle">▾</div>
+      </div>
+      <div class="day-body">
+        <div class="day-body-inner">
+          <div class="day-img-placeholder">[ Bild: Vattenfall i Presidente Figueiredo ]</div>
+          <p>Dagsutflykt till Presidente Figueiredo — känt som vattenfallens land. Kristallklara bäckar, spektakulära vattenfall och naturliga pooler mitt i tät regnskog. En helt annan sida av Amazonas.</p>
+          <p>Kvällen avslutas med en trevlig avskedsmiddag på en restaurang i Manaus.</p>
+          <div class="day-meals"><span class="day-meal">Frukost</span><span class="day-meal">Lunch</span><span class="day-meal">Middag</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day" data-day>
+      <div class="day-header" onclick="toggleDay(this)">
+        <div class="day-num">7</div>
+        <div class="day-header-text">
+          <div class="day-date">Torsdag 23 oktober</div>
+          <div class="day-title">Hemresa</div>
+        </div>
+        <div class="day-toggle">▾</div>
+      </div>
+      <div class="day-body">
+        <div class="day-body-inner">
+          <p>Frukost och fri tid fram till transfer till flygplatsen. Hemresa med minnen, nya vänner och en kamera full av bilder du aldrig hade fått utan den här veckan.</p>
+          <div class="day-meals"><span class="day-meal">Frukost</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INCLUDES -->
+<section class="section section-white">
+  <div class="inner">
+    <div class="section-head">
+      <div class="tag">Vad ingår</div>
+      <h2>Ingår och ingår <em>inte</em></h2>
+    </div>
+
+    <div class="inc-grid">
+      <div class="inc-col yes">
+        <h3>Ingår i resan</h3>
+        <ul class="inc-list">
+          <li><span class="ico">✓</span> 4 nätter hotell i Manaus (Hotel Casa Do Bispo***)</li>
+          <li><span class="ico">✓</span> 2 nätter djungelcamp (hängmatta)</li>
+          <li><span class="ico">✓</span> Måltider enligt program</li>
+          <li><span class="ico">✓</span> Alla transporter under resan</li>
+          <li><span class="ico">✓</span> Lokala guider (före detta armésoldater)</li>
+          <li><span class="ico">✓</span> Rezdar som reseledare och foto/film-coach</li>
+          <li><span class="ico">✓</span> Stadsrundtur i Manaus</li>
+          <li><span class="ico">✓</span> Djungelexpedition med alla aktiviteter</li>
+          <li><span class="ico">✓</span> Dagsutflykt Presidente Figueiredo</li>
+          <li><span class="ico">✓</span> Välkomst- och avskedsmiddag</li>
+        </ul>
+      </div>
+      <div class="inc-col no">
+        <h3>Ingår inte</h3>
+        <ul class="inc-list">
+          <li><span class="ico">✕</span> Flyg till/från Manaus</li>
+          <li><span class="ico">✕</span> Reseförsäkring</li>
+          <li><span class="ico">✕</span> Vaccin och ev. malariaprofylax</li>
+          <li><span class="ico">✕</span> Måltider utöver program</li>
+          <li><span class="ico">✕</span> Personliga utgifter och dricks</li>
+          <li><span class="ico">✕</span> Visum (ej nödvändigt för svenska medborgare)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GUIDE -->
+<section class="section">
+  <div class="inner">
+    <div class="section-head">
+      <div class="tag">Din reseledare</div>
+      <h2>Res med <em>Rezdar</em></h2>
+    </div>
+
+    <div class="guide-card">
+      <div class="guide-photo">[ Bild ]</div>
+      <div class="guide-info">
+        <h3>Rezdar</h3>
+        <div class="role">Äventyrare, filmare, 800 000+ följare</div>
+        <p>Känd från YouTube för sina expeditioner i Amazonas, Sahara, Uganda och Svalbard. Rezdar kombinerar äkta äventyrslust med ett skarpt öga för foto och film — och den kunskapen delar han med sig av under hela resan. Han vet hur man navigerar i tuff terräng, men lika viktigt: han vet hur man fångar ögonblicket.</p>
+        <div class="guide-socials">
+          <a href="https://www.youtube.com/@Rezdar1" target="_blank">YouTube</a>
+          <a href="https://www.instagram.com/rezdar/" target="_blank">Instagram</a>
+          <a href="https://www.tiktok.com/@rezdar" target="_blank">TikTok</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICE + BOOKING -->
+<section class="section section-white" id="booking">
+  <div class="inner">
+    <div class="price-box">
+      <div class="from">Pris från</div>
+      <div class="amount">XX XXX kr</div>
+      <div class="per">per person, delat dubbelrum</div>
+      <div class="note">Pris sätts inom kort. Anmäl ditt intresse nedan så får du veta först när priset släpps och bokningen öppnar.</div>
+      <div class="price-spots">Max 12 platser — begränsat antal</div>
+    </div>
+
+    <div style="margin-top: 2rem;">
+      <h2 style="font-family: 'Playfair Display', serif; font-weight: 400; font-size: 1.4rem; margin-bottom: 0.5rem;">Anmäl intresse</h2>
+      <p style="font-size: 0.88rem; font-weight: 300; color: var(--stone); line-height: 1.6; margin-bottom: 1.5rem;">Fyll i dina uppgifter så kontaktar jag dig när priset är satt och bokningen öppnar.</p>
+
+      <form onsubmit="handleBook(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Förnamn</label>
+            <input type="text" class="form-input" placeholder="Ditt förnamn" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Efternamn</label>
+            <input type="text" class="form-input" placeholder="Ditt efternamn" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">E-post</label>
+          <input type="email" class="form-input" placeholder="din@email.se" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Telefon</label>
+          <input type="tel" class="form-input" placeholder="+46 70 000 00 00">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Antal resenärer</label>
+          <select class="form-select">
+            <option>1 person</option>
+            <option>2 personer</option>
+            <option>3 personer</option>
+            <option>4+ personer</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Frågor eller önskemål</label>
+          <textarea class="form-textarea" placeholder="Något du vill veta eller berätta?"></textarea>
+        </div>
+        <button type="submit" class="btn-book">Anmäl intresse</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section" id="faq">
+  <div class="inner">
+    <div class="section-head">
+      <div class="tag">Vanliga frågor</div>
+      <h2>Bra att <em>veta</em></h2>
+    </div>
+
+    <div class="faq-item" data-faq>
+      <div class="faq-q" onclick="toggleFaq(this)">Behöver jag vara i bra fysisk form?<span class="faq-toggle">▾</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Du behöver inte vara topptrimad, men normal kondition krävs. Djungelvandringarna sker i fuktigt klimat och ojämn terräng. Om du klarar en normal dagstur i naturen klarar du det här — det handlar mer om mental uthållighet än fysisk styrka.</div></div>
+    </div>
+
+    <div class="faq-item" data-faq>
+      <div class="faq-q" onclick="toggleFaq(this)">Vilka vaccin behövs?<span class="faq-toggle">▾</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Gula febern-vaccin rekommenderas starkt och kan krävas vid inresa till Brasilien. Hepatit A och B, difteri/stelkramp och eventuellt tyfoid rekommenderas också. Rådgör med din vaccinationsmottagning minst 6 veckor innan avresa. Malariaprofylax kan övervägas — diskutera med din läkare.</div></div>
+    </div>
+
+    <div class="faq-item" data-faq>
+      <div class="faq-q" onclick="toggleFaq(this)">Är det farligt?<span class="faq-toggle">▾</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Med erfarna guider är riskerna minimala. De lokala guiderna har djungeln som sitt andra hem och vet exakt hur man rör sig säkert. De största riskerna är vardagliga: insektsbett, uttorkning och hetta. Vi har alltid försiktighetsåtgärder och nödkontakter på plats.</div></div>
+    </div>
+
+    <div class="faq-item" data-faq>
+      <div class="faq-q" onclick="toggleFaq(this)">Hur tar jag mig till Manaus?<span class="faq-toggle">▾</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Du flyger till Manaus internationella flygplats (MAO). Vanliga rutter från Sverige går via São Paulo eller Lissabon. Du bokar ditt eget flyg — vi hjälper gärna med tips på bra anslutningar.</div></div>
+    </div>
+
+    <div class="faq-item" data-faq>
+      <div class="faq-q" onclick="toggleFaq(this)">Vad ska jag packa?<span class="faq-toggle">▾</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Du får en detaljerad packlista efter anmälan. Kort sammanfattat: lätta, snabbtorkande kläder, bra vandringsskor, myggnät, pannlampa, kamera och en bra reseförsäkring. Vi ger detaljerade rekommendationer för allt.</div></div>
+    </div>
+
+    <div class="faq-item" data-faq>
+      <div class="faq-q" onclick="toggleFaq(this)">Hur sover man i djungeln?<span class="faq-toggle">▾</span></div>
+      <div class="faq-a"><div class="faq-a-inner">I hängmattor med myggnät under bar himmel. Det låter primitivt men det är bekvämare än du tror — och att somna till djungelns ljud under en stjärnhimmel utan ljusföroreningar är en av resans starkaste upplevelser. Hängmattor tillhandahålls.</div></div>
+    </div>
+
+    <div class="faq-item" data-faq>
+      <div class="faq-q" onclick="toggleFaq(this)">Behövs visum?<span class="faq-toggle">▾</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Nej, svenska medborgare behöver inte visum för Brasilien vid besök under 90 dagar. Du behöver ett giltigt pass med minst 6 månaders giltighet.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="foot">
+  <div class="inner">
+    <p style="margin-bottom: 0.5rem;">
+      <a href="https://www.youtube.com/@Rezdar1">YouTube</a> &nbsp;·&nbsp;
+      <a href="https://www.instagram.com/rezdar/">Instagram</a> &nbsp;·&nbsp;
+      <a href="https://www.tiktok.com/@rezdar">TikTok</a>
+    </p>
+    <p>100WILD by Rezdar &nbsp;·&nbsp; Rezdar Digital &nbsp;·&nbsp; © 2027</p>
+  </div>
+</footer>
+
+<!-- STICKY MOBILE CTA -->
+<div class="sticky-cta" id="stickyCta">
+  <div class="sticky-cta-inner">
+    <div class="sticky-price">
+      <span class="sp-label">Expedition Amazonas</span>
+      17–23 okt 2027
+    </div>
+    <a href="#booking" class="sticky-btn">Boka</a>
+  </div>
+</div>
+
+<script>
+// Nav scroll
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 60));
+
+// Sticky CTA show after hero
+const stickyCta = document.getElementById('stickyCta');
+const heroEnd = document.querySelector('.strip');
+if (heroEnd && stickyCta) {
+  const obs = new IntersectionObserver(([e]) => {
+    stickyCta.style.transform = e.isIntersecting ? 'translateY(100%)' : 'translateY(0)';
+    stickyCta.style.transition = 'transform 0.3s';
+  }, { threshold: 0 });
+  // Show sticky after scroll past strip
+  window.addEventListener('scroll', () => {
+    const rect = heroEnd.getBoundingClientRect();
+    stickyCta.style.transform = rect.bottom > 0 ? 'translateY(100%)' : 'translateY(0)';
+    stickyCta.style.transition = 'transform 0.3s';
+  });
+}
+
+// Day accordion
+function toggleDay(header) {
+  const day = header.parentElement;
+  const body = day.querySelector('.day-body');
+  const inner = body.querySelector('.day-body-inner');
+  if (day.classList.contains('open')) {
+    body.style.maxHeight = '0';
+    day.classList.remove('open');
+  } else {
+    body.style.maxHeight = inner.scrollHeight + 'px';
+    day.classList.add('open');
+  }
+}
+// Open first day on load
+document.querySelectorAll('.day.open .day-body').forEach(b => {
+  b.style.maxHeight = b.querySelector('.day-body-inner').scrollHeight + 'px';
+});
+
+// FAQ accordion
+function toggleFaq(q) {
+  const item = q.parentElement;
+  const a = item.querySelector('.faq-a');
+  const inner = a.querySelector('.faq-a-inner');
+  if (item.classList.contains('open')) {
+    a.style.maxHeight = '0';
+    item.classList.remove('open');
+  } else {
+    a.style.maxHeight = inner.scrollHeight + 'px';
+    item.classList.add('open');
+  }
+}
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+
+// Form
+function handleBook(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('.btn-book');
+  btn.textContent = '✓  Tack! Jag hör av mig snart.';
+  btn.style.background = '#3d5a3e';
+  btn.disabled = true;
+  setTimeout(() => { btn.textContent = 'Anmäl intresse'; btn.style.background = ''; btn.disabled = false; }, 4000);
+}
+</script>
+
+</body>
+</html>
