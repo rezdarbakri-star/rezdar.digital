@@ -50,23 +50,32 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--d
   display: flex; flex-direction: column; justify-content: flex-end;
   padding: 0 1.5rem 2.5rem;
   position: relative;
-  background: linear-gradient(175deg, #2a3a20 0%, #1a2416 40%, #0f1a0c 100%);
+  background: #0f1a0c;
   color: var(--white);
   overflow: hidden;
 }
 
-.hero-img-placeholder {
+.hero-video-wrap {
   position: absolute; inset: 0;
-  background:
-    linear-gradient(to bottom, rgba(15,26,12,0) 30%, rgba(15,26,12,0.85) 75%, rgba(15,26,12,1) 100%),
-    linear-gradient(175deg, #2a3a20, #1a2416);
-  /* Replace background with: background-image: url('your-image.jpg'); background-size: cover; background-position: center; */
+  overflow: hidden;
 }
 
-.hero-img-note {
-  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  font-size: 0.7rem; color: rgba(255,255,255,0.2); letter-spacing: 0.1em;
-  text-align: center; pointer-events: none;
+.hero-video-wrap iframe {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 177.78vh; /* 16:9 ratio */
+  height: 100vh;
+  min-width: 100%;
+  min-height: 56.25vw;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.hero-overlay {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(15,26,12,0.15) 0%, rgba(15,26,12,0.4) 40%, rgba(15,26,12,0.88) 72%, rgba(15,26,12,1) 100%);
+  pointer-events: none;
 }
 
 .hero-content { position: relative; z-index: 2; max-width: 600px; }
@@ -410,8 +419,10 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--d
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-img-placeholder"></div>
-  <div class="hero-img-note">[ PLACEHOLDER: Bakgrundsbild — Rio Negro, djungel från båten, eller Rezdar i Amazonas ]</div>
+  <div class="hero-video-wrap">
+    <div id="ytPlayer"></div>
+  </div>
+  <div class="hero-overlay"></div>
   <div class="hero-content">
     <div class="hero-tag">
       <span class="dot"></span> 100WILD Gruppresa
@@ -805,6 +816,50 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--d
 </div>
 
 <script>
+// YouTube Background — first 20s looped
+var tag = document.createElement('script');
+tag.src = 'https://www.youtube.com/iframe_api';
+document.head.appendChild(tag);
+
+var ytPlayer;
+function onYouTubeIframeAPIReady() {
+  ytPlayer = new YT.Player('ytPlayer', {
+    videoId: 'oeJV9fTi0u4',
+    playerVars: {
+      autoplay: 1,
+      mute: 1,
+      controls: 0,
+      showinfo: 0,
+      rel: 0,
+      modestbranding: 1,
+      playsinline: 1,
+      start: 61,
+      end: 103,
+      loop: 0,
+      disablekb: 1,
+      iv_load_policy: 3,
+    },
+    events: {
+      onReady: function(e) {
+        e.target.mute();
+        e.target.playVideo();
+      },
+      onStateChange: function(e) {
+        if (e.data === YT.PlayerState.ENDED || e.data === YT.PlayerState.PAUSED) {
+          e.target.seekTo(61);
+          e.target.playVideo();
+        }
+      }
+    }
+  });
+  setInterval(function() {
+    if (ytPlayer && ytPlayer.getCurrentTime && ytPlayer.getCurrentTime() >= 102.5) {
+      ytPlayer.seekTo(61);
+      ytPlayer.playVideo();
+    }
+  }, 500);
+}
+
 // Nav scroll
 const nav = document.getElementById('nav');
 window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 60));
