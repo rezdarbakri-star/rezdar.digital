@@ -2043,7 +2043,7 @@ BARA JSON, inget annat.`}]
                 setTplSteps([...rev,...post]);
               }} style={{fontSize:12,fontWeight:600,color:C.ac,cursor:"pointer",padding:"4px 8px",borderRadius:6,background:C.ac+"12"}}>⇅ Vänd ordning</div>
             </div>
-            <div style={{fontSize:11,color:C.t3,marginBottom:10,lineHeight:1.5}}>Överst = första steget. Nederst = 🎯 deadline. Dagar = arbetsdagar efter steget ovanför.</div>
+            <div style={{fontSize:11,color:C.t3,marginBottom:10,lineHeight:1.5}}>Överst = första steget. Nederst = 🎯 deadline. "+2 dagar" = 2 arbetsdagar efter steget ovanför.</div>
             {tplSteps.filter(s=>!s.after).map((s,i,arr)=>{
               const realIdx=tplSteps.indexOf(s);
               const isFirstPre=i===0,isDLPre=i===arr.length-1;
@@ -2053,7 +2053,7 @@ BARA JSON, inget annat.`}]
                 onDragStart={e=>{e.dataTransfer.setData("text/plain",String(realIdx));e.dataTransfer.effectAllowed="move"}}
                 onDragOver={e=>{e.preventDefault()}}
                 onDrop={e=>{e.preventDefault();const from=parseInt(e.dataTransfer.getData("text/plain"));if(!isNaN(from)&&from!==realIdx&&!tplSteps[from].after===!tplSteps[realIdx].after){const n=[...tplSteps];const [moved]=n.splice(from,1);n.splice(realIdx,0,moved);setTplSteps(n)}}}
-                style={{display:"grid",gridTemplateColumns:"20px 1fr 56px 28px",alignItems:"center",gap:6,padding:"10px 12px",background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:8,marginBottom:4,cursor:"grab"}}>
+                style={{display:"grid",gridTemplateColumns:"20px 1fr 96px 28px",alignItems:"center",gap:6,padding:"10px 12px",background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:8,marginBottom:4,cursor:"grab"}}>
                 <span style={{fontSize:14,color:C.t3,cursor:"grab",userSelect:"none"}}>≡</span>
                 <div style={{display:"flex",alignItems:"center",gap:4,minWidth:0}}>
                 {isDLPre&&<span style={{fontSize:13}}>🎯</span>}
@@ -2062,20 +2062,20 @@ BARA JSON, inget annat.`}]
                   onFocus={e=>e.target.style.borderColor=C.bd} onBlur={e=>e.target.style.borderColor="transparent"}/>
                 </div>
                 {isFirstPre?<div style={{fontSize:11,color:C.t3,textAlign:"center"}}>start</div>:
-                <div style={{display:"flex",alignItems:"center",gap:2}}>
+                <div style={{display:"flex",alignItems:"center",gap:4}} title="Arbetsdagar efter steget ovanför">
+                  <span style={{fontSize:13,color:C.t3,fontWeight:700}}>+</span>
                   <input type="number" min="0" value={s.days} onChange={e=>{const n=[...tplSteps];n[realIdx]={...n[realIdx],days:parseInt(e.target.value)||0};setTplSteps(n)}}
                     style={{background:C.bg4,border:`1px solid ${C.bd}`,borderRadius:4,padding:4,textAlign:"center",fontFamily:"monospace",fontSize:12,color:C.t1,width:"100%"}}/>
-                  <span style={{fontSize:8,color:C.t3,whiteSpace:"nowrap"}}>d</span>
+                  <span style={{fontSize:11,color:C.t3,whiteSpace:"nowrap"}}>dagar</span>
                 </div>}
                 <button onClick={()=>{const n=[...tplSteps];n.splice(realIdx,1);setTplSteps(n)}} style={{background:"none",border:"none",color:C.t3,cursor:"pointer",fontSize:14}}>✕</button>
               </div>
             )})}
             <button onClick={()=>{
-              const lastPre=tplSteps.filter(s=>!s.after).length;
-              const postStart=tplSteps.findIndex(s=>s.after);
-              const insertAt=postStart>=0?postStart:tplSteps.length;
+              const preIdx=tplSteps.map((s,i)=>s.after?-1:i).filter(i=>i>=0);
+              const insertAt=preIdx.length>=2?preIdx[preIdx.length-1]:(preIdx.length?preIdx[preIdx.length-1]+1:0);
               const n=[...tplSteps];n.splice(insertAt,0,{name:"",days:1});setTplSteps(n);
-            }} style={{width:"100%",padding:10,border:`1px dashed ${C.bd}`,borderRadius:8,background:"transparent",color:C.t3,cursor:"pointer",fontSize:12,fontFamily:"inherit",marginTop:4}}>+ Lägg till steg</button>
+            }} style={{width:"100%",padding:10,border:`1px dashed ${C.bd}`,borderRadius:8,background:"transparent",color:C.t3,cursor:"pointer",fontSize:12,fontFamily:"inherit",marginTop:4}}>+ Lägg till steg (hamnar före 🎯 deadline)</button>
 
             {/* DEADLINE SEPARATOR */}
             <div style={{display:"flex",alignItems:"center",gap:8,margin:"16px 0"}}>
