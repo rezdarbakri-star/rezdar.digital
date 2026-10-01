@@ -53,15 +53,15 @@
     // Firestore helpers
     async function loadUserData(uid) {
       try {
-        const doc = await db.collection("users").doc(uid).get();
-        if (doc.exists) return doc.data();
-      } catch(e) { console.error("Load error:", e); }
-      return null;
+        const doc = await db.collection("users").doc(uid).get({source:"server"});
+        return {ok:true, data: doc.exists ? doc.data() : null};
+      } catch(e) { console.error("Load error:", e); return {ok:false, error:e.code||e.message}; }
     }
     async function saveUserData(uid, data) {
       try {
         await db.collection("users").doc(uid).set(data);
-      } catch(e) { console.error("Save error:", e); }
+        return {ok:true};
+      } catch(e) { console.error("Save error:", e); return {ok:false, error:e.code||e.message}; }
     }
 
     // Google Calendar API — push a single event
@@ -125,12 +125,13 @@ const CLIENT_COLORS=["#6c5ce7","#00d2a0","#f0a030","#ff4757","#0abde3","#e056a0"
 const DAYS=["sön","mån","tis","ons","tor","fre","lör"];
 const MONTHS=["jan","feb","mar","apr","maj","jun","jul","aug","sep","okt","nov","dec"];
 const gid=()=>Date.now().toString(36)+Math.random().toString(36).substr(2,5);
-const iso=d=>d.toISOString().split("T")[0];
+const iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const parseD=s=>{const [y,m,dd]=s.split("-").map(Number);return new Date(y,m-1,dd,12)};
 const fmtShort=s=>{const d=new Date(s);return`${d.getDate()} ${MONTHS[d.getMonth()]}`};
 const fmtDay=s=>DAYS[new Date(s).getDay()];
 const isToday=s=>s===iso(new Date());
 const isPast=s=>new Date(s)<new Date(iso(new Date()));
-const getWeekNum=s=>{const d=new Date(s);d.setHours(0,0,0,0);d.setDate(d.getDate()+3-(d.getDay()+6)%7);const w=new Date(d.getFullYear(),0,4);return 1+Math.round(((d-w)/864e5-3+(w.getDay()+6)%7)/7)};
+const getWeekNum=s=>{const d=parseD(s);d.setHours(0,0,0,0);d.setDate(d.getDate()+3-(d.getDay()+6)%7);const w=new Date(d.getFullYear(),0,4);return 1+Math.round(((d-w)/864e5-3+(w.getDay()+6)%7)/7)};
 function skipWknd(d){while(d.getDay()===0||d.getDay()===6)d.setDate(d.getDate()-1);return d}
 function skipWkndFwd(d){while(d.getDay()===0||d.getDay()===6)d.setDate(d.getDate()+1);return d}
 function subBizDays(d,n){let r=n;while(r>0){d.setDate(d.getDate()-1);if(d.getDay()!==0&&d.getDay()!==6)r--}return d}
@@ -140,7 +141,7 @@ function calcSteps(tpl,dl,skip=true){
   const post=tpl.steps.filter(s=>s.after);
   const st=[];
   // Pre-deadline steps (backward from deadline)
-  let c=new Date(dl);
+  let c=parseD(dl);
   if(skip)skipWknd(c);
   for(let i=pre.length-1;i>=0;i--){
     st.unshift({name:pre[i].name,date:iso(c),completed:false});
@@ -148,7 +149,7 @@ function calcSteps(tpl,dl,skip=true){
   }
   // Post-deadline steps (forward from deadline)
   if(post.length>0){
-    let p=new Date(dl);
+    let p=parseD(dl);
     for(let i=0;i<post.length;i++){
       if(skip)addBizDays(p,post[i].days);else p.setDate(p.getDate()+post[i].days);
       st.push({name:post[i].name,date:iso(p),completed:false,after:true});
@@ -670,6 +671,7 @@ function Onboarding({onDone}){
 @keyframes cursorMove{0%{right:-10px;top:50px;opacity:0}20%{opacity:1}100%{right:14px;top:30px;opacity:1}}
 @keyframes stepPop{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
 @keyframes sheetUp{0%{transform:translateY(100%)}100%{transform:translateY(0)}}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 `}</style>
     </div>
   );
@@ -892,7 +894,7 @@ function ProjectsView({data,onDelete}){
 }
 
 // ===== TEMPLATES VIEW =====
-function TemplatesView({data,onEdit,onDelete,onNew}){
+function TemplatesView({data,onEdit,onDelete,onNew,onRestore}){
   const [collapsed,setCollapsed]=useState({});
   const toggle=id=>setCollapsed(c=>({...c,[id]:!c[id]}));
 
@@ -921,6 +923,15 @@ function TemplatesView({data,onEdit,onDelete,onNew}){
 
   return(
     <div style={{paddingBottom:80}}>
+      {data.templates.length===0&&(
+        <div style={{padding:"24px 20px",background:C.bg3,border:`1px dashed ${C.ac}50`,borderRadius:14,textAlign:"center",marginBottom:16}}>
+          <div style={{fontSize:28,marginBottom:6}}>📋</div>
+          <div style={{fontSize:16,fontWeight:700,color:C.t1,marginBottom:4}}>Inga mallar än</div>
+          <div style={{fontSize:13,color:C.t3,marginBottom:14}}>Hämta färdiga mallar eller skapa en egen</div>
+          <button onClick={onRestore} style={{width:"100%",padding:14,borderRadius:12,background:C.ac,border:"none",color:"#fff",fontSize:15,fontWeight:700,fontFamily:"inherit",cursor:"pointer",marginBottom:8}}>📥 Hämta standardmallar</button>
+          <button onClick={onNew} style={{width:"100%",padding:12,borderRadius:12,background:"transparent",border:`1px solid ${C.bd}`,color:C.t2,fontSize:14,fontWeight:600,fontFamily:"inherit",cursor:"pointer"}}>+ Skapa egen mall</button>
+        </div>
+      )}
       {groups.map(g=>{
         const isOpen=!collapsed[g.id];
         return(
@@ -948,9 +959,10 @@ function TemplatesView({data,onEdit,onDelete,onNew}){
 }
 
 // ===== PROFILE VIEW =====
-function ProfileView({authState,data,onDeleteProject,onResetPush,onLogout}){
+function ProfileView({authState,data,onDeleteProject,onResetPush,onLogout,aiKey,onAiKeyChange,syncInfo,syncError}){
   const [confirmDel,setConfirmDel]=useState(null);
   const [showPP,setShowPP]=useState(false);
+  const [showKey,setShowKey]=useState(false);
   return(
     <div style={{paddingBottom:80}}>
       {/* Account info */}
@@ -1025,6 +1037,39 @@ function ProfileView({authState,data,onDeleteProject,onResetPush,onLogout}){
         );
       })}
 
+      {/* SYNC STATUS */}
+      <div style={{background:C.bg3,border:`1px solid ${syncError?C.rd:C.bd}`,borderRadius:12,padding:16,marginBottom:16,fontSize:13,lineHeight:1.8}}>
+        <div style={{fontSize:14,fontWeight:700,color:C.t1,marginBottom:6}}>🔄 Synk-status <span style={{fontSize:11,fontWeight:500,color:C.t3}}>· version 2026-10-01c</span></div>
+        <div style={{color:C.t2}}>Inloggad som: <b>{authState?.type==="google"?"Google":authState?.type==="email"?"E-post":"Test (ingen synk!)"}</b>{authState?.email?` · ${authState.email}`:""}</div>
+        <div style={{color:C.t2}}>Mallar i appen nu: <b>{data.templates.length}</b></div>
+        <div style={{color:C.t2}}>Mallar vid inläsning: <b>{syncInfo?.loadedTpls??"–"}</b> {syncInfo?.loaded?`(kl ${syncInfo.loaded})`:""}</div>
+        <div style={{color:syncError?C.rd:C.gn,fontWeight:600}}>{syncError?`❌ Sparning misslyckas: ${syncError}`:syncInfo?.saved?`✅ Senast sparat kl ${syncInfo.saved}`:"Inget sparat än i denna session"}</div>
+      </div>
+
+      {/* AI API Key */}
+      <div style={{background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:12,padding:16,marginBottom:16}}>
+        <div onClick={()=>setShowKey(v=>!v)} style={{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}}>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <span style={{fontSize:20}}>✨</span>
+            <div>
+              <div style={{fontSize:14,fontWeight:700,color:C.t1}}>AI Quick Create</div>
+              <div style={{fontSize:12,color:aiKey?C.gn:C.t3}}>{aiKey?"Nyckel sparad ✓":"Lägg till API-nyckel"}</div>
+            </div>
+          </div>
+          <span style={{fontSize:10,color:C.t3,transform:showKey?"rotate(180deg)":"rotate(0)",transition:"transform .2s",display:"inline-block"}}>▼</span>
+        </div>
+        {showKey&&(
+          <div style={{marginTop:12}}>
+            <p style={{fontSize:12,color:C.t3,marginBottom:8,lineHeight:1.5}}>Klistra in din Anthropic API-nyckel för att använda AI-funktionen. Nyckeln sparas krypterat i ditt konto.</p>
+            <input value={aiKey} onChange={e=>onAiKeyChange(e.target.value)}
+              placeholder="sk-ant-..."
+              type="password"
+              style={{width:"100%",padding:"12px 14px",background:C.bg2,border:`1px solid ${C.bd}`,borderRadius:8,color:C.t1,fontFamily:"monospace",fontSize:13,outline:"none"}}/>
+            <p style={{fontSize:11,color:C.t3,marginTop:6}}>Hämta din nyckel på <span style={{color:C.ac}}>console.anthropic.com</span></p>
+          </div>
+        )}
+      </div>
+
       {/* Logout */}
       <button onClick={onLogout}
         style={{width:"100%",padding:14,borderRadius:10,background:C.rd+"10",border:`1px solid ${C.rd}30`,color:C.rd,fontSize:14,fontWeight:700,fontFamily:"inherit",cursor:"pointer",marginTop:20}}>
@@ -1056,6 +1101,9 @@ function CalendarOverview({data,month,setMonth,onToggle,onPush}){
   const cells=[];
   for(let i=0;i<offset;i++)cells.push(null);
   for(let i=1;i<=dim;i++)cells.push(i);
+  while(cells.length%7)cells.push(null);
+  const weeks=[];for(let w=0;w<cells.length;w+=7)weeks.push(cells.slice(w,w+7));
+  const dsOf=d=>`${yr}-${String(mo+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
 
   const [selDate,setSelDate]=useState(null);
   const selTasks=selDate?byDate[selDate]||[]:[];
@@ -1074,13 +1122,29 @@ function CalendarOverview({data,month,setMonth,onToggle,onPush}){
 
       {/* Calendar grid */}
       <div style={{background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:12,padding:8,marginBottom:12}}>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",textAlign:"center",marginBottom:4}}>
-          {["M","T","O","T","F","L","S"].map((d,i)=><div key={d+i} style={{fontSize:9,fontWeight:700,color:i>=5?C.t3+"70":C.t3,padding:"4px 0"}}>{d}</div>)}
+        <div style={{display:"grid",gridTemplateColumns:"36px repeat(7,1fr)",textAlign:"center",marginBottom:2,paddingBottom:6,borderBottom:`2px solid ${C.bd}`}}>
+          <div style={{fontSize:10,fontWeight:700,color:C.t3,padding:"4px 0",opacity:0.6}}>V</div>
+          {["Mån","Tis","Ons","Tor","Fre","Lör","Sön"].map((d,i)=><div key={d} style={{fontSize:11,fontWeight:700,color:i>=5?C.t3+"70":C.t3,padding:"4px 0"}}>{d}</div>)}
         </div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:2}}>
-          {cells.map((d,i)=>{
+        <div>
+          {weeks.map((wk,wi)=>{
+            const fd=wk.find(x=>x!==null);
+            const wn=getWeekNum(dsOf(fd));
+            const isCurWeek=wk.some(x=>x!==null&&dsOf(x)===todayStr);
+            const wkCount=wk.reduce((a,x)=>a+(x!==null?(byDate[dsOf(x)]||[]).filter(t=>!t.done).length:0),0);
+            return(
+            <div key={wi} style={{display:"grid",gridTemplateColumns:"36px repeat(7,1fr)",gap:3,alignItems:"stretch",padding:"5px 0",
+              borderTop:wi>0?`1px solid ${C.bd}`:"none",background:isCurWeek?C.ac+"10":"transparent",borderRadius:isCurWeek?8:0}}>
+              <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",borderRight:`1px solid ${isCurWeek?C.ac+"50":C.bd}`,
+                color:isCurWeek?C.ac:wkCount?C.t2:C.t3,opacity:isCurWeek||wkCount?1:0.55}}>
+                <span style={{fontSize:8,fontWeight:600,opacity:0.7,lineHeight:1}}>v.</span>
+                <span style={{fontSize:12,fontWeight:800,lineHeight:1.1}}>{wn}</span>
+                {wkCount>0&&<span style={{fontSize:8,fontWeight:700,marginTop:2,opacity:0.8}}>{wkCount} st</span>}
+              </div>
+          {wk.map((d,j)=>{
+            const i=wi*7+j;
             if(d===null)return <div key={i}/>;
-            const ds=`${yr}-${String(mo+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+            const ds=dsOf(d);
             const dayTasks=byDate[ds]||[];
             const isTdy=ds===todayStr;
             const isSel=ds===selDate;
@@ -1090,10 +1154,10 @@ function CalendarOverview({data,month,setMonth,onToggle,onPush}){
               <div key={i} onClick={()=>setSelDate(ds===selDate?null:ds)}
                 style={{padding:"6px 2px 4px",borderRadius:8,cursor:"pointer",textAlign:"center",
                   opacity:isPast?0.3:1,
-                  background:isSel?C.ac+"20":isTdy?C.ac+"08":"transparent",
+                  background:isSel?C.ac+"20":isTdy?C.ac+"08":j>=5?C.t3+"12":"transparent",
                   border:isSel?`2px solid ${C.ac}`:isTdy?`2px solid ${C.ac}30`:"2px solid transparent",
-                  transition:"all .15s",minHeight:38}}>
-                <div style={{fontSize:12,fontWeight:isTdy||isSel?700:400,color:isPast?C.t3:isSel?C.ac:isTdy?C.ac:i%7>=5?C.t3:C.t1}}>{d}</div>
+                  transition:"all .15s",minHeight:44}}>
+                <div style={{fontSize:14,fontWeight:isTdy||isSel?700:400,color:isPast?C.t3:isSel?C.ac:isTdy?C.ac:j>=5?C.t3:C.t1}}>{d}</div>
                 {!isPast&&colors.length>0&&(
                   <div style={{display:"flex",gap:2,justifyContent:"center",marginTop:2,flexWrap:"wrap"}}>
                     {colors.slice(0,3).map((cl,ci)=><div key={ci} style={{width:5,height:5,borderRadius:"50%",background:cl}}/>)}
@@ -1102,6 +1166,8 @@ function CalendarOverview({data,month,setMonth,onToggle,onPush}){
                 )}
               </div>
             );
+          })}
+            </div>);
           })}
         </div>
       </div>
@@ -1178,6 +1244,9 @@ function App(){
   const [showCatPicker,setShowCatPicker]=useState(false);
 
   const [data,setData]=useState({clients:[],templates:[],projects:[]});
+  const dataLoaded=useRef(false);
+  const [syncError,setSyncError]=useState(null);
+  const [syncInfo,setSyncInfo]=useState({loaded:null,saved:null,loadedTpls:null});
   const [tab,setTab]=useState("week");
   const [toast,setToast]=useState("");
   const [showOnboard,setShowOnboard]=useState(false);
@@ -1188,11 +1257,37 @@ function App(){
       if(user){
         const info={type:user.providerData[0]?.providerId==="google.com"?"google":"email",email:user.email,uid:user.uid};
         setAuthState(info);
-        const saved=await loadUserData(user.uid);
-        if(saved&&saved.projects){
-          setData(saved);
+        const res=await loadUserData(user.uid);
+        let local=null;try{local=JSON.parse(localStorage.getItem("df_"+user.uid)||"null")}catch(e){}
+        const localHasData=local&&((local.templates||[]).length||(local.projects||[]).length);
+        if(!res.ok){
+          // Cloud unreachable — use local backup if we have one
+          setSyncError(res.error);
+          if(localHasData){setData(local);dataLoaded.current=true}
           setShowOnboard(false);setShowCatPicker(false);
+          setAuthLoading(false);
+          return;
+        }
+        setSyncError(null);
+        let saved=res.data;
+        if(localHasData&&(!saved||(local.updatedAt||0)>(saved.updatedAt||0)||!(saved.templates||[]).length)){
+          saved={...local,aiKey:saved?.aiKey||local.aiKey};
+        }
+        setSyncInfo(si=>({...si,loaded:new Date().toLocaleTimeString("sv-SE"),loadedTpls:saved&&saved.templates?saved.templates.length:0}));
+        if(saved&&saved.projects){
+          if(saved.aiKey)setAiKey(saved.aiKey);
+          const {aiKey:_,...rest}=saved;
+          setData(rest);
+          dataLoaded.current=true;
+          setShowOnboard(false);
+          // If templates got wiped, show category picker to restore them
+          if(!rest.templates||rest.templates.length===0){
+            setShowCatPicker(true);
+          }else{
+            setShowCatPicker(false);
+          }
         }else{
+          dataLoaded.current=true;
           setShowOnboard(true);
         }
       }
@@ -1219,6 +1314,10 @@ function App(){
   const [wizDragOver,setWizDragOver]=useState(null);
   const dragNavTimer=useRef(null);
   const [showPushPopup,setShowPushPopup]=useState(false);
+  const [aiText,setAiText]=useState("");
+  const [aiLoading,setAiLoading]=useState(false);
+  const [aiOpen,setAiOpen]=useState(false);
+  const [aiKey,setAiKey]=useState("");
 
   // Template modal
   const [tplOpen,setTplOpen]=useState(false);
@@ -1227,7 +1326,7 @@ function App(){
   const [editTplId,setEditTplId]=useState(null);
 
   const msg=m=>{setToast(m);setTimeout(()=>setToast(""),3000)};
-  const upd=useCallback(fn=>{setData(d=>{const n=JSON.parse(JSON.stringify(d));fn(n);return n})},[]);
+  const upd=useCallback(fn=>{setData(d=>{const n=JSON.parse(JSON.stringify(d));fn(n);n.updatedAt=Date.now();return n})},[]);
   const toggle=useCallback((pid,si)=>{upd(d=>{const p=d.projects.find(x=>x.id===pid);if(p)p.steps[si].completed=!p.steps[si].completed})},[upd]);
 
   // Push unpushed future steps to Google Calendar
@@ -1286,22 +1385,34 @@ function App(){
     else msg(`☁️ ${ok} uppgifter pushade till Google Calendar!`);
   },[upd,data,authState]);
 
-  // Cloud sync — save to Firestore on every change
+  // Local backup — written instantly on every change
+  useEffect(()=>{
+    if(!authState||!dataLoaded.current)return;
+    const key=authState.type==="test"?"df_test":"df_"+authState.uid;
+    try{localStorage.setItem(key,JSON.stringify(data))}catch(e){}
+  },[data,authState]);
+
+  // Cloud sync — save to Firestore on every change (only after data loaded)
   const saveTimer=useRef(null);
   useEffect(()=>{
     if(!authState||authState.type==="test")return;
+    if(!dataLoaded.current)return; // Don't save before data is loaded!
+    if(!data.templates?.length&&!data.projects?.length&&!data.clients?.length)return; // Never overwrite with empty data
     if(saveTimer.current)clearTimeout(saveTimer.current);
     saveTimer.current=setTimeout(()=>{
-      saveUserData(authState.uid,data);
-    },1000);
+      saveUserData(authState.uid,{...data,aiKey}).then(r=>{if(!r.ok)setSyncError(r.error);else{setSyncError(null);setSyncInfo(si=>({...si,saved:new Date().toLocaleTimeString("sv-SE")}))}});
+    },400);
     return ()=>{if(saveTimer.current)clearTimeout(saveTimer.current)};
-  },[data,authState]);
+  },[data,authState,aiKey]);
 
   // Login handler — only used for test mode (real auth handled by onAuthStateChanged)
   const handleLogin=async(info)=>{
     if(info.type==="test"){
+      let local=null;try{local=JSON.parse(localStorage.getItem("df_test")||"null")}catch(e){}
       setAuthState(info);
-      setShowOnboard(true);
+      if(local&&((local.templates||[]).length||(local.projects||[]).length)){
+        setData(local);dataLoaded.current=true;setShowOnboard(false);setShowCatPicker(false);
+      }else{dataLoaded.current=true;setShowOnboard(true)}
     }
     // For email/google: Firebase auth triggers onAuthStateChanged which loads data
   };
@@ -1310,12 +1421,13 @@ function App(){
   const handleCatDone=(catIds)=>{
     setShowCatPicker(false);
     const tpls=CATEGORIES.filter(c=>catIds.includes(c.id)).flatMap(c=>c.templates);
-    upd(d=>{d.templates=[...tpls]});
+    upd(d=>{const have=new Set((d.templates||[]).map(t=>t.id));d.templates=[...(d.templates||[]),...tpls.filter(t=>!have.has(t.id))]});
     msg("✅ Mallar laddade!");
   };
 
   // Logout
   const handleLogout=async()=>{
+    dataLoaded.current=false;
     try{await auth.signOut()}catch(e){}
     setAuthState(null);setData({clients:[],templates:[],projects:[]});
     setShowOnboard(true);setShowCatPicker(false);setTab("week");
@@ -1324,10 +1436,89 @@ function App(){
   // === PROJECT CREATION ===
   const startWiz=()=>{
     setPClient("");setPTpl(data.templates[0]?.id||"");setPName("");setPDL("");setPSkipWknd(true);setShowColors(false);setClientFocus(false);
-    setPCustomSteps(null);setMovingIdx(-1);setWizDragOver(null);
+    setPCustomSteps(null);setMovingIdx(-1);setWizDragOver(null);setAiText("");setAiOpen(false);setAiLoading(false);
     const used=data.clients.map(c=>c.color);setPColor(CLIENT_COLORS.find(c=>!used.includes(c))||CLIENT_COLORS[0]);
     setCalMonth(new Date(new Date().getFullYear(),new Date().getMonth(),1));
     setWiz(true);
+  };
+
+  // === AI QUICK CREATE ===
+  const aiParse=async()=>{
+    if(!aiText.trim()||aiLoading)return;
+    if(!aiKey.trim()){msg("⚠️ Lägg till din Anthropic API-nyckel under Konto");return}
+    setAiLoading(true);
+    try{
+      const tplList=data.templates.map(t=>`id:"${t.id}" name:"${t.name}" steps:${t.steps.length}`).join("\n");
+      const clientList=data.clients.map(c=>`name:"${c.name}"`).join(", ");
+      const today=new Date();
+      const yearHint=today.getFullYear();
+
+      const res=await fetch("https://api.anthropic.com/v1/messages",{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json",
+          "x-api-key":aiKey.trim(),
+          "anthropic-version":"2023-06-01",
+          "anthropic-dangerous-direct-browser-access":"true"
+        },
+        body:JSON.stringify({
+          model:"claude-sonnet-4-20250514",
+          max_tokens:1000,
+          messages:[{role:"user",content:`Du är en JSON-parser för en projektplaneringsapp. Tolka användarens text och returnera BARA JSON (ingen markdown, inga backticks).
+
+Tillgängliga mallar:
+${tplList}
+
+Befintliga kunder: ${clientList||"inga"}
+
+Dagens datum: ${iso(today)}
+År att anta om inget anges: ${yearHint}
+
+Användarens text: "${aiText}"
+
+Returnera JSON med exakt dessa fält:
+{"template_id":"...", "client":"...", "deadline":"YYYY-MM-DD", "project_name":"..."}
+
+Regler:
+- template_id: Matcha bästa mall baserat på nyckelord. Om ingen matchar, returnera ""
+- client: Kundens namn från texten. Om ingen nämns, returnera ""
+- deadline: Datumet i ISO-format. Tolka "17 april" som "${yearHint}-04-17", "om 2 veckor" relativt till dagens datum. Om inget datum nämns, returnera ""
+- project_name: Ett kort projektnamn baserat på beskrivningen (max 4 ord)
+
+BARA JSON, inget annat.`}]
+        })
+      });
+      const d=await res.json();
+      const text=d.content.map(i=>i.text||"").join("");
+      const clean=text.replace(/```json|```/g,"").trim();
+      const parsed=JSON.parse(clean);
+
+      // Apply parsed data
+      if(parsed.template_id){
+        const tpl=data.templates.find(t=>t.id===parsed.template_id);
+        if(tpl)setPTpl(parsed.template_id);
+      }
+      if(parsed.client)setPClient(parsed.client);
+      if(parsed.deadline){
+        setPDL(parsed.deadline);
+        const [y,m]=parsed.deadline.split("-");
+        setCalMonth(new Date(parseInt(y),parseInt(m)-1,1));
+      }
+      if(parsed.project_name)setPName(parsed.project_name);
+
+      // Match client color
+      if(parsed.client){
+        const existing=data.clients.find(c=>c.name.toLowerCase()===parsed.client.toLowerCase());
+        if(existing)setPColor(existing.color);
+      }
+
+      setAiOpen(false);
+      msg("✨ AI fyllde i projektet!");
+    }catch(e){
+      console.error("AI parse error:",e);
+      msg("⚠️ Kunde inte tolka — kontrollera API-nyckeln eller försök igen");
+    }
+    setAiLoading(false);
   };
 
   // Live preview — computed whenever inputs change
@@ -1449,8 +1640,8 @@ function App(){
       <div style={{flex:1,overflowY:"auto",padding:"4px 16px 100px"}}>
         {tab==="week"&&<WeekView data={data} onToggle={toggle}/>}
         {tab==="calendar"&&<CalendarOverview data={data} month={calOverviewMonth} setMonth={setCalOverviewMonth} onToggle={toggle} onPush={pushToGcal}/>}
-        {tab==="templates"&&<TemplatesView data={data} onEdit={id=>openTpl(id)} onDelete={delTpl} onNew={()=>openTpl()}/>}
-        {tab==="profile"&&<ProfileView authState={authState} data={data} onDeleteProject={delProject} onResetPush={resetPush} onLogout={handleLogout}/>}
+        {tab==="templates"&&<TemplatesView data={data} onEdit={id=>openTpl(id)} onDelete={delTpl} onNew={()=>openTpl()} onRestore={()=>setShowCatPicker(true)}/>}
+        {tab==="profile"&&<ProfileView authState={authState} data={data} onDeleteProject={delProject} onResetPush={resetPush} onLogout={handleLogout} aiKey={aiKey} onAiKeyChange={setAiKey} syncInfo={syncInfo} syncError={syncError}/>}
       </div>
 
       {/* BOTTOM TAB BAR */}
@@ -1495,6 +1686,46 @@ function App(){
           </div>
 
           <div style={{flex:1,overflowY:"auto",padding:"16px 20px"}}>
+
+            {/* AI QUICK CREATE */}
+            <div style={{marginBottom:16}}>
+              {!aiOpen?(
+                <button onClick={()=>setAiOpen(true)}
+                  style={{width:"100%",padding:"14px 18px",background:`linear-gradient(135deg,${C.ac}15,${C.ac}08)`,border:`1px solid ${C.ac}30`,borderRadius:12,cursor:"pointer",display:"flex",alignItems:"center",gap:10,fontFamily:"inherit"}}>
+                  <span style={{fontSize:20}}>✨</span>
+                  <div style={{textAlign:"left"}}>
+                    <div style={{fontSize:14,fontWeight:700,color:C.t1}}>Beskriv ditt projekt</div>
+                    <div style={{fontSize:12,color:C.t3}}>{aiKey?"\"TikTok för MMSports, deadline 17 april\"":"Lägg till API-nyckel under Konto först"}</div>
+                  </div>
+                </button>
+              ):(
+                <div style={{background:C.bg3,border:`1px solid ${C.ac}40`,borderRadius:12,padding:14,position:"relative"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:8}}>
+                    <span style={{fontSize:16}}>✨</span>
+                    <span style={{fontSize:13,fontWeight:700,color:C.t1}}>Beskriv projektet</span>
+                    <span onClick={()=>{setAiOpen(false);setAiText("")}} style={{marginLeft:"auto",fontSize:12,color:C.t3,cursor:"pointer"}}>✕</span>
+                  </div>
+                  <textarea value={aiText} onChange={e=>setAiText(e.target.value)}
+                    placeholder={"T.ex:\n• TikTok video för MMSports, deadline 17 april\n• YouTube film åt Red Bull, klart 3 maj\n• Golvslipning Anderssons, 25 mars"}
+                    onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();aiParse()}}}
+                    style={{width:"100%",minHeight:80,padding:"12px 14px",background:C.bg2,border:`1px solid ${C.bd}`,borderRadius:8,color:C.t1,fontFamily:"inherit",fontSize:15,outline:"none",resize:"vertical",lineHeight:1.5}}/>
+                  <button onClick={aiParse} disabled={aiLoading||!aiText.trim()}
+                    style={{width:"100%",marginTop:8,padding:14,borderRadius:10,background:aiText.trim()?C.ac:C.bd,border:"none",color:aiText.trim()?"#fff":C.t3,fontSize:15,fontWeight:700,fontFamily:"inherit",cursor:aiText.trim()?"pointer":"default",display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"all .2s"}}>
+                    {aiLoading?(<><span style={{display:"inline-block",width:16,height:16,border:"2px solid rgba(255,255,255,.3)",borderTopColor:"#fff",borderRadius:"50%",animation:"spin .6s linear infinite"}}/>Tolkar...</>):"✨ Skapa med AI"}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* DIVIDER */}
+            {aiOpen&&(
+              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:16}}>
+                <div style={{flex:1,height:1,background:C.bd}}/>
+                <span style={{fontSize:11,color:C.t3}}>eller fyll i manuellt</span>
+                <div style={{flex:1,height:1,background:C.bd}}/>
+              </div>
+            )}
+
             {/* 1. CALENDAR — centered, primary */}
             <div style={{fontSize:14,fontWeight:600,color:C.t3,marginBottom:6}}>Välj deadline</div>
             <div style={{margin:"0 auto 12px"}}>
@@ -1527,12 +1758,13 @@ function App(){
                   })()}
                 </div>
                 <div style={{padding:"8px 10px 10px"}}>
-                  <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",textAlign:"center",marginBottom:4}}>
-                    {["M","T","O","T","F","L","S"].map((d,i)=>(
-                      <div key={d+i} style={{fontSize:11,fontWeight:700,color:i>=5?C.t3+"70":C.t3,padding:"4px 0"}}>{d}</div>
+                  <div style={{display:"grid",gridTemplateColumns:"36px repeat(7,1fr)",textAlign:"center",marginBottom:2,paddingBottom:6,borderBottom:`2px solid ${C.bd}`}}>
+                    <div style={{fontSize:10,fontWeight:700,color:C.t3,padding:"4px 0",opacity:0.6}}>V</div>
+                    {["Mån","Tis","Ons","Tor","Fre","Lör","Sön"].map((d,i)=>(
+                      <div key={d} style={{fontSize:11,fontWeight:700,color:i>=5?C.t3+"70":C.t3,padding:"4px 0"}}>{d}</div>
                     ))}
                   </div>
-                  <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",textAlign:"center"}}>
+                  <div>
                     {(()=>{
                       const yr=calMonth.getFullYear(),mo=calMonth.getMonth();
                       const first=new Date(yr,mo,1).getDay();
@@ -1542,17 +1774,37 @@ function App(){
                       const cells=[];
                       for(let i=0;i<offset;i++)cells.push(null);
                       for(let i=1;i<=dim;i++)cells.push(i);
+                      while(cells.length%7)cells.push(null);
+                      const weeks=[];for(let w=0;w<cells.length;w+=7)weeks.push(cells.slice(w,w+7));
+                      const dsOf=d=>`${yr}-${String(mo+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
                       const stepMap={};// date -> {idx,name}
                       const dlIdx2=wizSteps?wizSteps.reduce((a,s,i)=>s.after?a:i,-1):-1;
                       if(wizSteps)wizSteps.forEach((s,idx)=>{stepMap[s.date]={idx,name:s.name,isLast:idx===dlIdx2,isAfter:!!s.after}});
-                      return cells.map((d,i)=>{
+                      return weeks.map((wk,wi)=>{
+                        const firstDay=wk.find(x=>x!==null);
+                        const wn=getWeekNum(dsOf(firstDay));
+                        const isCurWeek=wk.some(x=>x!==null&&dsOf(x)===todayStr);
+                        const wkHasSteps=wk.some(x=>x!==null&&stepMap[dsOf(x)]);
+                        return(
+                        <div key={wi} style={{display:"grid",gridTemplateColumns:"36px repeat(7,1fr)",textAlign:"center",alignItems:"stretch",gap:3,
+                          padding:"5px 0",borderTop:wi>0?`1px solid ${C.bd}`:"none",
+                          background:isCurWeek?C.ac+"10":"transparent",borderRadius:isCurWeek?8:0}}>
+                          <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",
+                            fontSize:11,fontWeight:800,color:isCurWeek?C.ac:wkHasSteps?C.t2:C.t3,opacity:isCurWeek||wkHasSteps?1:0.55,
+                            borderRight:`1px solid ${isCurWeek?C.ac+"50":C.bd}`}}>
+                            <span style={{fontSize:8,fontWeight:600,opacity:0.7,lineHeight:1}}>v.</span>
+                            <span style={{lineHeight:1.1}}>{wn}</span>
+                          </div>
+                        {wk.map((d,j)=>{
+                        const i=wi*7+j;
                         if(d===null)return <div key={i}/>;
-                        const ds=`${yr}-${String(mo+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+                        const ds=dsOf(d);
+                        const isTodayCell=ds===todayStr;
                         const isSel=pDL===ds;
                         const step=stepMap[ds];
                         const isStep=!!step&&!isSel;
                         const isPastDay=ds<todayStr;
-                        const isWknd=i%7===5||i%7===6;
+                        const isWknd=j>=5;
                         const stepInPast=isStep&&isPastDay;
                         const isDragTarget=wizDragOver===ds&&!isStep&&!isSel;
                         const isBeingMoved=movingIdx>=0&&step&&step.idx===movingIdx;
@@ -1577,8 +1829,8 @@ function App(){
                             }}
                             style={{padding:"7px 2px",borderRadius:8,position:"relative",
                               cursor:isStep?"grab":isPastDay?"default":"pointer",
-                              background:isBeingMoved?C.ac+"35":isDragTarget?C.ac+"25":isSel?(isPastDay?C.rd+"40":C.ac):stepInPast?"rgba(255,71,87,.1)":isStep?(step.isAfter?C.gn+"25":wasCustomized?C.ac+"20":C.step+"30"):"transparent",
-                              border:isBeingMoved?`2px solid ${C.ac}`:isDragTarget?`2px dashed ${C.ac}`:"2px solid transparent",
+                              background:isBeingMoved?C.ac+"35":isDragTarget?C.ac+"25":isSel?(isPastDay?C.rd+"40":C.ac):stepInPast?"rgba(255,71,87,.1)":isStep?(step.isAfter?C.gn+"25":wasCustomized?C.ac+"20":C.step+"30"):isWknd?C.t3+"12":"transparent",
+                              border:isBeingMoved?`2px solid ${C.ac}`:isDragTarget?`2px dashed ${C.ac}`:isTodayCell&&!isSel?`2px solid ${C.ac}80`:"2px solid transparent",
                               transition:"all .15s",userSelect:"none"}}>
                             <div style={{fontSize:14,fontWeight:isSel||isStep||isDragTarget?700:400,
                               color:isBeingMoved?C.ac:isDragTarget?C.ac:isSel?(isPastDay?C.rd:"#fff"):stepInPast?C.rd+"80":isStep?(step.isAfter?C.gn:wasCustomized?C.ac:C.step):isPastDay?C.t3+"40":isWknd?C.t3+"70":C.t1}}>
@@ -1587,6 +1839,8 @@ function App(){
                             {isStep&&<div style={{fontSize:8,fontWeight:700,color:step.isAfter?C.gn:wasCustomized?C.ac:C.step,lineHeight:1,marginTop:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:"100%",padding:"0 2px"}}>{step.isAfter?"↪":""}{step.name.split(" ")[0]}</div>}
                           </div>
                         );
+                      })}
+                        </div>);
                       });
                     })()}
                   </div>
@@ -1664,6 +1918,15 @@ function App(){
                 {CLIENT_COLORS.map(c=>(
                   <div key={c} onClick={()=>{setPColor(c);setShowColors(false)}} style={{width:28,height:28,borderRadius:6,background:c,cursor:"pointer",border:pColor===c?"2px solid #fff":"2px solid transparent"}}/>
                 ))}
+              </div>
+            )}
+
+            {/* 3b. PROJECT NAME — optional override */}
+            {pName&&(
+              <div style={{marginBottom:12}}>
+                <div style={{fontSize:14,fontWeight:600,color:C.t3,marginBottom:6}}>Projektnamn</div>
+                <input value={pName} onChange={e=>setPName(e.target.value)} placeholder="Auto-genererat om tomt"
+                  style={{width:"100%",padding:"14px 16px",background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:10,color:C.t1,fontFamily:"inherit",fontSize:16,outline:"none"}}/>
               </div>
             )}
 
@@ -1772,9 +2035,18 @@ function App(){
               style={{width:"100%",padding:"14px 16px",background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:10,color:C.t1,fontFamily:"inherit",fontSize:16,outline:"none",marginBottom:20}}/>
 
             {/* PRE-DEADLINE STEPS */}
-            <div style={{fontSize:13,fontWeight:600,color:C.t2,marginBottom:8}}>Steg före deadline</div>
-            {tplSteps.filter(s=>!s.after).map((s,i)=>{
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
+              <div style={{fontSize:13,fontWeight:600,color:C.t2}}>Steg före deadline</div>
+              <div onClick={()=>{
+                const pre=tplSteps.filter(s=>!s.after),post=tplSteps.filter(s=>s.after),n=pre.length;
+                const rev=pre.map((_,j)=>({...pre[n-1-j],days:j===0?0:pre[n-j].days}));
+                setTplSteps([...rev,...post]);
+              }} style={{fontSize:12,fontWeight:600,color:C.ac,cursor:"pointer",padding:"4px 8px",borderRadius:6,background:C.ac+"12"}}>⇅ Vänd ordning</div>
+            </div>
+            <div style={{fontSize:11,color:C.t3,marginBottom:10,lineHeight:1.5}}>Överst = första steget. Nederst = 🎯 deadline. Dagar = arbetsdagar efter steget ovanför.</div>
+            {tplSteps.filter(s=>!s.after).map((s,i,arr)=>{
               const realIdx=tplSteps.indexOf(s);
+              const isFirstPre=i===0,isDLPre=i===arr.length-1;
               return(
               <div key={realIdx}
                 draggable
@@ -1783,14 +2055,18 @@ function App(){
                 onDrop={e=>{e.preventDefault();const from=parseInt(e.dataTransfer.getData("text/plain"));if(!isNaN(from)&&from!==realIdx&&!tplSteps[from].after===!tplSteps[realIdx].after){const n=[...tplSteps];const [moved]=n.splice(from,1);n.splice(realIdx,0,moved);setTplSteps(n)}}}
                 style={{display:"grid",gridTemplateColumns:"20px 1fr 56px 28px",alignItems:"center",gap:6,padding:"10px 12px",background:C.bg3,border:`1px solid ${C.bd}`,borderRadius:8,marginBottom:4,cursor:"grab"}}>
                 <span style={{fontSize:14,color:C.t3,cursor:"grab",userSelect:"none"}}>≡</span>
+                <div style={{display:"flex",alignItems:"center",gap:4,minWidth:0}}>
+                {isDLPre&&<span style={{fontSize:13}}>🎯</span>}
                 <input value={s.name} onChange={e=>{const n=[...tplSteps];n[realIdx]={...n[realIdx],name:e.target.value};setTplSteps(n)}} placeholder="Stegnamn..."
                   style={{background:"transparent",border:`1px solid transparent`,borderRadius:4,padding:"4px 6px",color:C.t1,fontFamily:"inherit",fontSize:14,outline:"none",transition:"border .15s"}}
                   onFocus={e=>e.target.style.borderColor=C.bd} onBlur={e=>e.target.style.borderColor="transparent"}/>
+                </div>
+                {isFirstPre?<div style={{fontSize:11,color:C.t3,textAlign:"center"}}>start</div>:
                 <div style={{display:"flex",alignItems:"center",gap:2}}>
                   <input type="number" min="0" value={s.days} onChange={e=>{const n=[...tplSteps];n[realIdx]={...n[realIdx],days:parseInt(e.target.value)||0};setTplSteps(n)}}
                     style={{background:C.bg4,border:`1px solid ${C.bd}`,borderRadius:4,padding:4,textAlign:"center",fontFamily:"monospace",fontSize:12,color:C.t1,width:"100%"}}/>
                   <span style={{fontSize:8,color:C.t3,whiteSpace:"nowrap"}}>d</span>
-                </div>
+                </div>}
                 <button onClick={()=>{const n=[...tplSteps];n.splice(realIdx,1);setTplSteps(n)}} style={{background:"none",border:"none",color:C.t3,cursor:"pointer",fontSize:14}}>✕</button>
               </div>
             )})}
@@ -1846,6 +2122,16 @@ function App(){
       )}
 
       {/* TOAST */}
+      {syncError&&authState&&authState.type!=="test"&&(
+        <div style={{position:"fixed",top:0,left:0,right:0,maxWidth:480,margin:"0 auto",zIndex:3000,background:C.rd,color:"#fff",padding:"12px 16px",fontSize:13,fontWeight:600,lineHeight:1.4,display:"flex",alignItems:"center",gap:10}}>
+          <span style={{fontSize:18}}>⚠️</span>
+          <div style={{flex:1}}>
+            Synk till molnet fungerar inte — ändringar sparas inte.
+            <div style={{fontSize:11,fontWeight:400,opacity:0.85,marginTop:2}}>{syncError==="permission-denied"?"Firestore-reglerna nekar åtkomst (troligen utgånget test mode).":"Fel: "+syncError}</div>
+          </div>
+          <button onClick={()=>location.reload()} style={{background:"rgba(255,255,255,.2)",border:"none",color:"#fff",borderRadius:8,padding:"6px 10px",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>Försök igen</button>
+        </div>
+      )}
       {toast&&<div style={{position:"fixed",bottom:90,left:"50%",transform:"translateX(-50%)",padding:"10px 20px",background:C.bg4,border:`1px solid ${C.gn}`,borderRadius:10,fontSize:13,fontWeight:500,zIndex:2000,color:C.t1,whiteSpace:"nowrap"}}>{toast}</div>}
     </div>
   );
