@@ -16,6 +16,42 @@
 <script type="text/babel">
 const { useState, useEffect, useRef, createContext, useContext } = React;
 
+const IMG_FALLBACK2 = {
+  "bilder/tiger/walk.jpg": "https://i.ibb.co/MDL6vW6n/WALK.jpg",
+  "bilder/tiger/treehouse.jpg": "https://i.ibb.co/66qtgyY/TREEHOUSE.jpg",
+  "bilder/tiger/sun.jpg": "https://i.ibb.co/9Hc3QSYX/SUN.jpg",
+};
+const IMG_FALLBACK = {
+  "bilder/tiger/sun.jpg": "https://i.ibb.co/1FMtJTH/SUN.jpg",
+  "bilder/tiger/treehouse.jpg": "https://i.ibb.co/1YG0Dyns/TREEHOUSE.jpg",
+  "bilder/tiger/tigersign.jpg": "https://i.ibb.co/3m6PrTx7/TIGERSIGN.jpg",
+  "bilder/tiger/img-0079-2.jpg": "https://i.ibb.co/99GB1YL3/IMG-0079-2.jpg",
+  "bilder/tiger/rb2.jpg": "https://i.ibb.co/Fqg3v4hm/RB2.jpg",
+  "bilder/tiger/crocodilesign.jpg": "https://i.ibb.co/HLS0Z2DF/CROCODILESIGN.jpg",
+  "bilder/tiger/lookingback.jpg": "https://i.ibb.co/Jw8Qz1mM/LOOKINGBACK.jpg",
+  "bilder/timor.jpg": "https://i.ibb.co/JwWGJpFL/Freediving-with-Whales-in-Timor-Leste.jpg",
+  "bilder/tiger/camping.jpg": "https://i.ibb.co/MD7DKGWB/CAMPING.jpg",
+  "bilder/pantanal.jpg": "https://i.ibb.co/NgD6YxRR/latin-america-pantanal-capybara-family-emma-healey-gallery.jpg",
+  "bilder/tiger/rvrc.jpg": "https://i.ibb.co/PGtwrNxx/RVRC.jpg",
+  "bilder/tiger/rb.jpg": "https://i.ibb.co/PGyLKRm7/RB.jpg",
+  "bilder/tiger/o-gamoto-gav2.jpg": "https://i.ibb.co/Y7hCN0nM/O-GAMOTO-GAV2.jpg",
+  "bilder/tiger/rvrc-keps.jpg": "https://i.ibb.co/jPn82dZT/RVRC-KEPS.jpg",
+  "bilder/tiger/walk.jpg": "https://i.ibb.co/k6Bg5m32/WALK.jpg",
+  "bilder/tiger/img-0066.jpg": "https://i.ibb.co/rft8WfnZ/IMG-0066.jpg",
+  "bilder/tiger/safarri.jpg": "https://i.ibb.co/tPJqxdVj/SAFARRI.jpg",
+};
+function imgFail(e) {
+  const el = e.target, cur = el.getAttribute("src");
+  const key = el.dataset.orig || cur;
+  if (!el.dataset.orig) el.dataset.orig = cur;
+  const flat = key.startsWith("bilder/tiger/") ? key.replace("bilder/tiger/", "bilder/") : null;
+  const chain = [flat, IMG_FALLBACK[key], IMG_FALLBACK2[key]].filter(Boolean);
+  const step = +(el.dataset.step || 0);
+  if (step < chain.length) { el.dataset.step = step + 1; el.src = chain[step]; return; }
+  console.warn("[100WILD] Bild saknas:", el.dataset.orig || cur);
+  el.style.display = "none";
+}
+
 /* ═══════════════════════════════════════════════════════════════
    LANGUAGE CONTEXT
    ═══════════════════════════════════════════════════════════════ */
@@ -121,7 +157,7 @@ const BIOMES_SHOWCASE_EN = [
 
 const EXPEDITIONS_SV = [
   { id: "pantanal", name: "PANTANAL", themeId: "amazon", color: "#4caf50", icon: "🐆",
-    photo: "https://i.ibb.co/NgD6YxRR/latin-america-pantanal-capybara-family-emma-healey-gallery.jpg", grad: "linear-gradient(135deg, #0a1e0a, #2e5e2e)",
+    photo: "bilder/pantanal.jpg", grad: "linear-gradient(135deg, #0a1e0a, #2e5e2e)",
     status: "NÄSTA EXPEDITION", window: "Sep 2026",
     tagline: "Världens största våtmark.",
     frame: "Den tätaste rovdjurskoncentrationen på jorden, där land och vatten flyter ihop till en enda värld.",
@@ -134,7 +170,7 @@ const EXPEDITIONS_SV = [
     ],
     cost: "90 000 kr", slots: 2 },
   { id: "timor", name: "TIMOR-LESTE", themeId: "ocean", color: "#039be5", icon: "🐋",
-    photo: "https://i.ibb.co/JwWGJpFL/Freediving-with-Whales-in-Timor-Leste.jpg", grad: "linear-gradient(135deg, #04101f, #0b3a5c)",
+    photo: "bilder/timor.jpg", grad: "linear-gradient(135deg, #04101f, #0b3a5c)",
     status: "PLANERAD", window: "Nov 2026",
     tagline: "Världens mest artrika hav.",
     frame: "De största djur som någonsin levt gömmer sig utanför ett av jordens minst besökta länder.",
@@ -150,7 +186,7 @@ const EXPEDITIONS_SV = [
 
 const EXPEDITIONS_EN = [
   { id: "pantanal", name: "PANTANAL", themeId: "amazon", color: "#4caf50", icon: "🐆",
-    photo: "https://i.ibb.co/NgD6YxRR/latin-america-pantanal-capybara-family-emma-healey-gallery.jpg", grad: "linear-gradient(135deg, #0a1e0a, #2e5e2e)",
+    photo: "bilder/pantanal.jpg", grad: "linear-gradient(135deg, #0a1e0a, #2e5e2e)",
     status: "NEXT EXPEDITION", window: "Sep 2026",
     tagline: "The world's largest wetland.",
     frame: "The densest concentration of predators on Earth, where land and water blur into a single world.",
@@ -163,7 +199,7 @@ const EXPEDITIONS_EN = [
     ],
     cost: "90,000 kr", slots: 2 },
   { id: "timor", name: "TIMOR-LESTE", themeId: "ocean", color: "#039be5", icon: "🐋",
-    photo: "https://i.ibb.co/JwWGJpFL/Freediving-with-Whales-in-Timor-Leste.jpg", grad: "linear-gradient(135deg, #04101f, #0b3a5c)",
+    photo: "bilder/timor.jpg", grad: "linear-gradient(135deg, #04101f, #0b3a5c)",
     status: "PLANNED", window: "Nov 2026",
     tagline: "The most biodiverse water on Earth.",
     frame: "The largest animals that have ever lived, hiding off one of the least-visited countries on the planet.",
@@ -486,7 +522,7 @@ function ExpCard({ photo, idx }) {
         <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", borderRadius: 8, overflow: "hidden",
           border: "1px solid rgba(255,255,255,0.08)", background: photo.grad }}>
           <img src={photo.src} alt={photo.label} style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }}
-            onError={e => { e.target.style.display = "none"; }} />
+            onError={imgFail} />
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 50%)" }} />
           <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <span style={{ fontSize: 32, opacity: 0.15 }}>{photo.icon}</span>
@@ -581,49 +617,49 @@ function LangToggle({ lang, setLang }) {
    TRIP CAROUSEL
    ═══════════════════════════════════════════════════════════════ */
 const TRIP_SLIDES = [
-  { src: "https://i.ibb.co/Jw8Qz1mM/LOOKINGBACK.jpg",
+  { src: "bilder/tiger/lookingback.jpg",
     sv: "Drömmen är uppfylld, tigern är nu en del av kollektionen!",
     en: "The dream is fulfilled, the tiger is now part of the collection!" },
-  { src: "https://i.ibb.co/Fqg3v4hm/RB2.jpg",
+  { src: "bilder/tiger/rb2.jpg",
     sv: "Firar med Red Bulls lokala limited edition-smak Blueberry Blackcurrant efter en framgångsrik trek genom Bardias olika biomer och ett tigermöte.",
     en: "Celebrating with Red Bull's local limited edition flavour Blueberry Blackcurrant after a successful trek through Bardia's biomes and a tiger encounter." },
-  { src: "https://i.ibb.co/PGtwrNxx/RVRC.jpg",
+  { src: "bilder/tiger/rvrc.jpg",
     sv: "I RevolutionRace Nordwand. Stretchig nog att slänga benen över motorcykeln, tålig nog att kasta sig ner i gräset och gruset.",
     en: "In RevolutionRace Nordwand. Stretchy enough to swing onto the motorcycle, tough enough to throw yourself down in the grass and gravel." },
-  { src: "https://i.ibb.co/tPJqxdVj/SAFARRI.jpg",
+  { src: "bilder/tiger/safarri.jpg",
     sv: "Rezdar lär sig navigera med en jeep, off-road jungle edition.",
     en: "Rezdar learning to navigate a jeep, off-road jungle edition." },
-  { src: "https://i.ibb.co/1FMtJTH/SUN.jpg",
+  { src: "bilder/tiger/sun.jpg",
     sv: "Vid solnedgången, varje kväll förvandlas solen och blir illröd. Mystiskt!",
     en: "At sunset, every evening the sun transformed into a fiery red. Mysterious!" },
-  { src: "https://i.ibb.co/k6Bg5m32/WALK.jpg",
+  { src: "bilder/tiger/walk.jpg",
     sv: "Trekking genom vildmarken. Närsomhelst kan vad som helst hända...",
     en: "Trekking through the wilderness. At any moment, anything can happen..." },
-  { src: "https://i.ibb.co/3m6PrTx7/TIGERSIGN.jpg",
+  { src: "bilder/tiger/tigersign.jpg",
     sv: "Tigern är den ensamma härskaren här.",
     en: "The tiger is the lone ruler here." },
-  { src: "https://i.ibb.co/1YG0Dyns/TREEHOUSE.jpg",
+  { src: "bilder/tiger/treehouse.jpg",
     sv: "Overnight in a treehouse, vi fångade en tigerjakt på natten. Håll utkik!",
     en: "Overnight in a treehouse, we caught a tiger hunt at night. Stay tuned!" },
-  { src: "https://i.ibb.co/Y7hCN0nM/O-GAMOTO-GAV2.jpg",
+  { src: "bilder/tiger/o-gamoto-gav2.jpg",
     sv: "Öga mot öga mot en tiger i det vilda, inget slår känslan.",
     en: "Eye to eye with a tiger in the wild, nothing beats that feeling." },
-  { src: "https://i.ibb.co/HLS0Z2DF/CROCODILESIGN.jpg",
+  { src: "bilder/tiger/crocodilesign.jpg",
     sv: "Äkta vildmark med Mugger-krokodiler som lurar i vattnet. Det gäller att vara på sin vakt!",
     en: "Real wilderness with mugger crocodiles lurking in the water. You have to stay alert!" },
-  { src: "https://i.ibb.co/PGyLKRm7/RB.jpg",
+  { src: "bilder/tiger/rb.jpg",
     sv: "Uppladdning inför varje expedition! Eller är Rezdar beroende av smaken? Den var otrolig!",
     en: "Fuelling up before every expedition! Or is Rezdar addicted to the flavour? It was incredible!" },
-  { src: "https://i.ibb.co/MD7DKGWB/CAMPING.jpg",
+  { src: "bilder/tiger/camping.jpg",
     sv: "Contemplating... var det här en bra idé?",
     en: "Contemplating... was this a good idea?" },
-  { src: "https://i.ibb.co/jPn82dZT/RVRC-KEPS.jpg",
+  { src: "bilder/tiger/rvrc-keps.jpg",
     sv: "Känslan när tigern är på väg, gående rakt mot en.",
     en: "The feeling when the tiger is on its way, walking straight toward you." },
-  { src: "https://i.ibb.co/rft8WfnZ/IMG-0066.jpg",
+  { src: "bilder/tiger/img-0066.jpg",
     sv: "Tigerspår, vi är nära nu!",
     en: "Tiger tracks, we're close now!" },
-  { src: "https://i.ibb.co/99GB1YL3/IMG-0079-2.jpg",
+  { src: "bilder/tiger/img-0079-2.jpg",
     sv: "Krishna Shah, mannen som överlevde en tigerattack. Tigerspårare åt BBC och David Attenborough för serien \"Entangled Asia\".",
     en: "Krishna Shah, the man who survived a tiger attack. Tiger tracker for BBC and David Attenborough on the series \"Entangled Asia\"." },
 ];
@@ -672,7 +708,7 @@ function TripCarousel() {
               border: "1px solid rgba(255,143,0,0.22)", background: "#1a0f04" }}>
               <img src={sl.src} alt="" loading={idx < 2 ? "eager" : "lazy"}
                 style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
-                onError={e => { e.target.style.display = "none"; }} />
+                onError={imgFail} />
               <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18,10,4,0.95) 0%, transparent 50%)", pointerEvents: "none" }} />
               <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "14px 14px 13px" }}>
                 <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "clamp(11px,1.05vw,13px)", color: "rgba(255,255,255,.93)", lineHeight: 1.5, margin: 0, textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
@@ -789,8 +825,8 @@ function App() {
           }}>
             {/* photo / hero band */}
             <div style={{ position: "relative", aspectRatio: "21/9", background: "linear-gradient(135deg, #1a0f04, #4a2c0a)", overflow: "hidden" }}>
-              <img src="https://i.ibb.co/Jw8Qz1mM/LOOKINGBACK.jpg" alt="Bardia tiger" style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }}
-                onError={e => { e.target.style.display = "none"; }} />
+              <img src="bilder/tiger/lookingback.jpg" alt="Bardia tiger" style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }}
+                onError={imgFail} />
               <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18,10,4,0.98) 0%, rgba(18,10,4,0.85) 22%, rgba(18,10,4,0.35) 50%, rgba(18,10,4,0.15) 100%)" }} />
 
               {/* photo credit */}
@@ -872,7 +908,7 @@ function App() {
                 {/* Photo header */}
                 <div style={{ position: "relative", aspectRatio: "16/9", background: ex.grad, overflow: "hidden" }}>
                   <img src={ex.photo} alt={ex.name} style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }}
-                    onError={e => { e.target.style.display = "none"; }} />
+                    onError={imgFail} />
                   <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(8,10,14,0.95) 5%, transparent 60%)" }} />
                   <div style={{ position: "absolute", top: 14, left: 14, display: "inline-flex", alignItems: "center", gap: 6,
                     padding: "5px 11px", borderRadius: 6, background: `${ex.color}18`, border: `1px solid ${ex.color}45`,
@@ -927,7 +963,7 @@ function App() {
               <Reveal>
                 <div style={{ borderRadius: 12, overflow: "hidden", border: `1px solid ${biome.color}20`, aspectRatio: "3/4", position: "relative", background: biome.grad }}>
                   <img src={biome.photo} alt={biome.name} style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }}
-                    onError={e => { e.target.style.display = "none"; }} />
+                    onError={imgFail} />
                   <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 50%)" }} />
                   <div style={{ position: "absolute", bottom: 12, left: 12, right: 12 }}>
                     <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 14, letterSpacing: 3, color: biome.color }}>{biome.name}</div>
