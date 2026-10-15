@@ -3,22 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Expedition Amazonas med Rezdar | Gruppresa 17–23 okt 2027</title>
+<title>Expedition Amazonas med Rezdar 17–23 okt 2027</title>
 <meta name="description" content="Följ med Rezdar på en sju dagar lång gruppresa till Amazonas. Manaus, djungelläger vid Rio Negro, hängmatta, urfolkssamhälle och vattenfall. Max 12 resenärer, 26 900 kr.">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://rezdar.com/rezdarsresor/">
 
-<!-- Ikoner: ligger i roten av rezdar.com -->
-<link rel="icon" href="/favicon.ico" sizes="48x48">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<!-- Ikoner: ligger i samma mapp som sidan -->
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-96.png" type="image/png" sizes="96x96">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#1F3A2E">
 
 <!-- Delning i sociala medier -->
 <meta property="og:type" content="website">
 <meta property="og:locale" content="sv_SE">
-<meta property="og:site_name" content="100WILD by Rezdar">
+<meta property="og:site_name" content="Zoom Fotoresor">
 <meta property="og:title" content="Expedition Amazonas med Rezdar">
 <meta property="og:description" content="Sju dagar i världens största regnskog. Manaus, Rio Negro, djungelläger och vattenfall. Max 12 resenärer.">
 <meta property="og:url" content="https://rezdar.com/rezdarsresor/">
@@ -47,7 +46,7 @@
       {"@type": "ListItem", "position": 3, "name": "Presidente Figueiredo"}
     ]
   },
-  "provider": {"@type": "Person", "name": "Rezdar", "url": "https://www.youtube.com/@Rezdar1"},
+  "provider": {"@type": "Organization", "name": "Zoom Fotoresor"},
   "offers": {
     "@type": "Offer",
     "price": "26900",
@@ -99,11 +98,22 @@ section{padding:clamp(4rem,9vw,7rem) 0}
 /* Topbar */
 .top{position:fixed;inset:0 0 auto;z-index:20;padding-top:env(safe-area-inset-top,0px);transition:background .25s}
 .top .wrap{display:flex;justify-content:space-between;align-items:center;height:64px}
-.brand{font-family:var(--display);font-weight:800;font-size:1.15rem;color:var(--on-dark);text-decoration:none;letter-spacing:.01em}
+.brand{white-space:nowrap;font-family:var(--display);font-weight:800;font-size:1.15rem;color:var(--on-dark);text-decoration:none;letter-spacing:.01em}
 .top.solid{background:var(--forest);box-shadow:0 1px 0 rgba(255,255,255,.06)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;font-family:var(--display);font-weight:700;font-size:1rem;padding:.8rem 1.4rem;border-radius:999px;border:0;background:#E3A54A;color:#1A1208;text-decoration:none;cursor:pointer}
 .btn:hover{background:#EDB765}
 .btn.small{padding:.55rem 1.05rem;font-size:.95rem}
+.top-right{display:flex;align-items:center;gap:.7rem}
+.top .btn{gap:0;white-space:pre}
+.seats{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--display);font-weight:600;font-size:.92rem;padding:.42rem .9rem;border-radius:999px;background:rgba(14,24,18,.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#F4F1E8;border:1px solid rgba(227,165,74,.5);white-space:nowrap}
+.seats s{opacity:.55;text-decoration-color:#E3A54A;text-decoration-thickness:2px}
+.seats b{color:#E3A54A;font-weight:800}
+.seats .dot{width:.5rem;height:.5rem;border-radius:50%;background:#E3A54A;flex:none;animation:seatpulse 2.2s ease-out infinite}
+@keyframes seatpulse{0%{box-shadow:0 0 0 0 rgba(227,165,74,.65)}70%{box-shadow:0 0 0 9px rgba(227,165,74,0)}100%{box-shadow:0 0 0 0 rgba(227,165,74,0)}}
+@media (prefers-reduced-motion: reduce){.seats .dot{animation:none}}
+.seats.big{font-size:1.05rem;padding:.55rem 1.1rem;margin-top:.9rem}
+@media (max-width:420px){.top .wrap{width:calc(100% - 1.5rem)}.brand{font-size:.92rem !important}.top .seats .dot{display:none}}
+@media (max-width:520px){.top .lg{display:none}.brand{font-size:1rem}.top-right{gap:.45rem}.top .seats{padding:.38rem .7rem;font-size:.85rem}}
 
 /* Hero */
 .hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;color:var(--on-dark);
@@ -216,8 +226,11 @@ footer nav{display:flex;gap:1.3rem}
 
 <header class="top" id="top">
   <div class="wrap">
-    <a class="brand" href="#">100WILD</a>
-    <a class="btn small" href="#boka">Boka din plats</a>
+    <a class="brand" href="#">Zoom Fotoresor</a>
+    <div class="top-right">
+      <span class="seats" aria-label="11 av 12 platser kvar"><span class="dot" aria-hidden="true"></span><s class="seats-total">12</s> <b class="seats-left">11</b><span class="seats-label"><span class="lg"> platser</span> kvar</span></span>
+      <a class="btn small" href="#boka">Boka<span class="lg"> din plats</span></a>
+    </div>
   </div>
 </header>
 
@@ -384,7 +397,7 @@ footer nav{display:flex;gap:1.3rem}
       <img class="portrait" src="rezdar.jpg" alt="Rezdar i fält med kameran" width="600" height="750" onerror="this.remove();document.getElementById('guideWrap').classList.add('no-photo')">
       <div class="prose">
         <h2>Res med Rezdar</h2>
-        <p>Rezdar är äventyraren och filmaren bakom 100WILD, med närmare 800 000 följare på YouTube, Instagram och TikTok. Han söker sig till platser långt från turiststråken och har tagit sina tittare med till Amazonas, Sahara, Uganda och Svalbard.</p>
+        <p>Rezdar är äventyraren och filmaren med över 750 000 följare på YouTube, Instagram och TikTok. Han söker sig till platser långt från turiststråken och har tagit sina tittare med till Amazonas, Sahara, Uganda och Svalbard.</p>
         <p>Hans styrka är kombinationen av äventyrslust och ett skarpt öga för foto och film. Han vet hur man rör sig i tuff terräng och hur man fångar ögonblicket när ljuset är som bäst. Den kunskapen delar han generöst under hela resan, med praktiska tips som syns redan i dina första bilder.</p>
         <nav class="social" aria-label="Rezdar i sociala medier">
           <a href="https://www.youtube.com/@Rezdar1" rel="noopener" target="_blank">YouTube</a>
@@ -401,12 +414,13 @@ footer nav{display:flex;gap:1.3rem}
         <h2>Boka din plats</h2>
         <div class="price">
           <div class="amount">26 900 kr</div>
-          <small>per person i delat dubbelrum. Max 12 platser.</small>
+          <small>per person i delat dubbelrum</small>
+          <span class="seats big" aria-label="11 av 12 platser kvar"><span class="dot" aria-hidden="true"></span><s class="seats-total">12</s> <b class="seats-left">11</b><span class="seats-label"><span class="lg"> platser</span> kvar</span></span>
         </div>
       </div>
 
       <form id="bookingForm" novalidate>
-        <input class="hp" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
 
         <fieldset>
           <legend>Dina kontaktuppgifter</legend>
@@ -501,7 +515,7 @@ footer nav{display:flex;gap:1.3rem}
 
 <footer>
   <div class="wrap">
-    <span>100WILD by Rezdar, Rezdar Digital © 2026</span>
+    <span>Zoom Fotoresor © 2026</span>
     <nav aria-label="Sociala medier">
       <a href="https://www.youtube.com/@Rezdar1" rel="noopener" target="_blank">YouTube</a>
       <a href="https://www.instagram.com/rezdar/" rel="noopener" target="_blank">Instagram</a>
@@ -512,10 +526,23 @@ footer nav{display:flex;gap:1.3rem}
 
 <script>
 /* ===== INSTÄLLNINGAR =====
-   FORM_ENDPOINT: adress som tar emot bokningen (t.ex. Formspree eller en Firebase-funktion).
-   Lämnas den tom öppnas besökarens e-postprogram med bokningen ifylld till BOOKING_EMAIL. */
-const FORM_ENDPOINT = "";
-const BOOKING_EMAIL = "info@rezdar.com";
+   FORMSUBMIT_ALIAS: slumpsträngen från FormSubmits aktiveringsmejl till info@zoomfotoresor.se.
+   Så länge den är tom öppnas besökarens e-postprogram med bokningen ifylld i stället. */
+const FORMSUBMIT_ALIAS = "";
+const BOOKING_EMAIL = "info@zoomfotoresor.se";
+const FORM_ENDPOINT = FORMSUBMIT_ALIAS ? "https://formsubmit.co/ajax/" + FORMSUBMIT_ALIAS : "";
+
+/* Platser kvar: ändra SEATS_LEFT när någon bokar */
+const SEATS_TOTAL = 12;
+const SEATS_LEFT = 11;
+document.querySelectorAll(".seats").forEach(el => {
+  el.setAttribute("aria-label", SEATS_LEFT > 0 ? SEATS_LEFT + " av " + SEATS_TOTAL + " platser kvar" : "Fullbokat");
+  if (SEATS_LEFT <= 0){ el.innerHTML = "<b>Fullbokat</b>"; return; }
+  el.querySelector(".seats-total").textContent = SEATS_TOTAL;
+  el.querySelector(".seats-left").textContent = SEATS_LEFT;
+  if (SEATS_LEFT === SEATS_TOTAL) el.querySelector(".seats-total").remove();
+  if (SEATS_LEFT === 1) el.querySelector(".seats-label").innerHTML = '<span class="lg"> plats</span> kvar';
+});
 
 /* Topbar blir solid när man scrollar förbi hero */
 const topbar = document.getElementById("top");
@@ -564,15 +591,23 @@ form.addEventListener("submit", async e => {
     return;
   }
   const data = new FormData(form);
-  if (data.get("_gotcha")) return;
-  data.delete("_gotcha");
+  if (data.get("_honey")) return;
+  data.delete("_honey");
+  const tillagg = data.getAll("Tillägg");
+  data.delete("Tillägg");
+  data.append("Tillägg", tillagg.length ? tillagg.join(", ") : "Inga");
   data.append("Resa", "Expedition Amazonas 17–23 okt 2027");
 
   if (FORM_ENDPOINT){
     btn.disabled = true; btn.textContent = "Skickar…";
     try{
+      data.append("_subject", "Bokning Expedition Amazonas: " + data.get("Förnamn") + " " + data.get("Efternamn"));
+      data.append("_replyto", data.get("E-post"));
+      data.append("_template", "table");
+      data.append("_captcha", "false");
       const r = await fetch(FORM_ENDPOINT, {method:"POST", body:data, headers:{Accept:"application/json"}});
-      if (!r.ok) throw new Error(r.status);
+      const res = await r.json().catch(() => ({}));
+      if (!r.ok || String(res.success) !== "true") throw new Error(res.message || r.status);
       form.querySelectorAll("fieldset,.submit").forEach(el => el.style.display = "none");
       showStatus("Tack! Din bokning är skickad. Du får en bekräftelse med nästa steg via e-post.");
     }catch(err){
@@ -583,9 +618,7 @@ form.addEventListener("submit", async e => {
   }
 
   const lines = [];
-  const tillagg = data.getAll("Tillägg");
-  for (const [k, v] of data.entries()){ if (k !== "Tillägg" && v) lines.push(k + ": " + v); }
-  lines.push("Tillägg: " + (tillagg.length ? tillagg.join(", ") : "Inga"));
+  for (const [k, v] of data.entries()){ if (v) lines.push(k + ": " + v); }
   const subject = "Bokning Expedition Amazonas: " + data.get("Förnamn") + " " + data.get("Efternamn");
   location.href = "mailto:" + BOOKING_EMAIL + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(lines.join("\n"));
   showStatus("Ditt e-postprogram öppnas med bokningen ifylld. Skicka mejlet för att slutföra.");
