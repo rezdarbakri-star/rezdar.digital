@@ -21,10 +21,10 @@
 <meta property="og:title" content="Expedition Amazonas med Rezdar">
 <meta property="og:description" content="Sju dagar i världens största regnskog. Manaus, Rio Negro, djungelläger och vattenfall. Max 12 resenärer.">
 <meta property="og:url" content="https://rezdar.com/rezdarsresor/">
-<meta property="og:image" content="https://rezdar.com/rezdarsresor/hero.jpg">
+<meta property="og:image" content="https://rezdar.com/rezdarsresor/bilder/bat-pa-floden-1600.webp">
 <meta name="twitter:card" content="summary_large_image">
 
-<link rel="preload" as="image" href="hero.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="bilder/bat-pa-floden-1600.webp" imagesrcset="bilder/bat-pa-floden-1000.webp 1000w, bilder/bat-pa-floden-1600.webp 1600w" imagesizes="100vw" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
@@ -36,7 +36,7 @@
   "name": "Expedition Amazonas med Rezdar",
   "description": "Sju dagar i Amazonas: Manaus, djungelläger vid Rio Negro, urfolkssamhälle, piraya-fiske och vattenfallen i Presidente Figueiredo. Max 12 resenärer.",
   "url": "https://rezdar.com/rezdarsresor/",
-  "image": "https://rezdar.com/rezdarsresor/hero.jpg",
+  "image": "https://rezdar.com/rezdarsresor/bilder/bat-pa-floden-1600.webp",
   "touristType": "Äventyrsresenärer",
   "itinerary": {
     "@type": "ItemList",
@@ -117,9 +117,11 @@ section{padding:clamp(4rem,9vw,7rem) 0}
 
 /* Hero */
 .hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;color:var(--on-dark);
-  background:#1F3A2E url("hero.jpg") center/cover no-repeat;padding:0}
-.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,16,12,.55) 0%,rgba(8,16,12,0) 28%,rgba(8,16,12,.15) 50%,rgba(8,16,12,.86) 100%)}
-.hero .wrap{position:relative;padding:8rem 0 clamp(2.5rem,6vw,4.5rem)}
+  background:#1F3A2E;padding:0;overflow:hidden}
+.hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 60%}
+.hero::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(8,16,12,.72) 0%,rgba(8,16,12,.35) 45%,rgba(8,16,12,0) 75%),linear-gradient(180deg,rgba(8,16,12,.5) 0%,rgba(8,16,12,0) 25%,rgba(8,16,12,.1) 50%,rgba(8,16,12,.85) 100%)}
+@media (max-width:720px){.hero::before{background:linear-gradient(180deg,rgba(8,16,12,.55) 0%,rgba(8,16,12,.5) 40%,rgba(8,16,12,.88) 100%)}}
+.hero .wrap{position:relative;z-index:2;padding:8rem 0 clamp(2.5rem,6vw,4.5rem)}
 .hero h1{font-size:clamp(3.4rem,11vw,8.5rem);font-weight:800;line-height:.92;letter-spacing:-.035em;max-width:10ch}
 .hero .lead{font-size:clamp(1.1rem,2vw,1.3rem);max-width:34rem;margin:1.4rem 0 2rem;color:#E9E6DC}
 .facts{display:grid;grid-template-columns:repeat(4,auto);gap:1.2rem 2.6rem;margin:0 0 2.2rem;padding:1.4rem 0 0;border-top:1px solid rgba(244,241,232,.3);width:fit-content;max-width:100%}
@@ -132,9 +134,17 @@ section{padding:clamp(4rem,9vw,7rem) 0}
 @media (max-width:720px){.facts{grid-template-columns:1fr 1fr}}
 
 /* Intro */
-.intro .wrap{display:grid;grid-template-columns:1fr 1.25fr;gap:clamp(2rem,6vw,5rem);align-items:start}
-.intro h2{position:sticky;top:110px}
-@media (max-width:860px){.intro .wrap{grid-template-columns:1fr}.intro h2{position:static}}
+.intro .wrap{display:grid;grid-template-columns:1.15fr 1fr;gap:clamp(2rem,6vw,5rem);align-items:center}
+.intro h2{margin-bottom:1.6rem}
+.photo{margin:0}
+.photo img{display:block;width:100%;height:100%;object-fit:cover;border-radius:18px;background:var(--line)}
+.intro .photo img{aspect-ratio:4/5}
+@media (max-width:860px){.intro .wrap{grid-template-columns:1fr}.intro .photo img{aspect-ratio:4/3}}
+.band{margin-top:clamp(2.5rem,6vw,4rem)}
+.band img{aspect-ratio:16/7;object-position:center 75%}
+@media (max-width:760px){.band img{aspect-ratio:4/3}}
+.day-photo{margin:1.4rem 0 1.2rem;max-width:400px}
+.day-photo img{aspect-ratio:4/5;object-position:center 40%}
 .intro p:first-child::first-line{font-weight:600}
 
 /* Platser */
@@ -143,6 +153,9 @@ section{padding:clamp(4rem,9vw,7rem) 0}
 .places .grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2rem,5vw,4rem)}
 .places h3{font-size:1.6rem;margin-bottom:.8rem;color:#E3A54A}
 .places p{color:#DAD6CA}
+.places .wild-label{font-family:var(--display);font-weight:700;color:#F4F1E8;margin:1.4rem 0 .6rem}
+.wild{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:.5rem}
+.wild li{font-family:var(--display);font-size:.92rem;padding:.35rem .85rem;border-radius:999px;border:1px solid rgba(227,165,74,.5);color:#F4F1E8}
 @media (max-width:760px){.places .grid{grid-template-columns:1fr}}
 
 /* Program */
@@ -173,7 +186,7 @@ section{padding:clamp(4rem,9vw,7rem) 0}
 
 /* Rezdar */
 .guide .wrap{display:grid;grid-template-columns:auto 1fr;gap:clamp(2rem,5vw,4rem);align-items:center}
-.guide .portrait{width:clamp(180px,26vw,300px);aspect-ratio:4/5;object-fit:cover;border-radius:18px}
+.guide .portrait{width:clamp(220px,32vw,380px);height:auto;aspect-ratio:4/5;object-fit:cover;border-radius:18px}
 .guide .wrap.no-photo{grid-template-columns:1fr}
 .guide h2{margin-bottom:1.2rem}
 .social{display:flex;gap:1.4rem;font-family:var(--display);font-weight:700;margin-top:1.4rem}
@@ -236,6 +249,7 @@ footer nav{display:flex;gap:1.3rem}
 
 <main>
   <section class="hero">
+    <img class="hero-img" src="bilder/bat-pa-floden-1000.webp" srcset="bilder/bat-pa-floden-1000.webp 1000w, bilder/bat-pa-floden-1600.webp 1600w" sizes="100vw" width="1000" height="1500" alt="Träbåt med blått tak på Rio Negro framför regnskogen" fetchpriority="high" decoding="async">
     <div class="wrap">
       <h1>Expedition Amazonas</h1>
       <p class="lead">Sju dagar i världens största regnskog. Vi bor vid Rio Negro, sover i hängmatta vid flodstranden och lär oss djungeln av guider som har den som sitt andra hem. Rezdar leder resan och lär dig fånga den med kameran.</p>
@@ -254,12 +268,15 @@ footer nav{display:flex;gap:1.3rem}
 
   <section class="intro">
     <div class="wrap">
+      <div>
       <h2>Amazonas på nära håll</h2>
       <div class="prose">
         <p>Båten glider ut på Rio Negros mörka, spegelblanka vatten och regnskogen tätnar längs stränderna för varje mil. Du tänder eld i fuktig djungel, dricker vatten direkt ur lianer, fiskar piraya med handlina och spanar efter rosa floddelfiner medan apor och papegojor rör sig i trädkronorna.</p>
         <p>Mellan djungeldagarna väntar Manaus, staden som blev en av världens rikaste under gummiboomen och som bär det arvet i operahuset Teatro Amazonas. Veckan avslutas i Presidente Figueiredo, vattenfallens land, med kristallklara bäckar och naturliga pooler att bada i.</p>
         <p>Rezdar är med hela veckan som reseledare och foto- och filmcoach. Han visar hur du fångar ljuset, hittar vinklarna och vågar gå nära, så att du kommer hem med bilder som berättar resan.</p>
       </div>
+      </div>
+      <figure class="photo"><img src="bilder/tradtopparna-1000.webp" srcset="bilder/tradtopparna-1000.webp 1000w, bilder/tradtopparna-1600.webp 1600w" sizes="(max-width:860px) 100vw, 45vw" width="1000" height="1500" alt="Palmer och trädkronor i regnskogen i eftermiddagsljus" loading="lazy" decoding="async"></figure>
     </div>
   </section>
 
@@ -274,8 +291,11 @@ footer nav{display:flex;gap:1.3rem}
         <div>
           <h3>Rio Negro och regnskogen</h3>
           <p>Rio Negros vatten är mörkt som starkt te, färgat av garvämnen från regnskogen. Trädkronorna speglar sig i ytan, rosa floddelfiner bryter vattnet och i skymningen fylls skogen av cikador, grodor och nattens djur. Floden är vägen in, och längs stränderna tätnar en av jordens mest levande vildmarker.</p>
+          <p class="wild-label">Med chans att se</p>
+          <ul class="wild"><li>Rosa floddelfiner</li><li>Kajmaner</li><li>Papegojor och aror</li><li>Apor</li><li>Sengångare</li></ul>
         </div>
       </div>
+      <figure class="photo band"><img src="bilder/vatten-i-djungeln-1000.webp" srcset="bilder/vatten-i-djungeln-1000.webp 1000w, bilder/vatten-i-djungeln-1600.webp 1600w" sizes="(max-width:1160px) 100vw, 1120px" width="1000" height="1500" alt="Tefärgat vatten rinner genom tät regnskog" loading="lazy" decoding="async"></figure>
     </div>
   </section>
 
@@ -300,7 +320,7 @@ footer nav{display:flex;gap:1.3rem}
             <p class="date">Måndag 18 oktober</p>
             <h3>Stadsrundtur i Manaus</h3>
             <p>Vi utforskar Amazonas huvudstad: det historiska centrumet, Teatro Amazonas och de livliga kvarteren där moderna Manaus växer fram mitt i regnskogen. Dagens höjdpunkt är den lokala marknaden med färgstarka stånd fulla av tropiska frukter, flodfisk och kryddor, en perfekt plats för foto och film.</p>
-            <p>Eftermiddag och kväll på egen hand.</p>
+            <p>På eftermiddagen tar vi båten till Mötet mellan vattnen, där det mörka Rio Negro och det ljusbruna Solimões flyter sida vid sida i flera kilometer innan de blandas till Amazonfloden. Kvällen på egen hand.</p>
             <ul class="meals" aria-label="Måltider som ingår"><li>Frukost</li></ul>
           </div>
         </li>
@@ -309,7 +329,7 @@ footer nav{display:flex;gap:1.3rem}
           <div class="day-body">
             <p class="date">Tisdag 19 oktober</p>
             <h3>Expedition Amazonas</h3>
-            <p>Efter frukost tar båten oss ut på Rio Negro till Base Jaguar, lägret vid flodstranden som blir vårt hem i två nätter. Guiderna, med urfolksbakgrund och bakgrund i Brasiliens djungelarmé, leder första vandringen in i regnskogen. De visar hur man rör sig i tät djungel, hittar väderstreck med hjälp av skogen och känner igen ätbara växter, medicinalväxter och växter man håller avstånd till.</p>
+            <p>Efter frukost tar båten oss ut på Rio Negro till Base Jaguar, lägret vid flodstranden som blir vårt hem i två nätter. Guiderna, med urfolksbakgrund och bakgrund i Brasiliens djungelarmé, leder första vandringen in i regnskogen. De visar hur man rör sig i tät djungel, hittar väderstreck med hjälp av skogen och känner igen ätbara växter, medicinalväxter och växter man håller avstånd till. Längs vägen stannar vi vid regnskogens jätteträd samaúma, och med lite tur får vi syn på en sengångare högt uppe i trädkronorna.</p>
             <p>Vi dricker vatten direkt ur lianer och äter lunch lagad över öppen eld, serverad på palmblad. Eftermiddagen avslutas med ett bad i en bäck med kristallklart källvatten. I lägret lär du dig tända eld i den fuktiga regnskogen, och efter middagen somnar du i hängmattan till ljudet av cikador, grodor och nattens djur.</p>
             <ul class="meals" aria-label="Måltider som ingår"><li>Frukost</li><li>Lunch</li><li>Middag</li></ul>
           </div>
@@ -319,8 +339,9 @@ footer nav{display:flex;gap:1.3rem}
           <div class="day-body">
             <p class="date">Onsdag 20 oktober</p>
             <h3>Livet vid floden</h3>
-            <p>Vi vaknar före solen. Kaffet kokas vid elden medan dimman lättar över trädkronorna, och soluppgången över floden blir ett perfekt tillfälle att använda fototipsen. Med båten besöker vi ett av flodens urfolkssamhällen och får se maten, hantverket och traditionerna hos människor som levt med skogen i generationer.</p>
-            <p>På eftermiddagen fiskar vi piraya med handlina, och fångsten blir en del av kvällens middag. Längs stränderna spanar vi efter rosa floddelfiner, apor och papegojor medan Rezdar visar hur man filmar från båt och fångar djur i rörelse. När mörkret fallit glider vi ut igen och sveper med ficklamporna längs strandkanten efter djungelns nattliv.</p>
+            <p>Vi vaknar före solen. Kaffet kokas vid elden medan dimman lättar över trädkronorna. Gryningen är djurens tid, med chans att se papegojor och aror flyga över floden och höra vrålaporna ropa i skogen, och soluppgången blir ett perfekt tillfälle att använda fototipsen. Med båten besöker vi ett av flodens urfolkssamhällen och får se maten, hantverket och traditionerna hos människor som levt med skogen i generationer.</p>
+            <p>På eftermiddagen fiskar vi piraya med handlina, och fångsten blir en del av kvällens middag. Längs stränderna har vi chans att se rosa floddelfiner, apor och papegojor medan Rezdar visar hur man filmar från båt och fångar djur i rörelse. När mörkret fallit glider vi ut igen och sveper med ficklamporna längs strandkanten, med chans att se kajmanernas ögon lysa i mörkret.</p>
+            <figure class="photo day-photo"><img src="bilder/piraya-i-handen-1000.webp" srcset="bilder/piraya-i-handen-1000.webp 1000w, bilder/piraya-i-handen-1600.webp 1600w" sizes="400px" width="1000" height="1500" alt="Rezdar håller upp en piraya i kanoten" loading="lazy" decoding="async"></figure>
             <ul class="meals" aria-label="Måltider som ingår"><li>Frukost</li><li>Lunch</li><li>Middag</li></ul>
           </div>
         </li>
@@ -369,6 +390,7 @@ footer nav{display:flex;gap:1.3rem}
             <li>Måltider enligt programmet</li>
             <li>Välkomstdrink, välkomstmiddag och avskedsmiddag</li>
             <li>Stadsrundtur i Manaus med besök på lokal marknad</li>
+            <li>Båttur till Mötet mellan vattnen</li>
             <li>Djungelprogrammet med lokala guider och alla aktiviteter</li>
             <li>Dagsutflykt till vattenfallen i Presidente Figueiredo</li>
             <li>Transporter enligt programmet</li>
@@ -394,7 +416,7 @@ footer nav{display:flex;gap:1.3rem}
 
   <section class="guide">
     <div class="wrap" id="guideWrap">
-      <img class="portrait" src="rezdar.jpg" alt="Rezdar i fält med kameran" width="600" height="750" onerror="this.remove();document.getElementById('guideWrap').classList.add('no-photo')">
+      <img class="portrait" src="bilder/rezdar-i-djungeln-1000.webp" srcset="bilder/rezdar-i-djungeln-1000.webp 1000w, bilder/rezdar-i-djungeln-1600.webp 1600w" sizes="380px" width="1000" height="1500" alt="Rezdar ler mitt i regnskogen" loading="lazy" decoding="async" style="object-position:center 30%">
       <div class="prose">
         <h2>Res med Rezdar</h2>
         <p>Rezdar är äventyraren och filmaren med över 750 000 följare på YouTube, Instagram och TikTok. Han söker sig till platser långt från turiststråken och har tagit sina tittare med till Amazonas, Sahara, Uganda och Svalbard.</p>
