@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Aktivera bokningsformuläret</title>
+<style>
+  body{font-family:system-ui,sans-serif;background:#F1F4EE;color:#16231C;margin:0;display:grid;place-items:center;min-height:100vh;padding:1.5rem}
+  .card{background:#fff;max-width:30rem;padding:2rem;border-radius:16px;box-shadow:0 2px 20px rgba(0,0,0,.06)}
+  h1{font-size:1.4rem;margin:0 0 .8rem}
+  p{line-height:1.6;margin:0 0 1rem}
+  button{font:inherit;font-weight:700;background:#1F3A2E;color:#fff;border:0;border-radius:999px;padding:.85rem 1.5rem;cursor:pointer}
+  .note{font-size:.92rem;color:#4A5A50;margin-top:1.2rem}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Aktivera bokningsformuläret</h1>
+  <p>Klicka på knappen en gång. Då skickas ett testmejl till <strong>info@zoomfotoresor.se</strong> från FormSubmit.</p>
+  <form action="https://formsubmit.co/info@zoomfotoresor.se" method="POST" target="_blank">
+    <input type="hidden" name="_subject" value="Aktivering: bokningsformulär Expedition Amazonas">
+    <input type="hidden" name="_captcha" value="false">
+    <input type="hidden" name="Meddelande" value="Testinskick från rezdar.com/rezdarsresor för att aktivera bokningsformuläret.">
+    <button type="submit">Skicka aktiveringsmejl</button>
+  </form>
+  <p class="note">Efter klicket: Alle öppnar mejlet från FormSubmit, klickar på "Activate Form" och skickar slumpsträngen (aliaset) till Rezdar.</p>
+</div>
+</body>
+</html>
