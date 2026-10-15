@@ -161,6 +161,10 @@ section{padding:clamp(4rem,9vw,7rem) 0}
 /* Program */
 .program h2{margin-bottom:.8rem}
 .program .note{max-width:38rem;color:var(--muted);margin-bottom:3rem}
+.program-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:clamp(2rem,5vw,4.5rem);align-items:start}
+.program-photo{position:sticky;top:100px}
+.program-photo img{aspect-ratio:3/4;object-position:center 45%}
+@media (max-width:960px){.program-grid{grid-template-columns:1fr}.program-photo{position:static;grid-row:1}.program-photo img{aspect-ratio:4/3}}
 .days{list-style:none;margin:0;padding:0;position:relative}
 .days::before{content:"";position:absolute;left:2.35rem;top:.5rem;bottom:.5rem;width:3px;background:linear-gradient(var(--tea),var(--forest));border-radius:3px;opacity:.55}
 .day{display:grid;grid-template-columns:4.7rem 1fr;gap:1.6rem;padding-bottom:3rem;position:relative}
@@ -252,7 +256,7 @@ footer nav{display:flex;gap:1.3rem}
     <img class="hero-img" src="https://rezdar.com/rezdarsresor/bilder/bat-pa-floden-1000.webp" srcset="https://rezdar.com/rezdarsresor/bilder/bat-pa-floden-1000.webp 1000w, https://rezdar.com/rezdarsresor/bilder/bat-pa-floden-1600.webp 1600w" sizes="100vw" width="1000" height="1500" alt="Träbåt med blått tak på Rio Negro framför regnskogen" fetchpriority="high" decoding="async">
     <div class="wrap">
       <h1>Expedition Amazonas</h1>
-      <p class="lead">Sju dagar i världens största regnskog. Vi bor vid Rio Negro, sover i hängmatta vid flodstranden och lär oss djungeln av guider som har den som sitt andra hem. Rezdar leder resan och lär dig fånga den med kameran.</p>
+      <p class="lead">Sju dagar i världens största regnskog. Vi bor vid Rio Negro, sover i hängmatta vid flodstranden och lär oss djungeln av guider som har den som sitt andra hem. Rezdar leder resan och filmar den, så att du kommer hem med bilder och film från veckan.</p>
       <dl class="facts">
         <div><dt>Datum</dt><dd>17–23 okt 2027</dd></div>
         <div><dt>Längd</dt><dd>7 dagar, 6 nätter</dd></div>
@@ -273,7 +277,7 @@ footer nav{display:flex;gap:1.3rem}
       <div class="prose">
         <p>Båten glider ut på Rio Negros mörka, spegelblanka vatten och regnskogen tätnar längs stränderna för varje mil. Du tänder eld i fuktig djungel, dricker vatten direkt ur lianer, fiskar piraya med handlina och spanar efter rosa floddelfiner medan apor och papegojor rör sig i trädkronorna.</p>
         <p>Mellan djungeldagarna väntar Manaus, staden som blev en av världens rikaste under gummiboomen och som bär det arvet i operahuset Teatro Amazonas. Veckan avslutas i Presidente Figueiredo, vattenfallens land, med kristallklara bäckar och naturliga pooler att bada i.</p>
-        <p>Rezdar är med hela veckan som reseledare och foto- och filmcoach. Han visar hur du fångar ljuset, hittar vinklarna och vågar gå nära, så att du kommer hem med bilder som berättar resan.</p>
+        <p>Rezdar är med hela veckan som reseledare och videograf. Han filmar och fotograferar resan, från marken och med drönare, och efter resan får du ta del av bilderna och filmerna. Du kan vara helt närvarande i upplevelsen och ändå komma hem med minnen i toppkvalitet.</p>
       </div>
       </div>
       <figure class="photo"><img src="https://rezdar.com/rezdarsresor/bilder/tradtopparna-1000.webp" srcset="https://rezdar.com/rezdarsresor/bilder/tradtopparna-1000.webp 1000w, https://rezdar.com/rezdarsresor/bilder/tradtopparna-1600.webp 1600w" sizes="(max-width:860px) 100vw, 45vw" width="1000" height="1500" alt="Palmer och trädkronor i regnskogen i eftermiddagsljus" loading="lazy" decoding="async"></figure>
@@ -302,7 +306,8 @@ footer nav{display:flex;gap:1.3rem}
   <section class="program" id="program">
     <div class="wrap">
       <h2>Dag för dag</h2>
-      <p class="note">Under de första dagarna håller Rezdar en genomgång för alla som vill: hur du fångar ljuset, hittar rätt vinklar och vågar gå nära. Enkla knep som gör stor skillnad när det bär ut i regnskogen.</p>
+      <p class="note">Rezdar filmar och fotograferar hela veckan, från marken och med drönare. Efter resan delar han bilderna och filmerna med alla i gruppen.</p>
+      <div class="program-grid">
       <ol class="days">
         <li class="day">
           <div class="num" aria-hidden="true">1</div>
@@ -339,8 +344,8 @@ footer nav{display:flex;gap:1.3rem}
           <div class="day-body">
             <p class="date">Onsdag 20 oktober</p>
             <h3>Livet vid floden</h3>
-            <p>Vi vaknar före solen. Kaffet kokas vid elden medan dimman lättar över trädkronorna. Gryningen är djurens tid, med chans att se papegojor och aror flyga över floden och höra vrålaporna ropa i skogen, och soluppgången blir ett perfekt tillfälle att använda fototipsen. Med båten besöker vi ett av flodens urfolkssamhällen och får se maten, hantverket och traditionerna hos människor som levt med skogen i generationer.</p>
-            <p>På eftermiddagen fiskar vi piraya med handlina, och fångsten blir en del av kvällens middag. Längs stränderna har vi chans att se rosa floddelfiner, apor och papegojor medan Rezdar visar hur man filmar från båt och fångar djur i rörelse. När mörkret fallit glider vi ut igen och sveper med ficklamporna längs strandkanten, med chans att se kajmanernas ögon lysa i mörkret.</p>
+            <p>Vi vaknar före solen. Kaffet kokas vid elden medan dimman lättar över trädkronorna. Gryningen är djurens tid, med chans att se papegojor och aror flyga över floden och höra vrålaporna ropa i skogen, och soluppgången över floden blir en av veckans vackraste stunder. Med båten besöker vi ett av flodens urfolkssamhällen och får se maten, hantverket och traditionerna hos människor som levt med skogen i generationer.</p>
+            <p>På eftermiddagen fiskar vi piraya med handlina, och fångsten blir en del av kvällens middag. Längs stränderna har vi chans att se rosa floddelfiner, apor och papegojor medan Rezdar filmar från båten. När mörkret fallit glider vi ut igen och sveper med ficklamporna längs strandkanten, med chans att se kajmanernas ögon lysa i mörkret.</p>
             <figure class="photo day-photo"><img src="https://rezdar.com/rezdarsresor/bilder/piraya-i-handen-1000.webp" srcset="https://rezdar.com/rezdarsresor/bilder/piraya-i-handen-1000.webp 1000w, https://rezdar.com/rezdarsresor/bilder/piraya-i-handen-1600.webp 1600w" sizes="400px" width="1000" height="1500" alt="Rezdar håller upp en piraya i kanoten" loading="lazy" decoding="async"></figure>
             <ul class="meals" aria-label="Måltider som ingår"><li>Frukost</li><li>Lunch</li><li>Middag</li></ul>
           </div>
@@ -375,6 +380,8 @@ footer nav{display:flex;gap:1.3rem}
           </div>
         </li>
       </ol>
+        <figure class="photo program-photo"><img src="https://rezdar.com/rezdarsresor/bilder/kanot-ovanifran-1000.webp" srcset="https://rezdar.com/rezdarsresor/bilder/kanot-ovanifran-1000.webp 1000w, https://rezdar.com/rezdarsresor/bilder/kanot-ovanifran-1600.webp 1600w" sizes="(max-width:960px) 100vw, 420px" width="1000" height="1333" alt="Kanot på Rio Negro sedd uppifrån, omgiven av översvämmad regnskog" loading="lazy" decoding="async"></figure>
+      </div>
     </div>
   </section>
 
@@ -394,7 +401,8 @@ footer nav{display:flex;gap:1.3rem}
             <li>Djungelprogrammet med lokala guider och alla aktiviteter</li>
             <li>Dagsutflykt till vattenfallen i Presidente Figueiredo</li>
             <li>Transporter enligt programmet</li>
-            <li>Rezdar som reseledare och foto- och filmcoach</li>
+            <li>Rezdar som reseledare och videograf</li>
+            <li>Bilder och filmer från resan, inklusive drönarbilder</li>
             <li>Resegaranti</li>
           </ul>
         </div>
@@ -420,7 +428,7 @@ footer nav{display:flex;gap:1.3rem}
       <div class="prose">
         <h2>Res med Rezdar</h2>
         <p>Rezdar är äventyraren och filmaren med över 750 000 följare på YouTube, Instagram och TikTok. Han söker sig till platser långt från turiststråken och har tagit sina tittare med till Amazonas, Sahara, Uganda och Svalbard.</p>
-        <p>Hans styrka är kombinationen av äventyrslust och ett skarpt öga för foto och film. Han vet hur man rör sig i tuff terräng och hur man fångar ögonblicket när ljuset är som bäst. Den kunskapen delar han generöst under hela resan, med praktiska tips som syns redan i dina första bilder.</p>
+        <p>Hans styrka är kombinationen av äventyrslust och ett skarpt öga för foto och film. Han vet hur man rör sig i tuff terräng och hur man fångar ögonblicket när ljuset är som bäst. Under resan filmar och fotograferar han gruppen, och efteråt får du bilderna och filmerna som minne från veckan.</p>
         <nav class="social" aria-label="Rezdar i sociala medier">
           <a href="https://www.youtube.com/@Rezdar1" rel="noopener" target="_blank">YouTube</a>
           <a href="https://www.instagram.com/rezdar/" rel="noopener" target="_blank">Instagram</a>
