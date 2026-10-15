@@ -1,7 +1,0 @@
-User-agent: *
-# Privata appar och verktyg: ska inte synas på Google
-Disallow: /ekonomi/
-# Lägg till fler mappar här vid behov, en rad per mapp, t.ex.
-# Disallow: /mappnamn/
-
-Sitemap: https://rezdar.com/sitemap.xml
