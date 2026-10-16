@@ -123,15 +123,18 @@ section{padding:clamp(4rem,9vw,7rem) 0}
 @media (max-width:720px){.hero::before{background:linear-gradient(180deg,rgba(8,16,12,.55) 0%,rgba(8,16,12,.5) 40%,rgba(8,16,12,.88) 100%)}}
 .hero .wrap{position:relative;z-index:2;padding:8rem 0 clamp(2.5rem,6vw,4.5rem)}
 .hero h1{font-size:clamp(3.4rem,11vw,8.5rem);font-weight:800;line-height:.92;letter-spacing:-.035em;max-width:10ch}
-.hero .lead{font-size:clamp(1.1rem,2vw,1.3rem);max-width:34rem;margin:1.4rem 0 2rem;color:#E9E6DC}
-.facts{display:grid;grid-template-columns:repeat(4,auto);gap:1.2rem 2.6rem;margin:0 0 2.2rem;padding:1.4rem 0 0;border-top:1px solid rgba(244,241,232,.3);width:fit-content;max-width:100%}
+.hero .lead{text-wrap:pretty;font-size:clamp(1.1rem,2vw,1.3rem);max-width:34rem;margin:1.4rem 0 2rem;color:#E9E6DC}
+.facts{display:grid;grid-template-columns:repeat(5,auto);gap:1.2rem 2.6rem;margin:0 0 2.2rem;padding:1.4rem 0 0;border-top:1px solid rgba(244,241,232,.3);width:fit-content;max-width:100%}
 .facts div{min-width:0}
 .facts dt{font-family:var(--display);font-size:.85rem;color:#CFC9B8}
 .facts dd{margin:0;font-family:var(--display);font-weight:700;font-size:1.15rem}
 .hero-cta{display:flex;flex-wrap:wrap;align-items:center;gap:1.2rem 1.6rem}
 .hero-price{font-family:var(--display);font-size:1rem;color:#E9E6DC}
 .hero-price strong{font-size:1.5rem;color:#fff}
-@media (max-width:720px){.facts{grid-template-columns:1fr 1fr}}
+.fact-usp dd{color:#E3A54A}
+@media (min-width:1361px){.facts{gap:1.2rem 1.7rem}.facts dd{white-space:nowrap}}
+@media (max-width:1360px){.facts{grid-template-columns:repeat(3,auto)}}
+@media (max-width:720px){.facts{grid-template-columns:1fr 1fr}.fact-usp{grid-column:1 / -1}}
 
 /* Intro */
 .intro .wrap{display:grid;grid-template-columns:1.15fr 1fr;gap:clamp(2rem,6vw,5rem);align-items:center}
@@ -256,12 +259,13 @@ footer nav{display:flex;gap:1.3rem}
     <img class="hero-img" src="https://rezdar.com/rezdarsresor/bilder/bat-pa-floden-1000.webp" srcset="https://rezdar.com/rezdarsresor/bilder/bat-pa-floden-1000.webp 1000w, https://rezdar.com/rezdarsresor/bilder/bat-pa-floden-1600.webp 1600w" sizes="100vw" width="1000" height="1500" alt="Träbåt med blått tak på Rio Negro framför regnskogen" fetchpriority="high" decoding="async">
     <div class="wrap">
       <h1>Expedition Amazonas</h1>
-      <p class="lead">Sju dagar i världens största regnskog. Vi bor vid Rio Negro, sover i hängmatta vid flodstranden och lär oss djungeln av guider med rötter i regnskogens urfolk. Filmaren Rezdar leder resan och filmar den, så att du kan leva i stunden och ändå få med dig minnen för livet.</p>
+      <p class="lead">Sju dagar i världens största regnskog. Vi bor vid Rio Negro, sover i hängmatta vid flodstranden och lär oss djungeln av guider med rötter i regnskogens urfolk. Filmaren Rezdar leder resan.</p>
       <dl class="facts">
         <div><dt>Datum</dt><dd>17–23 okt 2027</dd></div>
         <div><dt>Längd</dt><dd>7 dagar, 6 nätter</dd></div>
         <div><dt>Grupp</dt><dd>Max 12 resenärer</dd></div>
         <div><dt>Boende</dt><dd>Hotell och djungelläger</dd></div>
+        <div class="fact-usp"><dt>Ingår</dt><dd>Film och bilder från resan</dd></div>
       </dl>
       <div class="hero-cta">
         <a class="btn" href="#boka">Boka din plats</a>
@@ -277,7 +281,7 @@ footer nav{display:flex;gap:1.3rem}
       <div class="prose">
         <p>Båten glider ut på Rio Negros mörka, spegelblanka vatten och regnskogen tätnar längs stränderna för varje mil. Du tänder eld i fuktig djungel, dricker vatten direkt ur lianer, fiskar piraya med handlina och spanar efter rosa floddelfiner medan apor och papegojor rör sig i trädkronorna.</p>
         <p>Mellan djungeldagarna väntar Manaus, staden som blev en av världens rikaste under gummiboomen och som bär det arvet i operahuset Teatro Amazonas. Veckan avslutas i Presidente Figueiredo, vattenfallens land, med kristallklara bäckar och naturliga pooler att bada i.</p>
-        <p>Rezdar är med hela veckan som reseledare och videograf. Han filmar och fotograferar resan, från marken och med drönare, och efter resan får du ta del av bilderna och filmerna. Du lägger undan mobilen, är helt närvarande och kommer ändå hem med minnen som håller livet ut.</p>
+        <p>Rezdar är med hela veckan som reseledare och videograf. Han filmar och fotograferar resan, från marken och med drönare, och efter resan får du ta del av bilderna och filmerna. Du lever i stunden, och Rezdar fångar den på film.</p>
       </div>
       </div>
       <figure class="photo"><img src="https://rezdar.com/rezdarsresor/bilder/tradtopparna-1000.webp" srcset="https://rezdar.com/rezdarsresor/bilder/tradtopparna-1000.webp 1000w, https://rezdar.com/rezdarsresor/bilder/tradtopparna-1600.webp 1600w" sizes="(max-width:860px) 100vw, 45vw" width="1000" height="1500" alt="Palmer och trädkronor i regnskogen i eftermiddagsljus" loading="lazy" decoding="async"></figure>
