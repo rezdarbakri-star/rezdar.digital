@@ -143,7 +143,7 @@ section{padding:clamp(4rem,9vw,7rem) 0}
 .photo img{display:block;width:100%;height:100%;object-fit:cover;border-radius:18px;background:var(--line)}
 .intro .photo img{aspect-ratio:4/5}
 @media (max-width:860px){.intro .wrap{grid-template-columns:1fr}.intro .photo img{aspect-ratio:4/3}}
-.band{margin-top:clamp(2.5rem,6vw,4rem)}
+.band{margin-top:clamp(2rem,4vw,2.8rem)}
 .band img{aspect-ratio:16/7;object-position:center 75%}
 @media (max-width:760px){.band img{aspect-ratio:4/3}}
 .day-photo{margin:1.4rem 0 1.2rem;max-width:400px}
@@ -156,7 +156,8 @@ section{padding:clamp(4rem,9vw,7rem) 0}
 .places .grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2rem,5vw,4rem)}
 .places h3{font-size:1.6rem;margin-bottom:.8rem;color:#E3A54A}
 .places p{color:#DAD6CA}
-.places .wild-label{font-family:var(--display);font-weight:700;color:#F4F1E8;margin:1.4rem 0 .6rem}
+.wild-row{display:flex;flex-wrap:wrap;align-items:center;gap:.8rem 1.2rem;margin-top:clamp(2rem,4vw,2.8rem);padding-top:clamp(1.4rem,3vw,1.8rem);border-top:1px solid rgba(244,241,232,.18)}
+.places .wild-label{font-family:var(--display);font-weight:700;color:#F4F1E8;margin:0}
 .wild{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:.5rem}
 .wild li{font-family:var(--display);font-size:.92rem;padding:.35rem .85rem;border-radius:999px;border:1px solid rgba(227,165,74,.5);color:#F4F1E8}
 @media (max-width:760px){.places .grid{grid-template-columns:1fr}}
@@ -164,10 +165,7 @@ section{padding:clamp(4rem,9vw,7rem) 0}
 /* Program */
 .program h2{margin-bottom:.8rem}
 .program .note{max-width:38rem;color:var(--muted);margin-bottom:3rem}
-.program-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:clamp(2rem,5vw,4.5rem);align-items:start}
-.program-photo{position:sticky;top:100px}
-.program-photo img{aspect-ratio:3/4;object-position:center 45%}
-@media (max-width:960px){.program-grid{grid-template-columns:1fr}.program-photo{position:static;grid-row:1}.program-photo img{aspect-ratio:4/3}}
+.program-band img{object-position:center 50%}
 .days{list-style:none;margin:0;padding:0;position:relative}
 .days::before{content:"";position:absolute;left:2.35rem;top:.5rem;bottom:.5rem;width:3px;background:linear-gradient(var(--tea),var(--forest));border-radius:3px;opacity:.55}
 .day{display:grid;grid-template-columns:4.7rem 1fr;gap:1.6rem;padding-bottom:3rem;position:relative}
@@ -299,9 +297,11 @@ footer nav{display:flex;gap:1.3rem}
         <div>
           <h3>Rio Negro och regnskogen</h3>
           <p>Rio Negros vatten är mörkt som starkt te, färgat av garvämnen från regnskogen. Trädkronorna speglar sig i ytan, rosa floddelfiner bryter vattnet och i skymningen fylls skogen av cikador, grodor och nattens djur. Floden är vägen in, och längs stränderna tätnar en av jordens mest levande vildmarker.</p>
-          <p class="wild-label">Med chans att se</p>
-          <ul class="wild"><li>Rosa floddelfiner</li><li>Kajmaner</li><li>Papegojor och aror</li><li>Apor</li><li>Sengångare</li></ul>
         </div>
+      </div>
+      <div class="wild-row">
+        <p class="wild-label">Med chans att se</p>
+        <ul class="wild"><li>Rosa floddelfiner</li><li>Kajmaner</li><li>Papegojor och aror</li><li>Apor</li><li>Sengångare</li></ul>
       </div>
       <figure class="photo band"><img src="https://rezdar.com/rezdarsresor/bilder/vatten-i-djungeln-1000.webp" srcset="https://rezdar.com/rezdarsresor/bilder/vatten-i-djungeln-1000.webp 1000w, https://rezdar.com/rezdarsresor/bilder/vatten-i-djungeln-1600.webp 1600w" sizes="(max-width:1160px) 100vw, 1120px" width="1000" height="1500" alt="Tefärgat vatten rinner genom tät regnskog" loading="lazy" decoding="async"></figure>
     </div>
@@ -311,7 +311,6 @@ footer nav{display:flex;gap:1.3rem}
     <div class="wrap">
       <h2>Dag för dag</h2>
       <p class="note">Rezdar filmar och fotograferar hela veckan, från marken och med drönare. Efter resan delar han bilderna och filmerna med alla i gruppen.</p>
-      <div class="program-grid">
       <ol class="days">
         <li class="day">
           <div class="num" aria-hidden="true">1</div>
@@ -384,8 +383,7 @@ footer nav{display:flex;gap:1.3rem}
           </div>
         </li>
       </ol>
-        <figure class="photo program-photo"><img src="https://rezdar.com/rezdarsresor/kanot-ovanifran-1000.webp" srcset="https://rezdar.com/rezdarsresor/kanot-ovanifran-1000.webp 1000w, https://rezdar.com/rezdarsresor/kanot-ovanifran-1600.webp 1600w" sizes="(max-width:960px) 100vw, 420px" width="1000" height="1333" alt="Kanot på Rio Negro sedd uppifrån, omgiven av översvämmad regnskog" loading="lazy" decoding="async"></figure>
-      </div>
+      <figure class="photo band program-band"><img src="https://rezdar.com/rezdarsresor/kanot-ovanifran-1000.webp" srcset="https://rezdar.com/rezdarsresor/kanot-ovanifran-1000.webp 1000w, https://rezdar.com/rezdarsresor/kanot-ovanifran-1600.webp 1600w" sizes="(max-width:1160px) 100vw, 1120px" width="1000" height="1333" alt="Kanot på Rio Negro sedd uppifrån, omgiven av översvämmad regnskog" loading="lazy" decoding="async"></figure>
     </div>
   </section>
 
