@@ -234,6 +234,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--tea);outline:none;box
 .faq details[open] summary::after{transform:rotate(45deg)}
 .faq details p{padding-bottom:1.2rem;margin:0;color:var(--muted)}
 
+.legal{background:var(--surface);border-top:1px solid var(--line);padding:clamp(3rem,6vw,4.5rem) 0}
+.legal h2{font-size:1.5rem;margin-bottom:1rem}
+.legal p{max-width:46rem;color:var(--muted);font-size:1rem}
+.legal a{color:var(--tea);font-weight:600}
 footer{background:var(--forest);color:#CFC9B8;padding:2.5rem 0 calc(2.5rem + env(safe-area-inset-bottom,0px));font-family:var(--display);font-size:.95rem}
 footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1rem}
 footer nav{display:flex;gap:1.3rem}
@@ -540,6 +544,13 @@ footer nav{display:flex;gap:1.3rem}
         <summary>Behöver jag visum?</summary>
         <p>Svenska medborgare reser visumfritt till Brasilien i upp till 90 dagar. Passet ska vara giltigt i minst sex månader efter hemresan.</p>
       </details>
+    </div>
+  </section>
+  <section class="legal" id="resegaranti">
+    <div class="wrap">
+      <h2>Resegaranti</h2>
+      <p>Zoom Fotoresor är arrangör av samtliga arrangemang på denna webbsida. För de arrangemang som omfattas av resegarantilagen har Zoom Fotoresor ställt lagstadgad resegaranti till Kammarkollegiet. Resevillkor följer bestämmelserna i Lagen om Paketresor bortsett från eventuella specialvillkor enligt ovan.</p>
+      <p>För mer detaljer om villkor och resebestämmelser, vänligen besök <a href="https://zoomfotoresor.se/reseinformation/" rel="noopener" target="_blank">zoomfotoresor.se/reseinformation</a>.</p>
     </div>
   </section>
 </main>
