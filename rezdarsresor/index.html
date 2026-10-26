@@ -576,7 +576,7 @@ const FORM_ENDPOINT = FORMSUBMIT_ALIAS ? "https://formsubmit.co/ajax/" + FORMSUB
 
 /* Platser kvar: ändra SEATS_LEFT när någon bokar */
 const SEATS_TOTAL = 12;
-const SEATS_LEFT = 7;
+const SEATS_LEFT = 6;
 document.querySelectorAll(".seats").forEach(el => {
   el.setAttribute("aria-label", SEATS_LEFT > 0 ? SEATS_LEFT + " av " + SEATS_TOTAL + " platser kvar" : "Fullbokat");
   if (SEATS_LEFT <= 0){ el.innerHTML = "<b>Fullbokat</b>"; return; }
