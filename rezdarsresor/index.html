@@ -647,13 +647,51 @@ form.addEventListener("submit", async e => {
       data.append("_replyto", data.get("E-post"));
       data.append("_template", "table");
       data.append("_captcha", "false");
+      data.append("email", data.get("E-post"));
+      const v = k => (data.get(k) || "").toString().trim();
+      const n = parseInt(v("Antal personer")) || 1;
+      const rows = [
+        ["Resa", "Expedition Amazonas | Brasilien | 17–23/10 2027 | Rezdar"],
+        ["Namn", v("Förnamn") + " " + v("Efternamn")],
+        ["Postadress", v("Postadress")],
+        ["Postnummer", v("Postnummer")],
+        ["Ort", v("Ort")],
+        ["Land", v("Land")],
+        ["E-post", v("E-post")],
+        ["Mobil", v("Mobil")],
+        ["Antal personer", String(n)]
+      ];
+      for (let i = 1; i <= n; i++) rows.push(["Deltagare " + i, (v("Deltagare " + i + " förnamn") + " " + v("Deltagare " + i + " efternamn")).trim()]);
+      rows.push(["Tillägg", v("Tillägg") || "Inga"]);
+      if (v("Övrigt")) rows.push(["Övrigt", v("Övrigt")]);
+      if (v("Rabattkod")) rows.push(["Rabattkod", v("Rabattkod")]);
+      rows.push(["Jag godkänner att mina kontaktuppgifter som namn, e-post och telefon delas med de övriga deltagarna inför resan", v("Delning av kontaktuppgifter")]);
+      const confirmation = [
+        "BOKNINGSBEKRÄFTELSE",
+        "",
+        "Tack för din bokning, vi ser fram emot ett fantastiskt äventyr tillsammans!",
+        "",
+        "Faktura på handpenningen, 20% av resans pris, kommer att skickas ut snarast efter bokning av din resa. Slutfakturan skickas ut ca 10 veckor före avresa med betalning åtta veckor före avresa.",
+        "",
+        "Vi ber dig att inte boka några flyg innan minimiantalet för resan har uppnåtts. Så snart detta sker kommer vi att skicka ut ett mail till dig och då även ge mer detaljerad reseinformation/kontaktuppgifter om du t.ex. skulle vilja ha hjälp med att boka flyg.",
+        "",
+        "För frågor om din bokning och för mer information om Zoom Fotoresor:",
+        "Telefon: 0470-466 40 • Mail: info@zoomfotoresor.se",
+        "",
+        "DIN BOKNING",
+        ...rows.map(([k, val]) => k + ": " + val),
+        "",
+        "Zoom Fotoresor har ställt lagstadgad resegaranti till Kammarkollegiet."
+      ].join("\n");
+      data.append("_autoresponse", confirmation);
       const r = await fetch(FORM_ENDPOINT, {method:"POST", body:data, headers:{Accept:"application/json"}});
       const res = await r.json().catch(() => ({}));
       if (!r.ok || String(res.success) !== "true") throw new Error(res.message || r.status);
       form.querySelectorAll("fieldset,.submit").forEach(el => el.style.display = "none");
       showStatus("Tack! Din bokning är skickad. Du får en bekräftelse med nästa steg via e-post.");
     }catch(err){
-      showStatus("Bokningen kunde inte skickas just nu. Försök igen om en stund eller mejla " + BOOKING_EMAIL + ".");
+      console.error("FormSubmit:", err);
+      showStatus("Bokningen kunde inte skickas just nu. Försök igen om en stund eller mejla " + BOOKING_EMAIL + ". (Info: " + (err && err.message ? err.message : err) + ")");
       btn.disabled = false; btn.textContent = "Boka resan";
     }
     return;
