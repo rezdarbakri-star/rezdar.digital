@@ -689,11 +689,16 @@ form.addEventListener("submit", async e => {
       const r = await fetch(FORM_ENDPOINT, {method:"POST", body:data, headers:{Accept:"application/json"}});
       const res = await r.json().catch(() => ({}));
       if (!r.ok || String(res.success) !== "true") throw new Error(res.message || r.status);
+      let mailNote = "";
       try{
-        await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, { email: v("E-post"), message: confirmationHtml });
-      }catch(mailErr){ console.error("EmailJS:", mailErr); }
+        if (!window.emailjs) throw new Error("EmailJS laddades inte");
+        await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, { email: v("E-post"), message: confirmationHtml }, { publicKey: EMAILJS_PUBLIC_KEY });
+      }catch(mailErr){
+        console.error("EmailJS:", mailErr);
+        mailNote = " (Bekräftelsemejl: " + (mailErr && (mailErr.text || mailErr.message) || mailErr) + ")";
+      }
       form.querySelectorAll("fieldset,.submit").forEach(el => el.style.display = "none");
-      showStatus("Tack! Din bokning är skickad. Du får en bekräftelse med nästa steg via e-post.");
+      showStatus("Tack! Din bokning är skickad. Du får en bekräftelse med nästa steg via e-post." + mailNote);
     }catch(err){
       console.error("FormSubmit:", err);
       showStatus("Bokningen kunde inte skickas just nu. Försök igen om en stund eller mejla " + BOOKING_EMAIL + ". (Info: " + (err && err.message ? err.message : err) + ")");
