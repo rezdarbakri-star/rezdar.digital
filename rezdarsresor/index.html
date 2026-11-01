@@ -566,6 +566,7 @@ footer nav{display:flex;gap:1.3rem}
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4.4.1/dist/email.min.js"></script>
 <script>
 /* ===== INSTÄLLNINGAR =====
    FORMSUBMIT_ALIAS: slumpsträngen från FormSubmits aktiveringsmejl till alexander.elmqvist@zoomphototours.com.
@@ -573,6 +574,11 @@ footer nav{display:flex;gap:1.3rem}
 const FORMSUBMIT_ALIAS = "ec0462bdd589b9843583c4c349fb98dc";
 const BOOKING_EMAIL = "alexander.elmqvist@zoomphototours.com";
 const FORM_ENDPOINT = FORMSUBMIT_ALIAS ? "https://formsubmit.co/ajax/" + FORMSUBMIT_ALIAS : "";
+/* EmailJS: skickar bokningsbekräftelsen till kunden */
+const EMAILJS_SERVICE = "service_bhhowp3";
+const EMAILJS_TEMPLATE = "template_5915qrc";
+const EMAILJS_PUBLIC_KEY = "Vrc6Uf7sUCPo5OPCH";
+try{ emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY }); }catch(e){ console.error("EmailJS init:", e); }
 
 /* Platser kvar: ändra SEATS_LEFT när någon bokar */
 const SEATS_TOTAL = 12;
@@ -647,7 +653,6 @@ form.addEventListener("submit", async e => {
       data.append("_replyto", data.get("E-post"));
       data.append("_template", "table");
       data.append("_captcha", "false");
-      data.append("email", data.get("E-post"));
       const v = k => (data.get(k) || "").toString().trim();
       const n = parseInt(v("Antal personer")) || 1;
       const rows = [
@@ -666,27 +671,27 @@ form.addEventListener("submit", async e => {
       if (v("Övrigt")) rows.push(["Övrigt", v("Övrigt")]);
       if (v("Rabattkod")) rows.push(["Rabattkod", v("Rabattkod")]);
       rows.push(["Jag godkänner att mina kontaktuppgifter som namn, e-post och telefon delas med de övriga deltagarna inför resan", v("Delning av kontaktuppgifter")]);
-      const confirmation = [
-        "BOKNINGSBEKRÄFTELSE",
-        "",
-        "Tack för din bokning, vi ser fram emot ett fantastiskt äventyr tillsammans!",
-        "",
-        "Faktura på handpenningen, 20% av resans pris, kommer att skickas ut snarast efter bokning av din resa. Slutfakturan skickas ut ca 10 veckor före avresa med betalning åtta veckor före avresa.",
-        "",
-        "Vi ber dig att inte boka några flyg innan minimiantalet för resan har uppnåtts. Så snart detta sker kommer vi att skicka ut ett mail till dig och då även ge mer detaljerad reseinformation/kontaktuppgifter om du t.ex. skulle vilja ha hjälp med att boka flyg.",
-        "",
-        "För frågor om din bokning och för mer information om Zoom Fotoresor:",
-        "Telefon: 0470-466 40 • Mail: info@zoomfotoresor.se",
-        "",
-        "DIN BOKNING",
-        ...rows.map(([k, val]) => k + ": " + val),
-        "",
-        "Zoom Fotoresor har ställt lagstadgad resegaranti till Kammarkollegiet."
-      ].join("\n");
-      data.append("_autoresponse", confirmation);
+      const esc = t => String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+      const P = t => '<p style="margin:0 0 14px">' + t + '</p>';
+      const confirmationHtml =
+        '<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.55;color:#1d1d1d;max-width:620px">' +
+        '<h2 style="font-size:20px;margin:0 0 16px;letter-spacing:.02em">BOKNINGSBEKRÄFTELSE</h2>' +
+        P('Tack för din bokning, vi ser fram emot ett fantastiskt äventyr tillsammans!') +
+        P('Faktura på handpenningen, 20% av resans pris, kommer att skickas ut snarast efter bokning av din resa. Slutfakturan skickas ut ca 10 veckor före avresa med betalning åtta veckor före avresa.') +
+        P('Vi ber dig att inte boka några flyg innan minimiantalet för resan har uppnåtts. Så snart detta sker kommer vi att skicka ut ett mail till dig och då även ge mer detaljerad reseinformation/kontaktuppgifter om du t.ex. skulle vilja ha hjälp med att boka flyg.') +
+        P('För frågor om din bokning och för mer information om Zoom Fotoresor:<br>Telefon: 0470-466 40 • Mail: <a href="mailto:info@zoomfotoresor.se">info@zoomfotoresor.se</a>') +
+        '<table style="border-collapse:collapse;width:100%;margin:22px 0;font-size:14px">' +
+        rows.map(([k, val]) => '<tr><td style="padding:7px 12px 7px 0;border-bottom:1px solid #e3e3e3;color:#666;vertical-align:top;width:42%">' + esc(k) + '</td><td style="padding:7px 0;border-bottom:1px solid #e3e3e3;vertical-align:top">' + esc(val) + '</td></tr>').join("") +
+        '</table>' +
+        P('Zoom Fotoresor har ställt lagstadgad resegaranti till Kammarkollegiet.') +
+        '</div>';
+
       const r = await fetch(FORM_ENDPOINT, {method:"POST", body:data, headers:{Accept:"application/json"}});
       const res = await r.json().catch(() => ({}));
       if (!r.ok || String(res.success) !== "true") throw new Error(res.message || r.status);
+      try{
+        await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, { email: v("E-post"), message: confirmationHtml });
+      }catch(mailErr){ console.error("EmailJS:", mailErr); }
       form.querySelectorAll("fieldset,.submit").forEach(el => el.style.display = "none");
       showStatus("Tack! Din bokning är skickad. Du får en bekräftelse med nästa steg via e-post.");
     }catch(err){
