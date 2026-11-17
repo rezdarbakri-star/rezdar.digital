@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>100WILD Content Flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0a; --ink:#ffffff; --muted:rgba(255,255,255,.45); --faint:rgba(255,255,255,.12);
+    --red:#e3000f; --yt:#ff3d3d; --tt:#25f4ee; --ig:#e1306c; --en:#22c55e; --exp:#ff8f00;
+  }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#0a0a0a; --ink:#ffffff; } }
+  :root[data-theme="dark"]{ --bg:#0a0a0a; --ink:#ffffff; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:var(--bg);color:var(--ink);font-family:'Space Mono',ui-monospace,monospace;min-height:100%}
+  body{display:flex;flex-direction:column;align-items:center;padding:28px 16px 40px;
+    background:radial-gradient(ellipse at 50% 30%, rgba(227,0,15,.07), var(--bg) 70%)}
+  .tag{font-size:11px;letter-spacing:6px;color:var(--red);text-align:center}
+  .tag::after{content:'';display:block;width:40px;height:2px;background:var(--red);margin:12px auto 0}
+  h1{font-family:'Bebas Neue',Impact,sans-serif;font-weight:400;font-size:clamp(40px,8vw,84px);letter-spacing:3px;line-height:.9;text-align:center;margin-top:18px}
+  .stage{width:100%;max-width:1040px;margin-top:22px;position:relative}
+  svg{width:100%;height:auto;display:block;overflow:visible}
+  .lbl{font-family:'Space Mono',monospace;fill:var(--muted);font-size:13px;letter-spacing:2px}
+  .big{font-family:'Bebas Neue',Impact,sans-serif;fill:var(--ink);letter-spacing:2px}
+  .bottom{margin-top:18px;text-align:center;font-family:'Bebas Neue',Impact,sans-serif;font-size:clamp(22px,4vw,38px);letter-spacing:2px;opacity:0;transition:opacity .8s}
+  .bottom b{color:var(--en);font-weight:400}
+  button{margin-top:22px;padding:10px 20px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.04);
+    color:var(--ink);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;cursor:pointer}
+  button:focus-visible{outline:2px solid var(--en);outline-offset:3px}
+  .note{margin-top:14px;font-size:10px;letter-spacing:1px;color:rgba(255,255,255,.3);text-align:center;max-width:560px;line-height:1.6}
+</style>
+</head>
+<body>
+  <div class="tag">PROTOTYP · CONTENT-MOTORN</div>
+  <h1>EN EXPEDITION. ÖVERALLT.</h1>
+  <div class="stage"><svg id="svg" role="img" aria-label="En expedition blir ett YouTube-avsnitt och 15 till 20 kortformat på TikTok, Instagram och det engelska kontot"></svg></div>
+  <div class="bottom" id="bottom">1 EXPEDITION → 1 YOUTUBE-AVSNITT → <b>18 SHORT-FORMS</b></div>
+  <button id="replay">↻ SPELA IGEN</button>
+  <div class="note">Prototyp. Siffrorna: YouTube 215K prenumeranter, TikTok 486K, Instagram 78K, @rezdarwild 793K visningar på Bardia-klippen.</div>
+
+<script>
+(() => {
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("svg");
+  const bottom = document.getElementById("bottom");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const css = getComputedStyle(document.documentElement);
+  const C = k => css.getPropertyValue(k).trim();
+
+  const PLATFORMS = [
+    { id: "tt", name: "TIKTOK", sub: "486K FÖLJARE", color: C("--tt"), icon: "♪", count: 8 },
+    { id: "ig", name: "INSTAGRAM", sub: "78K FÖLJARE", color: C("--ig"), icon: "◎", count: 5 },
+    { id: "en", name: "ENGELSKA", sub: "@REZDARWILD · 793K VISNINGAR", color: C("--en"), icon: "EN", count: 5 },
+  ];
+  const TOTAL = PLATFORMS.reduce((a, p) => a + p.count, 0);
+
+  let raf, start, L, el;
+
+  function mk(tag, attrs, parent) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    (parent || svg).appendChild(e);
+    return e;
+  }
+
+  function layout() {
+    const narrow = svg.parentElement.clientWidth < 640;
+    if (narrow) {
+      svg.setAttribute("viewBox", "0 0 400 820");
+      return { narrow, W: 400, H: 820,
+        exp: { x: 200, y: 70 }, yt: { x: 200, y: 290 },
+        plats: [{ x: 66, y: 690 }, { x: 200, y: 690 }, { x: 334, y: 690 }], r: 46, pr: 34 };
+    }
+    svg.setAttribute("viewBox", "0 0 1000 660");
+    return { narrow, W: 1000, H: 660,
+      exp: { x: 120, y: 300 }, yt: { x: 420, y: 300 },
+      plats: [{ x: 860, y: 80 }, { x: 860, y: 300 }, { x: 860, y: 520 }], r: 58, pr: 46 };
+  }
+
+  function node(x, y, r, color, icon, title, sub, iconSize, small) {
+    const g = mk("g", { opacity: 0, transform: `translate(${x},${y})` });
+    mk("circle", { r: r + 14, fill: color, opacity: .08 }, g);
+    mk("circle", { r, fill: "#0c0c12", stroke: color, "stroke-width": 2.5 }, g);
+    const ic = mk("text", { "text-anchor": "middle", "dominant-baseline": "central", class: "big", "font-size": iconSize || r * .8, fill: color }, g);
+    ic.style.fill = color; ic.textContent = icon;
+    const t = mk("text", { "text-anchor": "middle", y: r + (small ? 26 : 34), class: "big", "font-size": small ? 19 : 26 }, g); t.textContent = title;
+    const s = mk("text", { "text-anchor": "middle", y: r + (small ? 42 : 54), class: "lbl", "font-size": small ? 8 : 11 }, g); s.textContent = sub;
+    return { g, t, s };
+  }
+
+  function build() {
+    cancelAnimationFrame(raf);
+    svg.innerHTML = ""; bottom.style.opacity = 0;
+    L = layout();
+    el = {};
+    // EXP -> YT line
+    const d1 = L.narrow ? `M${L.exp.x},${L.exp.y + L.r} L${L.yt.x},${L.yt.y - L.r}` : `M${L.exp.x + L.r},${L.exp.y} L${L.yt.x - L.r},${L.yt.y}`;
+    el.line1 = mk("path", { d: d1, stroke: C("--exp"), "stroke-width": 3, fill: "none", "stroke-linecap": "round" });
+    const len1 = el.line1.getTotalLength();
+    el.line1.style.strokeDasharray = len1; el.line1.style.strokeDashoffset = len1; el.len1 = len1;
+
+    el.trails = mk("g", {});
+    el.exp = node(L.exp.x, L.exp.y, L.r, C("--exp"), "🐅", "1 EXPEDITION", "BARDIA, NEPAL");
+    el.yt = node(L.yt.x, L.yt.y, L.r, C("--yt"), "▶", "1 YOUTUBE-AVSNITT", "215K PRENUMERANTER", L.r * .7);
+    el.plats = PLATFORMS.map((p, i) => {
+      const sub = L.narrow && p.id === "en" ? "@REZDARWILD" : p.sub;
+      const n = node(L.plats[i].x, L.plats[i].y, L.pr, p.color, p.icon, p.name, sub, p.id === "en" ? L.pr * .55 : L.pr * .75, L.narrow);
+      const badge = mk("text", L.narrow ? { "text-anchor": "middle", y: -L.pr - 12, class: "big", "font-size": 22 } : { "text-anchor": "start", x: L.pr + 10, y: -L.pr + 14, class: "big", "font-size": 26 }, n.g);
+      badge.style.fill = p.color; badge.textContent = "";
+      return { ...p, ...n, badge, got: 0, pos: L.plats[i] };
+    });
+    // central counter by YT
+    const cx = L.narrow ? 345 : L.yt.x, cy = L.narrow ? L.yt.y + 8 : L.yt.y + L.r + 110;
+    el.counter = mk("text", { x: cx, y: cy, "text-anchor": "middle", class: "big", "font-size": L.narrow ? 46 : 64, opacity: 0 });
+    el.counter.style.fill = C("--en");
+    el.counterLbl = mk("text", { x: cx, y: cy + (L.narrow ? 18 : 24), "text-anchor": "middle", class: "lbl", "font-size": L.narrow ? 9 : 13, opacity: 0 });
+    el.counterLbl.textContent = "SHORT-FORMS";
+    el.particles = mk("g", {});
+
+    // schedule clips
+    el.clips = [];
+    const order = [];
+    PLATFORMS.forEach((p, pi) => { for (let k = 0; k < p.count; k++) order.push(pi); });
+    order.sort(() => Math.random() - .5);
+    order.forEach((pi, k) => el.clips.push({ pi, t0: 3.3 + k * 0.28, dur: 1.15, bend: (Math.random() - .5) * (L.narrow ? 160 : 220), done: false }));
+    el.got = 0;
+    start = performance.now();
+    if (reduce) { finalState(); return; }
+    raf = requestAnimationFrame(tick);
+  }
+
+  const ease = t => 1 - Math.pow(1 - t, 3);
+  const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+
+  function bez(a, c, b, t) {
+    const u = 1 - t;
+    return { x: u * u * a.x + 2 * u * t * c.x + t * t * b.x, y: u * u * a.y + 2 * u * t * c.y + t * t * b.y };
+  }
+
+  function clipPath(clip) {
+    const a = L.yt, b = el.plats[clip.pi].pos;
+    const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+    const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy) || 1;
+    const c = { x: mx - dy / len * clip.bend, y: my + dx / len * clip.bend };
+    return { a, b, c };
+  }
+
+  function tick(now) {
+    const t = (now - start) / 1000;
+    el.exp.g.setAttribute("opacity", clamp(t / .6));
+    el.line1.style.strokeDashoffset = el.len1 * (1 - ease(clamp((t - .8) / 1.2)));
+    el.yt.g.setAttribute("opacity", clamp((t - 1.8) / .5));
+    el.plats.forEach((p, i) => p.g.setAttribute("opacity", clamp((t - 2.5 - i * .15) / .5)));
+    el.counter.setAttribute("opacity", clamp((t - 3.1) / .4)); el.counterLbl.setAttribute("opacity", clamp((t - 3.1) / .4));
+
+    for (const clip of el.clips) {
+      const lt = (t - clip.t0) / clip.dur;
+      if (lt < 0) continue;
+      const P = clipPath(clip), p = el.plats[clip.pi];
+      if (!clip.trail) {
+        clip.trail = mk("path", { d: `M${P.a.x},${P.a.y} Q${P.c.x},${P.c.y} ${P.b.x},${P.b.y}`, stroke: p.color, "stroke-width": 1.5, fill: "none", opacity: .35 }, el.trails);
+        clip.tlen = clip.trail.getTotalLength();
+        clip.trail.style.strokeDasharray = clip.tlen; clip.trail.style.strokeDashoffset = clip.tlen;
+        clip.dot = mk("rect", { width: 12, height: 20, rx: 3, fill: p.color }, el.particles);
+      }
+      const e = ease(clamp(lt));
+      clip.trail.style.strokeDashoffset = clip.tlen * (1 - e);
+      const q = bez(P.a, P.c, P.b, e);
+      clip.dot.setAttribute("x", q.x - 6); clip.dot.setAttribute("y", q.y - 10);
+      clip.dot.setAttribute("opacity", lt >= 1 ? 0 : 1);
+      if (lt >= 1 && !clip.done) {
+        clip.done = true; p.got++; el.got++;
+        p.badge.textContent = "+" + p.got;
+        p.g.querySelector("circle").setAttribute("opacity", .3);
+        setTimeout(() => p.g.querySelector("circle").setAttribute("opacity", .08), 180);
+      }
+    }
+    el.counter.textContent = el.got;
+    if (el.got >= TOTAL) bottom.style.opacity = 1;
+    if (t < 3.3 + TOTAL * .28 + 2) raf = requestAnimationFrame(tick);
+  }
+
+  function finalState() {
+    el.exp.g.setAttribute("opacity", 1); el.yt.g.setAttribute("opacity", 1);
+    el.line1.style.strokeDashoffset = 0;
+    el.plats.forEach(p => { p.g.setAttribute("opacity", 1); p.badge.textContent = "+" + p.count; });
+    el.clips.forEach(clip => { const P = clipPath(clip); mk("path", { d: `M${P.a.x},${P.a.y} Q${P.c.x},${P.c.y} ${P.b.x},${P.b.y}`, stroke: el.plats[clip.pi].color, "stroke-width": 1.5, fill: "none", opacity: .35 }, el.trails); });
+    el.counter.setAttribute("opacity", 1); el.counterLbl.setAttribute("opacity", 1); el.counter.textContent = TOTAL;
+    bottom.style.opacity = 1;
+  }
+
+  document.getElementById("replay").addEventListener("click", build);
+  let rw; addEventListener("resize", () => { clearTimeout(rw); rw = setTimeout(build, 250); });
+  document.fonts && document.fonts.ready ? document.fonts.ready.then(build) : build();
+})();
+</script>
+</body>
+</html>
