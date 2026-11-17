@@ -300,7 +300,7 @@ const styles = `
     .glitch{word-break:break-word;overflow-wrap:break-word}
   }
   .trip-track::-webkit-scrollbar,.exp-track::-webkit-scrollbar{display:none}
-  @media(max-width:768px){.exp-slide{flex:0 0 86%!important}}
+  @media(max-width:768px){.exp-slide{flex:0 0 86%!important}.exp-arrow{display:none!important}}
 `;
 
 /* ═══════════════════════════════════════════════════════════════
@@ -557,6 +557,35 @@ function ExpeditionCard({ ex, delay }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   SIDOSCROLL FÖR KOMMANDE AVSNITT
+   ═══════════════════════════════════════════════════════════════ */
+function ExpTrack() {
+  const lang = useLang();
+  const ref = useRef(null);
+  const go = (d) => { const t = ref.current; if (!t) return; const c = t.children[0]; t.scrollBy({ left: d * (c ? c.offsetWidth + 18 : 300), behavior: "smooth" }); };
+  const btn = (d) => ({ position: "absolute", top: "40%", [d < 0 ? "left" : "right"]: -14, width: 46, height: 46, borderRadius: "50%",
+    border: "1px solid rgba(255,255,255,0.25)", background: "rgba(4,10,20,0.85)", color: "white", fontSize: 22, cursor: "pointer",
+    display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(6px)", zIndex: 5 });
+  return (
+    <div style={{ position: "relative" }}>
+      <div ref={ref} className="exp-track" style={{ display: "flex", gap: 18, overflowX: "auto", scrollSnapType: "x mandatory",
+        scrollbarWidth: "none", WebkitOverflowScrolling: "touch", paddingBottom: 6 }}>
+        {EXPEDITIONS.map((ex) => (
+          <div key={ex.id + lang} className="exp-slide" style={{ flex: "0 0 40%", scrollSnapAlign: "start" }}>
+            <ExpeditionCard ex={ex} delay={0} />
+          </div>
+        ))}
+      </div>
+      <button className="exp-arrow" aria-label="Previous" onClick={() => go(-1)} style={btn(-1)}>‹</button>
+      <button className="exp-arrow" aria-label="Next" onClick={() => go(1)} style={btn(1)}>›</button>
+      <div style={{ textAlign: "center", marginTop: 16, fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: 3, color: "rgba(255,255,255,.35)" }}>
+        ← <T sv={`SVEP FÖR ALLA ${EXPEDITIONS.length} EXPEDITIONER`} en={`SWIPE FOR ALL ${EXPEDITIONS.length} EXPEDITIONS`} /> →
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
    MAIN APP
    ═══════════════════════════════════════════════════════════════ */
 function App() {
@@ -721,19 +750,7 @@ function App() {
                  en="The next expeditions in the series are planned and ready to film. Eight worlds over the next 18 months." />
             </p>
           </div>
-          <div style={{ position: "relative" }}>
-            <div className="exp-track" style={{ display: "flex", gap: 18, overflowX: "auto", scrollSnapType: "x mandatory",
-              scrollbarWidth: "none", WebkitOverflowScrolling: "touch", paddingBottom: 6 }}>
-              {EXPEDITIONS.map((ex, ei) => (
-                <div key={ex.id + lang} className="exp-slide" style={{ flex: "0 0 calc(46% - 9px)", scrollSnapAlign: "start" }}>
-                  <ExpeditionCard ex={ex} delay={0} />
-                </div>
-              ))}
-            </div>
-            <div style={{ textAlign: "center", marginTop: 16, fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: 3, color: "rgba(255,255,255,.35)" }}>
-              ← <T sv={`SVEP FÖR ALLA ${EXPEDITIONS.length} EXPEDITIONER`} en={`SWIPE FOR ALL ${EXPEDITIONS.length} EXPEDITIONS`} /> →
-            </div>
-          </div>
+          <ExpTrack />
         </div>
       </Section>
 
@@ -853,8 +870,8 @@ function App() {
             </Reveal>
           </div>
           <p style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: 1, color: "rgba(255,255,255,.25)", marginTop: 22, lineHeight: 1.7 }}>
-            <T sv="Snitten bygger på reseserien på YouTube (11 avsnitt) och tidigare sponsrade kortformat."
-               en="Averages are based on the travel series on YouTube (11 episodes) and previous sponsored short-form content." />
+            <T sv="Snitten bygger på reseserien på YouTube (11 avsnitt) och tidigare kortformat."
+               en="Averages are based on the travel series on YouTube (11 episodes) and previous short-form content." />
           </p>
         </div>
       </Section>
