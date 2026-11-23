@@ -631,6 +631,13 @@ const statusBox = document.getElementById("status");
 const btn = document.getElementById("submitBtn");
 function showStatus(msg){ statusBox.textContent = msg; statusBox.classList.add("show"); }
 
+/* Botskydd. En riktig besökare rör formuläret innan den skickar det, och tar mer
+   än några sekunder på sig. Ett skript gör varken det ena eller det andra. */
+const formOpenedAt = Date.now();
+let humanTouched = false;
+["pointerdown", "keydown", "touchstart"].forEach(ev =>
+  form.addEventListener(ev, () => { humanTouched = true; }, { once: true, passive: true }));
+
 form.addEventListener("submit", async e => {
   e.preventDefault();
   if (!form.checkValidity()){
@@ -640,7 +647,10 @@ form.addEventListener("submit", async e => {
   }
   const data = new FormData(form);
   if (data.get("_honey")) return;
-  data.delete("_honey");
+  if (!humanTouched || Date.now() - formOpenedAt < 4000){
+    showStatus("Bokningen kunde inte skickas. Ladda om sidan och försök igen, eller mejla " + BOOKING_EMAIL + ".");
+    return;
+  }
   const tillagg = data.getAll("Tillägg");
   data.delete("Tillägg");
   data.append("Tillägg", tillagg.length ? tillagg.join(", ") : "Inga");
@@ -653,6 +663,7 @@ form.addEventListener("submit", async e => {
       data.append("_replyto", data.get("E-post"));
       data.append("_template", "table");
       data.append("_captcha", "false");
+      data.append("_blacklist", "1 Main Street,Main Street,123 Main,John Doe,Jane Doe,Richard Hale,test@test,@example.com,[url=,[/url],<a href,bitcoin,crypto,SEO services");
       const v = k => (data.get(k) || "").toString().trim();
       const n = parseInt(v("Antal personer")) || 1;
       const rows = [
