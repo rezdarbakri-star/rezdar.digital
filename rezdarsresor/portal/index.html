@@ -1,0 +1,928 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mina resor · Rezdars Resor</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Portalen för dig som har bokat en resa med Rezdars Resor.">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="icon" href="../apple-touch-icon.png">
+<style>
+@font-face{font-family:"Bricolage Grotesque";font-style:normal;font-weight:500 800;font-display:swap;src:url(typsnitt/bricolage.woff2) format("woff2")}
+@font-face{font-family:"Literata";font-style:normal;font-weight:400 600;font-display:swap;src:url(typsnitt/literata.woff2) format("woff2")}
+@font-face{font-family:"Literata";font-style:italic;font-weight:400;font-display:swap;src:url(typsnitt/literata-italic.woff2) format("woff2")}
+:root{
+  --paper:#F1F4EE; --surface:#FFFFFF; --ink:#16231C; --muted:#4A5A50;
+  --forest:#1F3A2E; --tea:#9A5B12; --tea-soft:#F3E3CB; --line:#D3DBD0;
+  --on-dark:#F4F1E8; --gold:#E3A54A; --ok:#2F6B45; --ok-soft:#DCEBDF; --focus:#C77A1A;
+  --bad:#9B2C2C; --bad-soft:#FBE3E3;
+  --display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --body:Literata,Georgia,"Times New Roman",serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --paper:#101A15; --surface:#17241D; --ink:#E4EAE2; --muted:#A9B7AC;
+  --forest:#0B1410; --tea:#E3A54A; --tea-soft:#2C2416; --line:#2A3A31; --ok:#7FC79A; --ok-soft:#1C3326; --focus:#E3A54A;
+  --bad:#F2A5A5; --bad-soft:#3A1D1D; color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:1.05rem;line-height:1.65;-webkit-font-smoothing:antialiased}
+[hidden]{display:none!important}
+img{max-width:100%}
+h1,h2,h3{font-family:var(--display);line-height:1.08;margin:0;letter-spacing:-.015em;text-wrap:balance}
+p{margin:0}
+a{color:var(--tea)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:6px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;font-family:var(--display);font-weight:700;font-size:1rem;padding:.8rem 1.4rem;border-radius:999px;border:0;background:var(--gold);color:#1A1208;text-decoration:none;cursor:pointer}
+.btn:disabled{opacity:.6;cursor:wait}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.small{padding:.5rem 1rem;font-size:.92rem}
+.linkbtn{background:none;border:0;padding:0;font:inherit;font-family:var(--display);font-weight:600;font-size:.95rem;color:var(--tea);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.label{font-family:var(--display);font-weight:600;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.missing{font-family:var(--display);font-size:.85rem;font-weight:700;color:var(--bad);background:var(--bad-soft);padding:.05rem .45rem;border-radius:6px}
+.err{font-family:var(--display);font-size:.95rem;color:var(--bad);background:var(--bad-soft);border-radius:10px;padding:.7rem .9rem}
+.note{font-family:var(--display);font-size:.95rem;color:var(--ok);background:var(--ok-soft);border-radius:10px;padding:.7rem .9rem}
+
+/* laddar */
+.loading{min-height:100vh;display:grid;place-items:center;font-family:var(--display);color:var(--muted)}
+
+/* inloggning */
+.login{min-height:100vh;display:grid;grid-template-columns:1.1fr 1fr}
+.login-img{background:#0B1410 url("../kanot-ovanifran-1600.webp") center/cover;position:relative}
+.login-img::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,20,16,.1),rgba(11,20,16,.75))}
+.login-img .cap{position:absolute;left:2rem;right:2rem;bottom:2rem;z-index:1;color:var(--on-dark)}
+.login-img .cap h1{font-size:clamp(2.6rem,6vw,4.6rem);font-weight:800;letter-spacing:-.03em;line-height:.95}
+.login-img .cap p{margin-top:.8rem;max-width:28rem;color:#E9E6DC}
+.login-form{display:flex;flex-direction:column;justify-content:center;gap:1.1rem;padding-block:3rem 6rem;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px));max-width:30rem;width:100%;margin:0 auto}
+.login-form h2{font-size:1.9rem;font-weight:800}
+.field{display:flex;flex-direction:column;gap:.35rem;min-width:0}
+.field label{font-family:var(--display);font-weight:600;font-size:.95rem}
+input[type=email],input[type=text],input[type=tel],input[type=password],input[type=date],input[type=datetime-local],input[type=month],select{font:inherit;font-size:1rem;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:.75rem .85rem;width:100%;min-width:0}
+.hint{font-size:.92rem;color:var(--muted)}
+.switch{display:flex;flex-wrap:wrap;gap:.4rem 1.2rem}
+@media (max-width:760px){.login{grid-template-columns:1fr;min-height:0}.login-img{min-height:42vh}.login-img .cap{left:16px;right:16px;bottom:1.4rem}}
+
+/* enkel ruta (bekräfta e-post, ingen bokning) */
+.solo{min-height:100vh;display:grid;place-items:center;padding-block:3rem 6rem;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.solo .panel{max-width:32rem;width:100%}
+
+/* app */
+.app{display:grid;grid-template-columns:15rem 1fr;min-height:100vh}
+.side{background:var(--forest);color:var(--on-dark);padding:1.5rem 1rem;display:flex;flex-direction:column;gap:1.6rem;position:sticky;top:0;height:100vh}
+.brand{font-family:var(--display);font-weight:800;font-size:1.1rem;padding:0 .6rem}
+.brand small{display:block;font-weight:500;font-size:.8rem;color:#CFC9B8;margin-top:.15rem}
+.nav{display:flex;flex-direction:column;gap:.2rem}
+.nav a{display:flex;align-items:center;gap:.7rem;color:#DAD6CA;text-decoration:none;font-family:var(--display);font-weight:600;font-size:.98rem;padding:.6rem .7rem;border-radius:10px}
+.nav a svg{width:20px;height:20px;flex:none}
+.nav a[aria-current="page"]{background:rgba(227,165,74,.16);color:var(--gold)}
+.nav a:hover{color:var(--on-dark)}
+.side .foot{margin-top:auto;display:flex;flex-direction:column;gap:.2rem}
+.side .foot a,.side .foot button{font-family:var(--display);font-size:.9rem;color:#CFC9B8;background:none;border:0;text-align:left;padding:.4rem .7rem;cursor:pointer;text-decoration:none}
+main{min-width:0;padding-block:2rem 5rem;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.view{max-width:52rem;margin:0 auto;display:flex;flex-direction:column;gap:1.6rem}
+.view > header{display:flex;flex-direction:column;gap:.4rem}
+.view > header h1{font-size:clamp(2rem,4.5vw,2.8rem);font-weight:800}
+.view > header p{color:var(--muted);max-width:40rem}
+
+/* min resa */
+.trip{border-radius:18px;overflow:hidden;background:#0B1410 url("../bilder/bat-pa-floden-1600.webp") center/cover;color:var(--on-dark);position:relative;min-height:19rem;display:flex;align-items:flex-end}
+.trip::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,20,16,.3),rgba(11,20,16,.88) 70%)}
+.trip-in{position:relative;padding:1.6rem;display:flex;flex-wrap:wrap;gap:1.4rem;align-items:flex-end;justify-content:space-between;width:100%}
+.trip h2{font-size:clamp(2rem,5vw,3rem);font-weight:800;letter-spacing:-.03em}
+.trip .meta{font-family:var(--display);color:#E9E6DC;margin-top:.3rem}
+.count{display:flex;flex-direction:column;align-items:flex-end;font-family:var(--display)}
+.count b{font-size:3.4rem;line-height:1;color:var(--gold);font-weight:800;font-variant-numeric:tabular-nums}
+.count span{font-size:.9rem;color:#DAD6CA}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media (max-width:640px){.grid2{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:1.3rem;display:flex;flex-direction:column;gap:.8rem;min-width:0}
+.panel h3{font-size:1.2rem}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--gold);border-radius:99px;transition:width .3s}
+.next{display:flex;gap:.8rem;align-items:flex-start}
+.next .dot{width:.7rem;height:.7rem;border-radius:50%;background:var(--gold);margin-top:.5rem;flex:none}
+.msg{display:flex;gap:.9rem}
+.msg img{width:2.8rem;height:2.8rem;border-radius:50%;object-fit:cover;flex:none}
+.msg .who{font-family:var(--display);font-weight:700;font-size:.95rem}
+.chip{display:inline-flex;font-family:var(--display);font-size:.78rem;font-weight:700;padding:.15rem .55rem;border-radius:999px;background:var(--tea-soft);color:var(--ink)}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}
+.chip.warn{background:var(--tea-soft);color:var(--tea)}
+.chip.late{background:var(--bad-soft);color:var(--bad)}
+.chip .missing{padding:0;background:none}
+.info{background:var(--tea-soft);border-radius:14px;padding:1rem 1.2rem;font-size:.98rem}
+
+/* uppgifter att fylla i */
+.tasks{display:flex;flex-direction:column;gap:.7rem}
+.task{background:var(--surface);border:1px solid var(--line);border-radius:16px}
+.task > summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:center;padding:1.1rem 1.2rem}
+.task > summary::-webkit-details-marker{display:none}
+.st{width:1.6rem;height:1.6rem;border-radius:50%;display:grid;place-items:center;flex:none;border:2px solid var(--gold);background:var(--tea-soft)}
+.task.done .st{background:var(--ok);border-color:var(--ok)}
+.task.done .st::after{content:"";width:.45rem;height:.8rem;border:solid var(--surface);border-width:0 3px 3px 0;transform:translateY(-2px) rotate(45deg)}
+.task .t{font-family:var(--display);font-weight:700;font-size:1.08rem;display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.task .sum{font-size:.95rem;color:var(--muted)}
+.task .open{font-family:var(--display);font-size:.9rem;font-weight:600;color:var(--tea)}
+.task[open] .open{visibility:hidden}
+.task form{padding:1.1rem 1.2rem 1.2rem;display:flex;flex-direction:column;gap:1rem;border-top:1px solid var(--line)}
+.task .d{color:var(--muted);font-size:.98rem}
+.dls{display:flex;flex-direction:column}
+.dls > div{display:grid;grid-template-columns:8rem 1fr 1fr;gap:1rem;align-items:center;padding:.6rem 0;border-bottom:1px solid var(--line);font-family:var(--display);font-size:.95rem}
+.dls .out{color:var(--muted);font-variant-numeric:tabular-nums}
+@media (max-width:560px){.dls > div{grid-template-columns:1fr 1fr}.dls > div b{grid-column:1/-1}}
+
+/* admin */
+.adm-sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:.8rem}
+.adm-sum .panel{gap:.2rem;padding:1rem}
+.adm-sum b{font-family:var(--display);font-size:1.9rem;line-height:1;font-variant-numeric:tabular-nums}
+.adm-sum span{font-size:.9rem;color:var(--muted)}
+.tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:16px}
+table{border-collapse:collapse;width:100%;min-width:40rem;font-family:var(--display);font-size:.95rem}
+th,td{padding:.75rem .9rem;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+tbody tr.r{cursor:pointer}
+tbody tr.r:hover{background:var(--paper)}
+tr.detail td{background:var(--paper);font-family:var(--body);font-size:.95rem}
+.dgrid{position:sticky;left:1rem;max-width:calc(100vw - 2*max(16px,env(safe-area-inset-left,0px)) - 2.5rem);overflow-wrap:anywhere}
+td small{display:block;color:var(--muted);font-weight:400}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:.8rem 1.5rem}
+.dgrid b{display:block;font-family:var(--display);font-size:.85rem;color:var(--muted);font-weight:600}
+.arr{display:flex;flex-direction:column}
+.arr div{display:grid;grid-template-columns:9rem 1fr auto;gap:1rem;padding:.6rem 0;border-bottom:1px solid var(--line);font-family:var(--display);font-size:.95rem;font-variant-numeric:tabular-nums}
+@media (max-width:560px){.arr div{grid-template-columns:1fr auto}.arr div span:first-child{grid-column:1/-1;color:var(--muted)}}
+.navsep{font-family:var(--display);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:#9FA99F;padding:.9rem .7rem .2rem}
+.booked{display:flex;flex-direction:column}
+.booked > div{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.4rem 1rem;align-items:center;padding:.55rem 0;border-bottom:1px solid var(--line);font-family:var(--display);font-size:.95rem}
+.booked > div span{min-width:0;overflow-wrap:anywhere}
+.addrow{display:grid;grid-template-columns:1.4fr 1fr auto;gap:.8rem;align-items:end}
+@media (max-width:640px){.addrow{grid-template-columns:1fr}}
+
+/* program */
+.days{display:flex;flex-direction:column;gap:.6rem}
+.day{background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.day summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:3rem 1fr auto;gap:1rem;align-items:center;padding:1rem 1.1rem}
+.day summary::-webkit-details-marker{display:none}
+.n{width:3rem;height:3rem;border-radius:50%;border:2.5px solid var(--tea);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:1.25rem;color:var(--tea)}
+.day .dt{font-family:var(--display);font-size:.85rem;color:var(--muted)}
+.day h3{font-size:1.15rem}
+.day .plus{font-family:var(--display);font-size:1.5rem;color:var(--tea);transition:transform .2s}
+.day[open] .plus{transform:rotate(45deg)}
+.day .body{padding:0 1.1rem 1.1rem 5.1rem;color:var(--muted);display:flex;flex-direction:column;gap:.6rem}
+@media (max-width:560px){.day .body{padding-left:1.1rem}}
+.day.today{border-color:var(--gold)}
+
+/* gruppen */
+.people{display:grid;grid-template-columns:repeat(auto-fill,minmax(13rem,1fr));gap:1rem}
+.person{display:flex;gap:.9rem;align-items:center;min-width:0}
+.person img,.ph{width:3.4rem;height:3.4rem;border-radius:50%;object-fit:cover;flex:none}
+.ph{background:var(--paper);border:2px solid var(--line);display:grid;place-items:center;font-family:var(--display);font-weight:800;color:var(--muted)}
+.person b{font-family:var(--display);display:block}
+.person span{font-size:.92rem;color:var(--muted)}
+
+/* packlista */
+.pack{columns:2 16rem;column-gap:2rem;padding:0;margin:0;list-style:none}
+.pack li{break-inside:avoid;padding:.55rem 0;border-bottom:1px solid var(--line);display:flex;gap:.7rem}
+.pack li::before{content:"";width:.5rem;height:.5rem;border-radius:50%;background:var(--tea);margin-top:.6rem;flex:none}
+
+/* film */
+.locked{border-radius:18px;overflow:hidden;position:relative;min-height:16rem;background:#0B1410 url("../bilder/tradtopparna-1600.webp") center/cover;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--on-dark)}
+.locked::before{content:"";position:absolute;inset:0;background:rgba(11,20,16,.72)}
+.locked > div{position:relative;padding:1.5rem;max-width:30rem;display:flex;flex-direction:column;gap:.6rem;align-items:center}
+.locked h2{font-size:1.8rem}
+
+/* formulär */
+.form{display:flex;flex-direction:column;gap:1rem}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media (max-width:560px){.row2{grid-template-columns:1fr}}
+.toggle{display:flex;gap:.8rem;align-items:flex-start;cursor:pointer}
+.toggle input{width:1.25rem;height:1.25rem;margin-top:.25rem;accent-color:var(--ok);flex:none}
+.saved{font-family:var(--display);font-size:.92rem;color:var(--ok)}
+.saved.bad{color:var(--bad)}
+
+/* mobil: flikar i botten */
+.tabs{display:none}
+.more{display:none;gap:0}
+.more a{display:flex;justify-content:space-between;padding:.85rem 0;border-top:1px solid var(--line);font-family:var(--display);font-weight:600;color:var(--ink);text-decoration:none}
+.more .label{margin-bottom:.3rem}
+@media (max-width:860px){.more{display:flex}}
+.mobilehead{display:none;justify-content:space-between;align-items:center;gap:1rem;font-family:var(--display);font-weight:800}
+.mobilehead span:last-child{display:flex;gap:1rem}
+.mobilehead a,.mobilehead button{font-weight:600;font-size:.9rem;color:var(--muted);text-decoration:none;background:none;border:0;padding:0;font-family:var(--display);cursor:pointer}
+@media (max-width:860px){
+  .app{grid-template-columns:1fr}
+  .side{display:none}
+  .tabs{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--forest);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+  .tabs a{display:flex;flex-direction:column;align-items:center;gap:.2rem;padding:.6rem .2rem;color:#CFC9B8;text-decoration:none;font-family:var(--display);font-size:.7rem;font-weight:600}
+  .tabs a svg{width:22px;height:22px}
+  .tabs a[aria-current="page"]{color:var(--gold)}
+  main{padding-bottom:calc(6rem + env(safe-area-inset-bottom,0px))}
+  .mobilehead{display:flex}
+}
+
+/* liten ruta om lagring, längst ner */
+.consent{position:fixed;z-index:20;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));max-width:24rem;width:calc(100% - 32px);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.18);padding:.9rem 1rem;display:flex;gap:.9rem;align-items:center;font-family:var(--display);font-size:.88rem;line-height:1.45}
+.consent p{flex:1;min-width:0}
+.consent .btn{padding:.45rem 1rem;font-size:.9rem;flex:none}
+@media (min-width:861px){.consent{left:auto;right:max(16px,env(safe-area-inset-right,0px))}}
+@media (max-width:860px){body.inapp .consent{bottom:calc(76px + env(safe-area-inset-bottom,0px))}}
+.legal{font-family:var(--display);font-size:.85rem;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="loading" id="v-laddar">Laddar …</div>
+
+<!-- INLOGGNING -->
+<section class="login" id="v-logga-in" hidden>
+  <div class="login-img">
+    <div class="cap">
+      <h1>Rezdars Resor</h1>
+      <p>Följ med Rezdar på magiska äventyr. Här samlas allt inför din resa.</p>
+    </div>
+  </div>
+  <form class="login-form" id="authform" novalidate>
+    <div style="display:flex;flex-direction:column;gap:.5rem">
+      <span class="label">För dig som har bokat</span>
+      <h2 id="auth-title">Logga in</h2>
+      <p class="hint" id="auth-lead">Logga in med e-postadressen du bokade med.</p>
+    </div>
+    <div class="field">
+      <label for="email">E-post</label>
+      <input type="email" id="email" autocomplete="email" placeholder="namn@exempel.se" required>
+    </div>
+    <div class="field" id="pw-field">
+      <label for="pw">Lösenord</label>
+      <input type="password" id="pw" autocomplete="current-password" minlength="8" required>
+    </div>
+    <p class="err" id="auth-err" hidden></p>
+    <p class="note" id="auth-note" hidden></p>
+    <button class="btn" type="submit" id="auth-btn">Logga in</button>
+    <div class="switch">
+      <button type="button" class="linkbtn" data-mode="skapa">Första gången? Skapa konto</button>
+      <button type="button" class="linkbtn" data-mode="glomt">Glömt lösenordet</button>
+      <button type="button" class="linkbtn" data-mode="logga-in" hidden>Tillbaka till inloggningen</button>
+    </div>
+    <p class="hint">Har du inte bokat än? <a href="../">Se Expedition Amazonas</a></p>
+    <p class="legal"><a href="integritet.html">Så hanterar vi dina uppgifter</a></p>
+  </form>
+</section>
+
+<!-- BEKRÄFTA E-POST -->
+<section class="solo" id="v-bekrafta" hidden>
+  <div class="panel">
+    <span class="label">Ett steg kvar</span>
+    <h2 style="font-size:1.7rem">Bekräfta din e-post</h2>
+    <p>Vi har skickat ett mejl till <b id="verify-to"></b>. Klicka på länken i mejlet och kom sedan tillbaka hit. Hittar du det inte, titta i skräpposten.</p>
+    <p class="note" id="verify-note" hidden></p>
+    <div style="display:flex;flex-wrap:wrap;gap:.8rem">
+      <button class="btn" type="button" id="verify-done">Jag har bekräftat</button>
+      <button class="btn ghost" type="button" id="verify-again">Skicka mejlet igen</button>
+    </div>
+    <button type="button" class="linkbtn" data-logout style="align-self:flex-start">Logga ut</button>
+  </div>
+</section>
+
+<!-- INGEN BOKNING -->
+<section class="solo" id="v-ingen-bokning" hidden>
+  <div class="panel">
+    <span class="label">Inloggad som <span class="who-email"></span></span>
+    <h2 style="font-size:1.7rem">Vi hittar ingen bokning på den här adressen</h2>
+    <p>Portalen öppnas när din bokning hos Zoom Fotoresor är registrerad. Har du bokat med en annan e-postadress? Logga ut och skapa ett konto med den.</p>
+    <p class="hint">Har du nyss bokat kan det ta en stund innan du kommer in.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:.8rem">
+      <button class="btn" type="button" id="recheck">Försök igen</button>
+      <button class="btn ghost" type="button" data-logout>Logga ut</button>
+    </div>
+  </div>
+</section>
+
+<!-- APPEN -->
+<div class="app" id="app" hidden>
+  <aside class="side">
+    <div class="brand">Rezdars Resor<small>Expedition Amazonas</small></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="foot">
+      <a href="integritet.html">Integritet</a>
+      <button type="button" data-logout>Logga ut</button>
+    </div>
+  </aside>
+
+  <main>
+    <!-- Min resa -->
+    <div class="view" id="v-min-resa" hidden>
+      <div class="mobilehead"><span>Rezdars Resor</span><span><a href="#admin" class="admin-only" hidden>Admin</a><button type="button" data-logout>Logga ut</button></span></div>
+      <header>
+        <span class="label">Hej <span class="fname">resenär</span></span>
+        <h1>Min resa</h1>
+      </header>
+      <div class="trip">
+        <div class="trip-in">
+          <div>
+            <h2>Expedition Amazonas</h2>
+            <p class="meta">17–23 okt 2027 · Ditt äventyr i världens största regnskog</p>
+          </div>
+          <div class="count"><b id="days">–</b><span>dagar kvar</span></div>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="panel">
+          <span class="label">Inför resan</span>
+          <h3><span id="donecount">0</span> av <span class="total">0</span> klara</h3>
+          <div class="bar"><i id="bar" style="width:0"></i></div>
+          <div class="next" id="nextup"><span class="dot"></span><div></div></div>
+          <a href="#infor-resan" class="btn ghost" style="align-self:flex-start">Fyll i uppgifterna</a>
+        </div>
+        <div class="panel">
+          <span class="label">Från Rezdar</span>
+          <div class="msg">
+            <img src="../bilder/rezdar-i-djungeln-1000.webp" alt="">
+            <div style="display:flex;flex-direction:column;gap:.35rem;min-width:0">
+              <span class="who">Rezdar</span>
+              <p>Välkommen med till Amazonas! Här lägger jag upp allt inför resan, och här hittar du bilderna och filmerna efteråt.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="wa-slot"></div>
+      <div class="panel">
+        <span class="label">Din bokning</span>
+        <div class="grid2" style="gap:.6rem 1.5rem">
+          <div><span class="hint">Arrangör</span><p>Zoom Fotoresor, resegaranti hos Kammarkollegiet</p></div>
+          <div><span class="hint">Boende</span><p>Delat dubbelrum</p></div>
+          <div><span class="hint">Betalning</span><p>Sköts av Zoom Fotoresor</p></div>
+          <div><span class="hint">Reseledare och videograf</span><p>Rezdar, hela veckan</p></div>
+        </div>
+      </div>
+      <nav class="panel more" aria-label="Mer om resan">
+        <span class="label">Mer om resan</span>
+        <a href="#packlista">Packlista <span aria-hidden="true">→</span></a>
+        <a href="#film">Bilder och film <span aria-hidden="true">→</span></a>
+        <a href="integritet.html">Så hanterar vi dina uppgifter <span aria-hidden="true">→</span></a>
+      </nav>
+    </div>
+
+    <!-- Inför resan -->
+    <div class="view" id="v-infor-resan" hidden>
+      <header>
+        <span class="label">Att fylla i</span>
+        <h1>Inför resan</h1>
+        <p>Fyll i uppgifterna när du har dem. Rezdar och Zoom Fotoresor ser dem och planerar transfer, mat och säkerhet efter dem. Gult betyder att något saknas, grönt att det är klart.</p>
+      </header>
+      <div class="bar"><i id="bar2" style="width:0"></i></div>
+      <div class="tasks" id="tasks"></div>
+      <p class="info">Betalningen sköts av Zoom Fotoresor och syns inte här. Pass-, person- och kortnummer sparas aldrig. Allt du fyller i raderas när resan är över. <a href="integritet.html">Läs mer</a></p>
+    </div>
+
+    <!-- Program -->
+    <div class="view" id="v-program" hidden>
+      <header>
+        <span class="label">17–23 oktober 2027</span>
+        <h1>Dag för dag</h1>
+        <p>Programmet för veckan. Under resan öppnas dagens punkt automatiskt.</p>
+      </header>
+      <div class="days" id="days-list"></div>
+    </div>
+
+    <!-- Gruppen -->
+    <div class="view" id="v-gruppen" hidden>
+      <header>
+        <span class="label" id="group-count">Max 12 resenärer</span>
+        <h1>Gruppen</h1>
+        <p>De som valt att visa sitt förnamn och sin mobil syns här, så att ni kan höra av er till varandra före resan. Det väljer du själv under Mina uppgifter.</p>
+      </header>
+      <div class="wa-slot"></div>
+      <div class="panel">
+        <span class="label">Reseledare</span>
+        <div class="person"><img src="../bilder/rezdar-i-djungeln-1000.webp" alt=""><div><b>Rezdar</b><span>Reseledare och videograf</span></div></div>
+      </div>
+      <div class="panel">
+        <span class="label">Medresenärer</span>
+        <div class="people" id="people"></div>
+      </div>
+    </div>
+
+    <!-- Packlista -->
+    <div class="view" id="v-packlista" hidden>
+      <header>
+        <span class="label">Inför resan</span>
+        <h1>Packlista</h1>
+        <p>Hängmatta och myggnät finns i djungellägret. Vandringarna går i värme och hög luftfuktighet, på stigar med rötter och lera.</p>
+      </header>
+      <ul class="pack">
+        <li>Lätta och snabbtorkande kläder</li>
+        <li>Bra vandringsskor</li>
+        <li>Pannlampa</li>
+        <li>Myggmedel</li>
+        <li>Din kamera</li>
+        <li>Badkläder, för bäcken och vattenfallen</li>
+      </ul>
+      <p class="info">Den detaljerade packlistan kommer från Zoom Fotoresor <span class="missing">[SAKNAS]</span></p>
+    </div>
+
+    <!-- Bilder och film -->
+    <div class="view" id="v-film" hidden>
+      <header>
+        <span class="label">Efter resan</span>
+        <h1>Bilder och film</h1>
+      </header>
+      <div class="locked"><div>
+        <h2>Kommer efter resan</h2>
+        <p>Rezdar filmar och fotograferar hela veckan. Bilderna och filmerna läggs upp här när ni är hemma.</p>
+      </div></div>
+    </div>
+
+    <!-- Mina uppgifter -->
+    <div class="view" id="v-uppgifter" hidden>
+      <header>
+        <span class="label">Profil</span>
+        <h1>Mina uppgifter</h1>
+        <p>Bara det som behövs för resan. Vi sparar aldrig pass-, person- eller kortnummer.</p>
+      </header>
+      <form class="panel form" id="profile">
+        <div class="row2">
+          <div class="field"><label for="p-fname">Förnamn</label><input type="text" id="p-fname" autocomplete="given-name" maxlength="60"></div>
+          <div class="field"><label for="p-lname">Efternamn</label><input type="text" id="p-lname" autocomplete="family-name" maxlength="60"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="p-email">E-post</label><input type="email" id="p-email" disabled></div>
+          <div class="field"><label for="p-tel">Mobil</label><input type="tel" id="p-tel" autocomplete="tel" maxlength="30"></div>
+        </div>
+        <label class="toggle"><input type="checkbox" id="p-share"><span>Visa mitt förnamn och min mobil för de andra i gruppen</span></label>
+        <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
+          <button class="btn" type="submit">Spara</button>
+          <span class="saved" id="savedmsg" hidden>Sparat</span>
+        </div>
+      </form>
+      <p class="legal"><a href="integritet.html">Så hanterar vi dina uppgifter</a> · Vill du att vi raderar dem tidigare, hör av dig till Rezdar.</p>
+    </div>
+
+    <!-- Admin -->
+    <div class="view" id="v-admin" hidden>
+      <div class="mobilehead"><span>Admin</span><span><a href="#min-resa">Till resenärsvyn</a></span></div>
+      <header>
+        <span class="label">Admin · Rezdar och Zoom Fotoresor</span>
+        <h1>Gruppen inför avresa</h1>
+        <p>Vad varje bokad resenär har fyllt i. Klicka på en rad för att se uppgifterna.</p>
+      </header>
+      <div class="adm-sum" id="admsum"></div>
+      <div class="tablewrap"><table>
+        <thead><tr id="admhead"></tr></thead>
+        <tbody id="admbody"></tbody>
+      </table></div>
+      <div class="panel">
+        <span class="label">Påminnelse</span>
+        <h3>Mejla dem som saknar något</h3>
+        <p class="hint">Kopierar adresserna till alla som har något gult eller rött kvar. Klistra in dem som dold kopia i ett mejl.</p>
+        <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
+          <button class="btn" type="button" id="remind">Kopiera adresserna</button>
+          <span class="saved" id="remindmsg" hidden></span>
+        </div>
+        <textarea id="remindbox" readonly hidden style="font:inherit;font-size:.9rem;width:100%;min-height:5rem;border:1.5px solid var(--line);border-radius:10px;padding:.6rem;background:var(--paper);color:var(--ink)"></textarea>
+      </div>
+      <div class="panel">
+        <span class="label">Ankomster till Manaus</span>
+        <h3>För transfer och välkomstkvällen</h3>
+        <div class="arr" id="arrivals"></div>
+      </div>
+      <form class="panel form" id="bookform">
+        <span class="label">Bokade resenärer</span>
+        <h3>Vem får logga in</h3>
+        <p class="hint">Lägg till e-postadressen resenären bokade med. Bara adresser i listan kommer in i portalen.</p>
+        <div class="addrow">
+          <div class="field"><label for="b-email">E-post</label><input type="email" id="b-email" required></div>
+          <div class="field"><label for="b-name">Namn</label><input type="text" id="b-name" maxlength="80"></div>
+          <button class="btn" type="submit">Lägg till</button>
+        </div>
+        <span class="saved" id="b-msg" hidden></span>
+        <div class="booked" id="booked"></div>
+      </form>
+      <form class="panel form" id="dlform">
+        <span class="label">Deadlines</span>
+        <h3>När behöver Zoom Fotoresor uppgifterna?</h3>
+        <p class="hint">Fyll i datumet Zoom Fotoresor senast behöver varje uppgift. Resenärerna ser ett tidigare datum, med bufferten dragen.</p>
+        <div class="field" style="max-width:14rem"><label for="dl-buf">Buffert i dagar</label><input type="text" inputmode="numeric" id="dl-buf"></div>
+        <div class="dls" id="dls"></div>
+        <div style="display:flex;gap:1rem;align-items:center"><button class="btn" type="submit">Spara</button><span class="saved" id="dl-msg" hidden>Sparat</span></div>
+      </form>
+      <form class="panel form" id="waform">
+        <span class="label">Gruppchatt på WhatsApp</span>
+        <h3>Expedition Amazonas 17–23 okt 2027</h3>
+        <p class="hint">Skapa gruppen i WhatsApp, välj Bjud in via länk och klistra in länken här. Resenärerna får en knapp att gå med.</p>
+        <div class="field"><label for="wa-link">Inbjudningslänk</label><input type="text" id="wa-link" placeholder="https://chat.whatsapp.com/…"></div>
+        <div class="field"><label for="wa-when">Visas för resenärerna</label>
+          <select id="wa-when"><option value="full">När resan är fullbokad</option><option value="now">Direkt</option></select></div>
+        <label class="toggle"><input type="checkbox" id="wa-full"><span>Resan är fullbokad <span class="hint">(slås på av sig själv vid 12 bokade)</span></span></label>
+        <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap"><button class="btn" type="submit">Spara</button><span class="saved" id="wa-msg" hidden>Sparat</span><span class="hint" id="wa-status"></span></div>
+      </form>
+    </div>
+  </main>
+
+  <nav class="tabs" id="tabs"></nav>
+</div>
+
+<div class="consent" id="consent" role="region" aria-label="Lagring i webbläsaren" hidden>
+  <p>Vi sparar bara det som behövs för att du ska vara inloggad. Inga spårningscookies, ingen statistik. <a href="integritet.html">Läs mer</a></p>
+  <button class="btn" type="button" id="consent-ok">OK</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut, reload } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, deleteDoc, onSnapshot, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+const fb = initializeApp({
+  apiKey: "AIzaSyBeRneLbdTEtXiTeAAWry8ImvN_qMJb-b0",
+  authDomain: "rezdarsresor.firebaseapp.com",
+  projectId: "rezdarsresor",
+  storageBucket: "rezdarsresor.firebasestorage.app",
+  messagingSenderId: "441842864157",
+  appId: "1:441842864157:web:ea13fc945da14c6204f6f4"
+});
+const auth = getAuth(fb);
+auth.languageCode = "sv";
+const db = getFirestore(fb);
+
+// Testdata hamnar under en egen resa när sidan körs lokalt, aldrig bland de riktiga resenärerna.
+const LOCAL = ["localhost","127.0.0.1"].includes(location.hostname);
+const TRIP = LOCAL ? "test" : "amazonas-2027";
+const MAX = 12;
+const tripRef = doc(db, "trips", TRIP);
+const $ = id => document.getElementById(id);
+
+// ---------- lagringsrutan ----------
+try { if (!localStorage.getItem("rr-lagring-ok")) $("consent").hidden = false; } catch (e) { $("consent").hidden = false; }
+$("consent-ok").addEventListener("click", () => { $("consent").hidden = true; try { localStorage.setItem("rr-lagring-ok", "1"); } catch (e) {} });
+
+// ---------- vyer ----------
+const ic = {
+  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>',
+  cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>',
+  group:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><circle cx="17" cy="9" r="2.5"/><path d="M17 14.5c2.4 0 4 1.6 4.5 4.5"/></svg>',
+  bag:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="16" height="14" rx="2"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>',
+  film:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="13" height="14" rx="2"/><path d="M16 10l5-3v10l-5-3"/></svg>',
+  user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>'
+};
+const views = [
+  {id:"min-resa",name:"Min resa",icon:"home",tab:true},
+  {id:"infor-resan",name:"Inför resan",icon:"check",tab:true},
+  {id:"program",name:"Program",icon:"cal",tab:true},
+  {id:"gruppen",name:"Gruppen",icon:"group",tab:true},
+  {id:"packlista",name:"Packlista",icon:"bag"},
+  {id:"film",name:"Bilder och film",icon:"film"},
+  {id:"uppgifter",name:"Mina uppgifter",icon:"user",tab:true},
+  {id:"admin",name:"Gruppen inför avresa",icon:"check",admin:true}
+];
+views.forEach(v => {
+  if (v.admin) $("nav").insertAdjacentHTML("beforeend", '<div class="navsep admin-only" hidden>Admin</div>');
+  $("nav").insertAdjacentHTML("beforeend", '<a href="#'+v.id+'" data-v="'+v.id+'"'+(v.admin?' class="admin-only" hidden':'')+'>'+ic[v.icon]+v.name+'</a>');
+  if (v.tab) $("tabs").insertAdjacentHTML("beforeend", '<a href="#'+v.id+'" data-v="'+v.id+'">'+ic[v.icon]+'<span>'+(v.id==="uppgifter"?"Jag":v.name)+'</span></a>');
+});
+
+const screens = ["v-laddar","v-logga-in","v-bekrafta","v-ingen-bokning","app"];
+function show(id){ screens.forEach(s => $(s).hidden = s !== id); document.body.classList.toggle("inapp", id === "app"); if (id === "app") route(); }
+
+let isAdmin = false;
+function route(){
+  if ($("app").hidden) return;
+  let h = (location.hash || "").slice(1);
+  if (!views.some(v => v.id === h) || (h === "admin" && !isAdmin)) h = "min-resa";
+  views.forEach(v => $("v-"+v.id).hidden = v.id !== h);
+  document.querySelectorAll("[data-v]").forEach(a => a.getAttribute("data-v") === h ? a.setAttribute("aria-current","page") : a.removeAttribute("aria-current"));
+  window.scrollTo(0,0);
+}
+window.addEventListener("hashchange", route);
+
+// ---------- hjälpare ----------
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function fmt(s){ if(!s) return ""; const d = new Date(s); if (isNaN(d)) return s;
+  return d.toLocaleDateString("sv-SE",{day:"numeric",month:"short"}) + (s.length>10 ? " "+d.toLocaleTimeString("sv-SE",{hour:"2-digit",minute:"2-digit"}) : ""); }
+const fmtM = s => s ? new Date(s+"-15T12:00").toLocaleDateString("sv-SE",{month:"long",year:"numeric"}) : "";
+const fmtY = s => new Date(s+"T12:00").toLocaleDateString("sv-SE",{day:"numeric",month:"short",year:"numeric"});
+const iso = d => d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const today = () => iso(new Date());
+function flash(id, text, bad){ const m = $(id); if (text) m.textContent = text; m.classList.toggle("bad", !!bad); m.hidden = false; clearTimeout(m._t); m._t = setTimeout(() => m.hidden = true, 3000); }
+
+// ---------- uppgifterna ----------
+const tasks = [
+  {id:"flyg",t:"Ditt flyg",short:"Flyg",
+   d:"Du bokar flyget själv till Manaus (MAO), vanligen med byte i São Paulo. Var på plats senast söndag 17 oktober.",
+   f:[{id:"in_nr",l:"Flyg in till Manaus, flightnummer",ph:"t.ex. XX 1234"},
+      {id:"in_tid",l:"Landar i Manaus",type:"datetime-local"},
+      {id:"ut_nr",l:"Flyg hem, flightnummer",ph:"t.ex. XX 5678"},
+      {id:"ut_tid",l:"Lyfter från Manaus",type:"datetime-local"}],
+   sum:v => v.in_nr+" landar "+fmt(v.in_tid)},
+  {id:"forsakring",t:"Reseförsäkring",short:"Försäkring",
+   d:"Bokas separat, eller läggs till i bokningen hos Zoom Fotoresor. Larmnumret behövs om något händer under resan.",
+   f:[{id:"bolag",l:"Försäkringsbolag"},{id:"nr",l:"Försäkringsnummer"},{id:"larm",l:"Försäkringsbolagets larmnummer",type:"tel",ph:"+46 …"}],
+   sum:v => v.bolag},
+  {id:"vaccin",t:"Vaccinationsmottagning",short:"Vaccin",fixed:"2027-09-05",
+   d:"Gula febern rekommenderas för Amazonasregionen. Övriga vaccinationer och malariaskydd går du igenom med mottagningen, minst sex veckor före avresa. Vi frågar bara när du har tid bokad, inte vilka vaccin du tar.",
+   f:[{id:"datum",l:"Datum för besöket",type:"date"}],
+   sum:v => "Besök "+fmt(v.datum)},
+  {id:"pass",t:"Pass",short:"Pass",
+   d:'Krav på passets giltighet för Brasilien: <span class="missing">[SAKNAS]</span>. Vi sparar aldrig passnumret, bara hur länge passet gäller.',
+   f:[{id:"giltigt",l:"Passet gäller till och med",type:"month"}],
+   sum:v => "Gäller t.o.m. "+fmtM(v.giltigt)},
+  {id:"nod",t:"Nödkontakt",short:"Nödkontakt",
+   d:"Någon hemma som vi kontaktar om något händer under resan.",
+   f:[{id:"namn",l:"Namn"},{id:"rel",l:"Relation",ph:"t.ex. sambo, mamma"},{id:"tel",l:"Telefon",type:"tel",ph:"+46 …"}],
+   sum:v => v.namn+" ("+v.rel+")"}
+];
+const isDone = (t,v) => !!v && t.f.every(x => v[x.id] && String(v[x.id]).trim());
+document.querySelectorAll(".total").forEach(e => e.textContent = tasks.length);
+
+// ---------- läge ----------
+let user = null, unsubs = [];
+let trip = {need:{}, buf:14, wa:{link:"",when:"full",full:false}, antal:null};
+let mine = {profil:{}, tasks:{}};
+let shared = [], travellers = [], booked = [];
+
+function deadline(t){
+  if (t.fixed) return t.fixed;
+  const n = (trip.need||{})[t.id]; if (!n) return null;
+  const d = new Date(n+"T12:00"); d.setDate(d.getDate() - (trip.buf||0)); return iso(d);
+}
+function dlChip(t, done){
+  if (done) return '<span class="chip ok">Klar</span>';
+  const dl = deadline(t);
+  if (!dl) return '<span class="chip warn">Fyll i</span>';
+  if (dl < today()) return '<span class="chip late">Försenad · senast '+fmt(dl)+'</span>';
+  return '<span class="chip warn">Fyll i senast '+fmt(dl)+'</span>';
+}
+
+// ---------- resenärsvyer ----------
+function renderTasks(){
+  const box = $("tasks"), openId = box.querySelector("details[open]")?.getAttribute("data-t");
+  box.innerHTML = tasks.map(t => {
+    const v = mine.tasks[t.id] || {}, done = isDone(t,v);
+    const fields = t.f.map(x => '<div class="field"><label for="f-'+t.id+'-'+x.id+'">'+x.l+'</label><input id="f-'+t.id+'-'+x.id+'" name="'+x.id+'" type="'+(x.type||"text")+'"'+(x.ph?' placeholder="'+x.ph+'"':"")+' maxlength="120" value="'+esc(v[x.id])+'"></div>').join("");
+    return '<details class="task'+(done?" done":"")+'" data-t="'+t.id+'"'+(openId===t.id?" open":"")+'><summary><span class="st"></span><div><div class="t"><span>'+t.t+'</span>'+dlChip(t,done)+'</div>'+
+      '<p class="sum">'+(done?esc(t.sum(v)):"Saknas")+'</p></div><span class="open">'+(done?"Ändra":"Fyll i")+'</span></summary>'+
+      '<form data-t="'+t.id+'"><p class="d">'+t.d+'</p><div class="row2">'+fields+'</div><div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap"><button class="btn" type="submit">Spara</button><span class="saved" id="ts-'+t.id+'" hidden>Sparat</span></div></form></details>';
+  }).join("");
+  const done = tasks.filter(t => isDone(t, mine.tasks[t.id]));
+  const pct = Math.round(done.length/tasks.length*100)+"%";
+  $("donecount").textContent = done.length; $("bar").style.width = pct; $("bar2").style.width = pct;
+  const next = tasks.find(t => !isDone(t, mine.tasks[t.id]));
+  $("nextup").querySelector("div").innerHTML = next
+    ? '<b style="font-family:var(--display)">Nästa: '+next.t+'</b>'+(deadline(next)?'<p class="hint">Senast '+fmtY(deadline(next))+'</p>':"")
+    : '<b style="font-family:var(--display)">Allt ifyllt. Vi ses i Manaus!</b>';
+}
+$("tasks").addEventListener("submit", async e => {
+  e.preventDefault();
+  const id = e.target.getAttribute("data-t"), v = {};
+  Array.from(e.target.elements).forEach(el => { if (el.name) v[el.name] = el.value.trim(); });
+  try {
+    await setDoc(doc(db,"trips",TRIP,"resenarer",user.uid), {email:user.email.toLowerCase(), tasks:{[id]:v}, uppdaterad:serverTimestamp()}, {merge:true});
+    flash("ts-"+id, "Sparat");
+  } catch (err) { flash("ts-"+id, "Kunde inte spara. Försök igen.", true); }
+});
+
+function renderProfile(){
+  const p = mine.profil || {};
+  if (document.activeElement?.closest("#profile")) return;
+  $("p-fname").value = p.fname || ""; $("p-lname").value = p.lname || ""; $("p-tel").value = p.tel || ""; $("p-share").checked = !!p.share;
+  document.querySelectorAll(".fname").forEach(e => e.textContent = p.fname || "resenär");
+}
+$("profile").addEventListener("submit", async e => {
+  e.preventDefault();
+  const p = {fname:$("p-fname").value.trim(), lname:$("p-lname").value.trim(), tel:$("p-tel").value.trim(), share:$("p-share").checked};
+  try {
+    await setDoc(doc(db,"trips",TRIP,"resenarer",user.uid), {email:user.email.toLowerCase(), profil:p, uppdaterad:serverTimestamp()}, {merge:true});
+    const sref = doc(db,"trips",TRIP,"delade",user.uid);
+    if (p.share && p.fname) await setDoc(sref, {namn:p.fname, tel:p.tel}); else await deleteDoc(sref).catch(() => {});
+    flash("savedmsg", "Sparat");
+  } catch (err) { flash("savedmsg", "Kunde inte spara. Försök igen.", true); }
+});
+
+function renderGroup(){
+  const others = shared.filter(s => s.id !== user?.uid);
+  $("people").innerHTML = others.length
+    ? others.map(s => '<div class="person"><div class="ph">'+esc((s.namn||"?").charAt(0).toUpperCase())+'</div><div><b>'+esc(s.namn)+'</b><span>'+esc(s.tel)+'</span></div></div>').join("")
+    : '<p class="hint">Ingen annan har valt att visa sina uppgifter än.</p>';
+  $("people").insertAdjacentHTML("beforeend", shared.some(s => s.id === user?.uid)
+    ? '<p class="hint">Du syns för de andra i gruppen. Det ändrar du under Mina uppgifter.</p>'
+    : '<p class="hint">Du syns inte för de andra. Vill du det, kryssa i rutan under Mina uppgifter.</p>');
+  $("group-count").textContent = trip.antal != null ? trip.antal+" av "+MAX+" platser bokade" : "Max "+MAX+" resenärer";
+}
+
+function renderWa(){
+  const wa = trip.wa || {}, full = wa.full || (trip.antal != null && trip.antal >= MAX);
+  const open = wa.link && (wa.when === "now" || full);
+  const why = !wa.link ? "Rezdar lägger upp länken till gruppen här." : "Gruppen öppnar när resan är fullbokad.";
+  const html = open
+    ? '<div class="panel"><span class="label">Gruppchatt</span><h3>Träffa de andra före resan</h3><p class="hint">Gruppen på WhatsApp för alla som ska till Amazonas. Här kommer också uppdateringar från Rezdar.</p><a class="btn" style="align-self:flex-start" href="'+esc(wa.link)+'" target="_blank" rel="noopener">Gå med i gruppen</a></div>'
+    : '<div class="panel"><span class="label">Gruppchatt</span><h3>Gruppen på WhatsApp</h3><p class="hint">'+why+'</p></div>';
+  document.querySelectorAll(".wa-slot").forEach(s => s.innerHTML = html);
+  if (isAdmin) $("wa-status").textContent = open ? "Resenärerna ser knappen nu." : "Resenärerna ser inte knappen än.";
+}
+
+// nedräkning och program
+const start = new Date(2027,9,17), now = new Date(); now.setHours(0,0,0,0);
+$("days").textContent = Math.max(0, Math.round((start-now)/864e5)).toLocaleString("sv-SE");
+const prog = [
+  ["Söndag 17 oktober","Välkommen till Amazonas","Ankomst till Manaus och incheckning på Hotel Casa Do Bispo. På kvällen samlas vi i receptionen och träffar Rezdar. Välkomstdrink på Bar do Armando intill Teatro Amazonas, sedan middag på Caxiri.","Middag"],
+  ["Måndag 18 oktober","Stadsrundtur i Manaus","Historiska centrum, Teatro Amazonas och den lokala marknaden. På eftermiddagen båt till Mötet mellan vattnen, där Rio Negro och Solimões flyter sida vid sida. Kvällen på egen hand.","Frukost"],
+  ["Tisdag 19 oktober","Expedition Amazonas","Båt ut på Rio Negro till Base Jaguar, lägret vid flodstranden. Första vandringen med guiderna, vatten ur lianer och lunch över öppen eld. Bad i en källbäck och första natten i hängmatta.","Frukost · Lunch · Middag"],
+  ["Onsdag 20 oktober","Livet vid floden","Gryning vid elden. Besök i ett av flodens urfolkssamhällen. Pirayafiske på eftermiddagen, och efter mörkrets inbrott spanar vi efter kajmaner längs stranden.","Frukost · Lunch · Middag"],
+  ["Torsdag 21 oktober","Sista morgonen i djungeln","Frukost vid elden, en sista vandring och ett sista dopp. Båt tillbaka till Manaus och incheckning på Hotel Casa Do Bispo. Kvällen på egen hand.","Frukost · Lunch"],
+  ["Fredag 22 oktober","Vattenfallens land","Dagsutflykt till Presidente Figueiredo med vattenfall och naturliga pooler. Avskedsmiddag i Manaus på kvällen.","Frukost · Lunch · Middag"],
+  ["Lördag 23 oktober","Hemresa","Frukost och tid på egen hand tills det är dags att åka till flygplatsen.","Frukost"]
+];
+$("days-list").innerHTML = prog.map((p,i) => {
+  const d = new Date(2027,9,17+i), isToday = d.getTime() === now.getTime();
+  return '<details class="day'+(isToday?" today":"")+'"'+(isToday||(i===0&&now<start)?" open":"")+'><summary><span class="n">'+(i+1)+'</span><div><div class="dt">'+p[0]+'</div><h3>'+p[1]+'</h3></div><span class="plus">+</span></summary><div class="body"><p>'+p[2]+'</p><p><span class="chip">'+p[3]+'</span></p></div></details>';
+}).join("");
+
+// ---------- admin ----------
+$("admhead").innerHTML = "<th>Resenär</th>"+tasks.map(t => "<th>"+t.short+"</th>").join("")+"<th>Klart</th>";
+let openRow = null;
+function people(){
+  const byEmail = {};
+  booked.forEach(b => byEmail[b.id] = {email:b.id, name:b.namn||"", data:{}, loggedIn:false});
+  travellers.forEach(t => {
+    const e = (t.email||"").toLowerCase(); if (!byEmail[e]) return; // bara bokade räknas
+    const p = t.profil || {};
+    byEmail[e].data = t.tasks || {}; byEmail[e].loggedIn = true;
+    if (p.fname) byEmail[e].name = (p.fname+" "+(p.lname||"")).trim();
+    byEmail[e].tel = p.tel;
+  });
+  return Object.values(byEmail).sort((a,b) => (a.name||a.email).localeCompare(b.name||b.email,"sv"));
+}
+function renderAdmin(){
+  if (!isAdmin) return;
+  const ps = people(); let allDone = 0; const perTask = tasks.map(() => 0);
+  let rows = "";
+  ps.forEach((p,i) => {
+    let n = 0;
+    const cells = tasks.map((t,j) => {
+      const ok = isDone(t, p.data[t.id]); if (ok) { n++; perTask[j]++; }
+      const dl = deadline(t), late = !ok && dl && dl < today();
+      return "<td>"+(ok ? '<span class="chip ok">Klar</span>' : '<span class="chip '+(late?"late":"warn")+'">'+(late?"Försenad":"Saknas")+"</span>")+"</td>";
+    }).join("");
+    if (n === tasks.length) allDone++;
+    rows += '<tr class="r" data-i="'+i+'"><td><b>'+esc(p.name||p.email)+'</b><small>'+(p.loggedIn?esc(p.email):"Har inte loggat in än")+'</small></td>'+cells+"<td>"+n+"/"+tasks.length+"</td></tr>";
+    if (openRow === i) {
+      rows += '<tr class="detail"><td colspan="'+(tasks.length+2)+'"><div class="dgrid"><div><b>Kontakt</b>'+esc(p.email)+(p.tel?" · "+esc(p.tel):"")+'</div>'+tasks.map(t => {
+        const v = p.data[t.id];
+        return "<div><b>"+t.t+"</b>"+(isDone(t,v) ? t.f.map(x => esc(x.type && x.type.indexOf("date")===0 ? fmt(v[x.id]) : x.type==="month" ? fmtM(v[x.id]) : v[x.id])).join(" · ") : '<span class="missing">Inte ifyllt</span>')+"</div>";
+      }).join("")+"</div></td></tr>";
+    }
+  });
+  $("admbody").innerHTML = rows || '<tr><td colspan="'+(tasks.length+2)+'" class="hint">Inga bokade resenärer än. Lägg till dem längre ner.</td></tr>';
+  $("admsum").innerHTML = '<div class="panel"><b>'+allDone+" av "+ps.length+'</b><span>resenärer helt klara</span></div>'+
+    tasks.map((t,j) => '<div class="panel"><b>'+perTask[j]+"/"+ps.length+"</b><span>"+t.short+"</span></div>").join("");
+  const withFlight = ps.filter(p => isDone(tasks[0], p.data.flyg));
+  $("arrivals").innerHTML = withFlight.sort((a,b) => a.data.flyg.in_tid < b.data.flyg.in_tid ? -1 : 1)
+    .map(p => "<div><span>"+fmt(p.data.flyg.in_tid)+"</span><span>"+esc(p.name||p.email)+"</span><span>"+esc(p.data.flyg.in_nr)+"</span></div>").join("") +
+    (ps.length - withFlight.length ? '<p class="hint" style="padding-top:.6rem">'+(ps.length - withFlight.length)+" har inte lagt in sitt flyg än.</p>" : "");
+  $("booked").innerHTML = booked.slice().sort((a,b) => a.id.localeCompare(b.id)).map(b =>
+    '<div><span>'+esc(b.namn ? b.namn+" · " : "")+esc(b.id)+'</span><button type="button" class="linkbtn" data-remove="'+esc(b.id)+'">Ta bort</button></div>').join("") ||
+    '<p class="hint">Listan är tom.</p>';
+}
+$("admbody").addEventListener("click", e => {
+  const tr = e.target.closest("tr.r"); if (!tr) return;
+  const i = +tr.getAttribute("data-i"); openRow = openRow === i ? null : i; renderAdmin();
+});
+async function syncCount(n){ await setDoc(tripRef, {antal:n}, {merge:true}); }
+$("bookform").addEventListener("submit", async e => {
+  e.preventDefault();
+  const em = $("b-email").value.trim().toLowerCase(), namn = $("b-name").value.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { flash("b-msg","Skriv en giltig e-postadress.",true); return; }
+  try {
+    await setDoc(doc(db,"trips",TRIP,"bokade",em), {namn, tillagd:serverTimestamp()});
+    await syncCount(booked.some(b => b.id === em) ? booked.length : booked.length + 1);
+    $("b-email").value = ""; $("b-name").value = ""; flash("b-msg", em+" kan nu logga in.");
+  } catch (err) { flash("b-msg","Kunde inte spara. Försök igen.",true); }
+});
+const pendingRemove = {};
+$("booked").addEventListener("click", async e => {
+  const em = e.target.getAttribute("data-remove"); if (!em) return;
+  if (!pendingRemove[em]) { pendingRemove[em] = true; e.target.textContent = "Tryck igen för att ta bort"; setTimeout(() => { delete pendingRemove[em]; renderAdmin(); }, 4000); return; }
+  try { await deleteDoc(doc(db,"trips",TRIP,"bokade",em)); await syncCount(Math.max(0, booked.length - 1)); }
+  catch (err) { flash("b-msg","Kunde inte ta bort. Försök igen.",true); }
+});
+$("remind").addEventListener("click", async () => {
+  const list = people().filter(p => tasks.some(t => !isDone(t, p.data[t.id]))).map(p => p.email);
+  if (!list.length) { flash("remindmsg","Alla är klara."); return; }
+  const text = list.join(", ");
+  $("remindbox").value = text; $("remindbox").hidden = false;
+  try { await navigator.clipboard.writeText(text); flash("remindmsg", list.length+" adresser kopierade."); }
+  catch (err) { $("remindbox").select(); flash("remindmsg","Markera och kopiera adresserna i rutan."); }
+});
+function renderDl(){
+  if (document.activeElement?.closest("#dlform")) return;
+  $("dl-buf").value = trip.buf;
+  $("dls").innerHTML = '<div><span class="hint">Uppgift</span><span class="hint">Zoom behöver senast</span><span class="hint">Resenären ser</span></div>' +
+    tasks.map(t => { const out = deadline(t);
+      return "<div><b>"+t.short+"</b>"+(t.fixed ? '<span class="hint">Fast, från säljsidan</span>' : '<input type="date" id="dl-'+t.id+'" value="'+((trip.need||{})[t.id]||"")+'">')+
+        '<span class="out">'+(out ? fmtY(out) : '<span class="missing">[SAKNAS]</span>')+"</span></div>"; }).join("");
+}
+$("dlform").addEventListener("submit", async e => {
+  e.preventDefault();
+  const raw = $("dl-buf").value.trim(), b = Number(raw), need = {};
+  if (!/^\d{1,3}$/.test(raw) || b > 120) { flash("dl-msg","Bufferten ska vara ett antal dagar, 0 till 120.",true); return; }
+  tasks.forEach(t => { const el = $("dl-"+t.id); if (el && el.value) need[t.id] = el.value; });
+  try { document.activeElement.blur(); await setDoc(tripRef, {need, buf: b}, {merge:true}); flash("dl-msg","Sparat"); }
+  catch (err) { flash("dl-msg","Kunde inte spara.",true); }
+});
+function renderWaForm(){
+  if (document.activeElement?.closest("#waform")) return;
+  const wa = trip.wa || {};
+  $("wa-link").value = wa.link || ""; $("wa-when").value = wa.when || "full"; $("wa-full").checked = !!wa.full;
+}
+$("waform").addEventListener("submit", async e => {
+  e.preventDefault();
+  const l = $("wa-link").value.trim();
+  if (l && !/^https:\/\/chat\.whatsapp\.com\/[A-Za-z0-9]+$/.test(l)) { $("wa-status").textContent = "Länken ska börja med https://chat.whatsapp.com/"; return; }
+  try { document.activeElement.blur(); await setDoc(tripRef, {wa:{link:l, when:$("wa-when").value, full:$("wa-full").checked}}, {merge:true}); flash("wa-msg","Sparat"); }
+  catch (err) { flash("wa-msg","Kunde inte spara.",true); }
+});
+
+function renderAll(){ renderTasks(); renderProfile(); renderGroup(); renderWa(); renderAdmin(); if (isAdmin) { renderDl(); renderWaForm(); } }
+
+// ---------- inloggning ----------
+let mode = "logga-in";
+const modes = {
+  "logga-in": {title:"Logga in", lead:"Logga in med e-postadressen du bokade med.", btn:"Logga in", pw:true, ac:"current-password"},
+  "skapa": {title:"Skapa konto", lead:"Använd e-postadressen du bokade med och välj ett lösenord, minst 8 tecken. Du får ett mejl för att bekräfta adressen.", btn:"Skapa konto", pw:true, ac:"new-password"},
+  "glomt": {title:"Nytt lösenord", lead:"Skriv din e-post så skickar vi en länk där du väljer ett nytt lösenord.", btn:"Skicka länken", pw:false}
+};
+function setMode(m){
+  mode = m; const c = modes[m];
+  $("auth-title").textContent = c.title; $("auth-lead").textContent = c.lead; $("auth-btn").textContent = c.btn;
+  $("pw-field").hidden = !c.pw; if (c.ac) $("pw").autocomplete = c.ac;
+  $("auth-err").hidden = true; $("auth-note").hidden = true;
+  document.querySelectorAll("[data-mode]").forEach(b => b.hidden = b.getAttribute("data-mode") === m || (m !== "logga-in" && b.getAttribute("data-mode") !== "logga-in"));
+}
+document.querySelectorAll("[data-mode]").forEach(b => b.addEventListener("click", () => setMode(b.getAttribute("data-mode"))));
+const authErr = {
+  "auth/invalid-credential":"Fel e-post eller lösenord.",
+  "auth/wrong-password":"Fel e-post eller lösenord.",
+  "auth/user-not-found":"Fel e-post eller lösenord.",
+  "auth/invalid-email":"Det ser inte ut som en e-postadress.",
+  "auth/email-already-in-use":"Det finns redan ett konto med den adressen. Logga in i stället, eller välj Glömt lösenordet.",
+  "auth/weak-password":"Lösenordet behöver vara minst 8 tecken.",
+  "auth/too-many-requests":"För många försök. Vänta en stund och försök igen.",
+  "auth/network-request-failed":"Ingen kontakt med servern. Kolla din uppkoppling."
+};
+$("authform").addEventListener("submit", async e => {
+  e.preventDefault();
+  const em = $("email").value.trim(), pw = $("pw").value, btn = $("auth-btn");
+  $("auth-err").hidden = true; $("auth-note").hidden = true;
+  if (mode !== "glomt" && pw.length < 8) { $("auth-err").textContent = "Lösenordet behöver vara minst 8 tecken."; $("auth-err").hidden = false; return; }
+  btn.disabled = true;
+  try {
+    if (mode === "logga-in") await signInWithEmailAndPassword(auth, em, pw);
+    else if (mode === "skapa") { const c = await createUserWithEmailAndPassword(auth, em, pw); await sendEmailVerification(c.user, {url: location.origin + location.pathname}); }
+    else { await sendPasswordResetEmail(auth, em, {url: location.origin + location.pathname}); $("auth-note").textContent = "Om det finns ett konto på "+em+" har vi skickat en länk dit. Titta även i skräpposten."; $("auth-note").hidden = false; }
+  } catch (err) {
+    $("auth-err").textContent = authErr[err.code] || "Något gick fel. Försök igen."; $("auth-err").hidden = false;
+  } finally { btn.disabled = false; }
+});
+// Ladda om sidan vid utloggning så att inget av den förra användarens uppgifter ligger kvar.
+document.querySelectorAll("[data-logout]").forEach(b => b.addEventListener("click", async () => { stop(); await signOut(auth); location.replace(location.pathname); }));
+$("verify-done").addEventListener("click", async () => {
+  await reload(auth.currentUser);
+  if (auth.currentUser.emailVerified) { await auth.currentUser.getIdToken(true); enter(auth.currentUser); }
+  else { $("verify-note").textContent = "Vi ser ingen bekräftelse än. Klicka på länken i mejlet först."; $("verify-note").hidden = false; }
+});
+$("verify-again").addEventListener("click", async () => {
+  try { await sendEmailVerification(auth.currentUser, {url: location.origin + location.pathname}); $("verify-note").textContent = "Skickat igen."; }
+  catch (err) { $("verify-note").textContent = authErr[err.code] || "Kunde inte skicka. Vänta en stund och försök igen."; }
+  $("verify-note").hidden = false;
+});
+$("recheck").addEventListener("click", () => enter(auth.currentUser));
+
+function stop(){ unsubs.forEach(u => u()); unsubs = []; }
+async function enter(u){
+  stop(); isAdmin = false; user = u;
+  document.querySelectorAll(".who-email").forEach(e => e.textContent = u.email);
+  $("p-email").value = u.email;
+  const me = u.email.toLowerCase();
+  try { await getDoc(doc(db,"trips",TRIP,"admin","koll")); isAdmin = true; } catch (e) {}
+  let isBooked = false;
+  try { isBooked = (await getDoc(doc(db,"trips",TRIP,"bokade",me))).exists(); } catch (e) {}
+  if (!isAdmin && !isBooked) { show("v-ingen-bokning"); return; }
+  document.querySelectorAll(".admin-only").forEach(e => e.hidden = !isAdmin);
+  const fail = () => {};
+  unsubs.push(onSnapshot(tripRef, s => { const d = s.data() || {}; trip = {need:d.need||{}, buf:d.buf ?? 14, wa:d.wa||{link:"",when:"full",full:false}, antal:d.antal ?? null}; renderAll(); }, fail));
+  unsubs.push(onSnapshot(doc(db,"trips",TRIP,"resenarer",u.uid), s => { const d = s.data() || {}; mine = {profil:d.profil||{}, tasks:d.tasks||{}}; renderAll(); }, fail));
+  unsubs.push(onSnapshot(collection(db,"trips",TRIP,"delade"), s => { shared = s.docs.map(d => ({id:d.id, ...d.data()})); renderGroup(); }, fail));
+  if (isAdmin) {
+    unsubs.push(onSnapshot(collection(db,"trips",TRIP,"resenarer"), s => { travellers = s.docs.map(d => ({id:d.id, ...d.data()})); renderAdmin(); }, fail));
+    unsubs.push(onSnapshot(collection(db,"trips",TRIP,"bokade"), s => { booked = s.docs.map(d => ({id:d.id, ...d.data()})); renderAdmin(); }, fail));
+  }
+  show("app"); renderAll();
+}
+
+onAuthStateChanged(auth, async u => {
+  if (!u) { stop(); user = null; isAdmin = false; setMode(mode); show("v-logga-in"); return; }
+  if (!u.emailVerified) { $("verify-to").textContent = u.email; show("v-bekrafta"); return; }
+  enter(u);
+});
+</script>
+</body>
+</html>
