@@ -104,6 +104,11 @@ section{padding:clamp(4rem,9vw,7rem) 0}
 .btn:hover{background:#EDB765}
 .btn.small{padding:.55rem 1.05rem;font-size:.95rem}
 .top-right{display:flex;align-items:center;gap:.7rem}
+.top .login{font-family:var(--display);font-weight:600;font-size:.95rem;color:var(--on-dark);text-decoration:none;white-space:nowrap}
+.top .login:hover{text-decoration:underline}
+.top .login{display:inline-flex;align-items:center;gap:.35rem}
+@media (max-width:400px){.top .login .login-text{display:none}.top-right{gap:.4rem !important}}
+@media (max-width:360px){.brand{font-size:.8rem !important}.top-right{gap:.3rem !important}.top .seats{padding:.34rem .55rem !important}}
 .top .btn{gap:0;white-space:pre}
 .seats{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--display);font-weight:600;font-size:.92rem;padding:.42rem .9rem;border-radius:999px;background:rgba(14,24,18,.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#F4F1E8;border:1px solid rgba(227,165,74,.5);white-space:nowrap}
 .seats s{opacity:.55;text-decoration-color:#E3A54A;text-decoration-thickness:2px}
@@ -250,6 +255,7 @@ footer nav{display:flex;gap:1.3rem}
     <a class="brand" href="#">Zoom Fotoresor</a>
     <div class="top-right">
       <span class="seats" aria-label="11 av 12 platser kvar"><span class="dot" aria-hidden="true"></span><s class="seats-total">12</s> <b class="seats-left">11</b><span class="seats-label"><span class="lg"> platser</span> kvar</span></span>
+      <a class="login" href="portal/" aria-label="Logga in för dig som har bokat"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span class="login-text">Logga in</span></a>
       <a class="btn small" href="#boka">Boka<span class="lg"> din plats</span></a>
     </div>
   </div>
@@ -558,6 +564,7 @@ footer nav{display:flex;gap:1.3rem}
 <footer>
   <div class="wrap">
     <span>Zoom Fotoresor © 2026</span>
+    <a href="portal/">Logga in för dig som har bokat</a>
     <nav aria-label="Sociala medier">
       <a href="https://www.youtube.com/@Rezdar1" rel="noopener" target="_blank">YouTube</a>
       <a href="https://www.instagram.com/rezdar/" rel="noopener" target="_blank">Instagram</a>
