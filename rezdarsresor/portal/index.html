@@ -899,6 +899,8 @@ $("recheck").addEventListener("click", () => enter(auth.currentUser));
 function stop(){ unsubs.forEach(u => u()); unsubs = []; }
 async function enter(u){
   stop(); isAdmin = false; user = u;
+  // Hämta en färsk inloggningsbiljett, annars kan databasen fortfarande tro att adressen är obekräftad.
+  try { await u.getIdToken(true); } catch (e) {}
   document.querySelectorAll(".who-email").forEach(e => e.textContent = u.email);
   $("p-email").value = u.email;
   const me = u.email.toLowerCase();
